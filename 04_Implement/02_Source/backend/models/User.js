@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
-    name: {
+    full_name: {
         type: String,
         required: true
     },
@@ -10,10 +10,27 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    phone_number: {
+        type: String,
+        require: true,
+        unique: true
+    },
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String, // CUSTOMER, EMPLOYEE, ADMIN
+        required: true
+    },
+    payment_account_id: {
+        type: String,
+        unique: true
+    },
+    saving_account_id: {
+        type: Array
     }
 })
 
 module.exports = User = mongoose.model('user', UserSchema)
+
