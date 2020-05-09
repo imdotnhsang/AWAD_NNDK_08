@@ -17,5 +17,17 @@ module.exports = {
         }
 
         return response
+    },
+    updateUser: async (input) => {
+        let filter = {
+            role: input.role
+        }
+
+        let response = await new DBModel().Update(User,filter,input)
+        return response
+    },
+    deleteUser: async (input) => {
+        let response = await new DBModel().Delete(User,input)
+        return response
     }
 }

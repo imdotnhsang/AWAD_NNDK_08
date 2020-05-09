@@ -8,7 +8,7 @@ class DBModel {
     Create(colection,data) {
         return new Promise((resolve, reject) => {
             let modelName = colection.modelName
-            colection.create(data,(err,obj) => {
+            colection.create(data,(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
                         status: "INVALID",
@@ -17,17 +17,17 @@ class DBModel {
                 }
                 resolve(new APIResponse({
                     status: "OK",
-                    data: [obj],
+                    data: Array.isArray(docs) ? docs : [docs],
                     message: `Create ${modelName} successfully`,
                 }))
             })
         })
        
     }
-    Query(colection,query,select,offset,limit,reverse) {
+    Query(colection,filter,select,offset,limit,reverse) {
         return new Promise((resolve,reject) => {
             let modelName = colection.modelName
-            colection.find(query,select,{skip: offset, limit},(err,obj) => {
+            colection.find(filter,select,{skip: offset, limit},(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
                         status: "INVALID",
@@ -36,16 +36,17 @@ class DBModel {
                 }
                 resolve(new APIResponse({
                     status: "OK",
-                    data: [obj],
+                    data: Array.isArray(docs) ? docs : [docs],
                     message: `Find ${modelName} successfully`,
                 }))
             }).sort({_id:reverse ? 1:-1})
         })
     }
-    Count(collection,query) {
+
+    Count(collection,filter) {
         return new Promise((resolve, reject) => {
             let modelName = collection.modelName
-            collection.estimatedDocumentCount(query,(err,count) => {
+            collection.estimatedDocumentCount(filter,(err,count) => {
                 if (err) {
                     resolve(new APIResponse({
                         status: "INVALID",
@@ -61,6 +62,64 @@ class DBModel {
             })
         })
     }
+
+    UpdateOne(collection,filter,updater) {
+        return new Promise((resolve,reject) => {
+            let modelName = collection.modelName
+            collection.findOneAndUpdate(filter,updater,{new:false}, (err,docs) => {
+                if (err) {
+                    resolve(new APIResponse({
+                        status: "INVALID",
+                        message: err
+                    }))
+                }
+                resolve(new APIResponse({
+                    status : "OK",
+                  //  data: Array.isArray(docs) ? docs : [docs],
+                    message: `Update ${modelName} successfully`,
+                }))
+            })
+        })
+    }
+
+    Update(collection,filter,updater) {
+        return new Promise((resolve,reject) => {
+            let modelName = collection.modelName
+            collection.update(filter,updater,{multi:true}, (err,docs) => {
+                if (err) {
+                    resolve(new APIResponse({
+                        status: "INVALID",
+                        message: err
+                    }))
+                }
+                resolve(new APIResponse({
+                    status : "OK",
+                   // data: Array.isArray(docs) ? docs : [docs],
+                    message: `Update ${modelName} successfully`,
+                }))
+            })
+        })
+    }
+
+    Delete(collection,filter) {
+        return new Promise((resolve, reject) => {
+            let modelName = collection.modelName
+            collection.deleteMany(filter,(err) => {
+                if (err) {
+                    resolve(new APIResponse({
+                        status: "INVALID",
+                        message: err
+                    }))
+                }
+                resolve(new APIResponse({
+                    status : "OK",
+                   // data: Array.isArray(docs) ? docs : [docs],
+                    message: `Delete ${modelName} successfully`,
+                }))
+            })
+        })
+    }
+
 }
 
 module.exports = DBModel
