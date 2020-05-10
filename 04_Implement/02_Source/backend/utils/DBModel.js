@@ -1,22 +1,22 @@
 
 var APIResponse = require('./APIResponse.js')
-
+var {APIStatus} = require("../utils/APIStatus.js")
 class DBModel {
     constructor() {
 
     }
-    Create(colection,data) {
+    Create(collection,data) {
         return new Promise((resolve, reject) => {
-            let modelName = colection.modelName
-            colection.create(data,(err,docs) => {
+            let modelName = collection.modelName
+            collection.create(data,(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
-                        status: "INVALID",
+                        status: APIStatus.Error,
                         message: err
                     }))
                 }
                 resolve(new APIResponse({
-                    status: "OK",
+                    status: APIStatus.Ok,
                     data: Array.isArray(docs) ? docs : [docs],
                     message: `Create ${modelName} successfully`,
                 }))
@@ -24,22 +24,42 @@ class DBModel {
         })
        
     }
-    Query(colection,filter,select,offset,limit,reverse) {
+
+    Query(collection,filter,select,offset,limit,reverse) {
         return new Promise((resolve,reject) => {
-            let modelName = colection.modelName
-            colection.find(filter,select,{skip: offset, limit},(err,docs) => {
+            let modelName = collection.modelName
+            collection.find(filter,select,{skip: offset, limit},(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
-                        status: "INVALID",
+                        status: APIStatus.Error,
                         message: err
                     }))
                 }
                 resolve(new APIResponse({
-                    status: "OK",
+                    status: APIStatus.Ok,
                     data: Array.isArray(docs) ? docs : [docs],
                     message: `Find ${modelName} successfully`,
                 }))
             }).sort({_id:reverse ? 1:-1})
+        })
+    }
+
+    QueryS(collection,filter,select,offset,limit,sortObject) {
+        return new Promise((resolve,reject) => {
+            let modelName = collection.modelName
+            collection.find(filter,select,{skip: offset, limit},(err,docs) => {
+                if (err) {
+                    resolve(new APIResponse({
+                        status: APIStatus.Error,
+                        message: err
+                    }))
+                }
+                resolve(new APIResponse({
+                    status: APIStatus.Ok,
+                    data: Array.isArray(docs) ? docs : [docs],
+                    message: `Find ${modelName} successfully`,
+                }))
+            }).sort(sortObject)
         })
     }
 
@@ -49,13 +69,13 @@ class DBModel {
             collection.estimatedDocumentCount(filter,(err,count) => {
                 if (err) {
                     resolve(new APIResponse({
-                        status: "INVALID",
+                        status: APIStatus.Error,
                         message: err,
                         total: 0
                     }))
                 }
                 resolve(new APIResponse({
-                    status: "OK",
+                    status: APIStatus.Ok,
                     message: `Count ${modelName} successfully`,
                     total: count
                 }))
@@ -69,12 +89,12 @@ class DBModel {
             collection.findOneAndUpdate(filter,updater,{new:false}, (err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
-                        status: "INVALID",
+                        status: APIStatus.Error,
                         message: err
                     }))
                 }
                 resolve(new APIResponse({
-                    status : "OK",
+                    status : APIStatus.Ok,
                   //  data: Array.isArray(docs) ? docs : [docs],
                     message: `Update ${modelName} successfully`,
                 }))
@@ -88,12 +108,12 @@ class DBModel {
             collection.update(filter,updater,{multi:true}, (err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
-                        status: "INVALID",
+                        status: APIStatus.Error,
                         message: err
                     }))
                 }
                 resolve(new APIResponse({
-                    status : "OK",
+                    status : APIStatus.Ok,
                    // data: Array.isArray(docs) ? docs : [docs],
                     message: `Update ${modelName} successfully`,
                 }))
@@ -107,18 +127,38 @@ class DBModel {
             collection.deleteMany(filter,(err) => {
                 if (err) {
                     resolve(new APIResponse({
-                        status: "INVALID",
+                        status: APIStatus.Error,
                         message: err
                     }))
                 }
                 resolve(new APIResponse({
-                    status : "OK",
+                    status : APIStatus.Ok,
                    // data: Array.isArray(docs) ? docs : [docs],
                     message: `Delete ${modelName} successfully`,
                 }))
             })
         })
     }
+
+    Distinct(collection, field, filter) {
+        return new Promise((resolve, reject) => {
+            collection.distinct(field,filter,(err,docs) => {
+                if (err) {
+                    resolve({
+                        status: APIStatus.Error,
+                        message: err
+                    })
+                }
+                resolve({
+                    status: APIStatus.Ok,
+                    data: docs,
+                    message: `Distinct ${field} successfully`
+                })
+            })
+        })
+    }
+
+
 
 }
 

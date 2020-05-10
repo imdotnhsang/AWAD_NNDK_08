@@ -2,15 +2,15 @@
 var DBModel = require("../utils/DBModel.js")
 var User = require("../models/user.js")
 
-
 module.exports = {
     createUser: async (data) => {
         let response = await new DBModel().Create(User,data)
         return response
     },
     getUser: async (condition,select, offset,limit,reverse, getTotal) => {
-        let response = await new DBModel().Query(User,condition,select,offset,limit,reverse)
-
+      //  let response = await new DBModel().Query(User,condition,select,offset,limit,reverse)
+     //   let response = await new DBModel().Distinct(User,'email',{})
+        let response = await new DBModel().QueryS(User,{},null,0,1000,{email:1})
         if (response.status == "OK" && getTotal) {
             let respTotal = await new DBModel().Count(User,condition)
             response.total = respTotal.total
