@@ -10,7 +10,7 @@ const AccountSchema = new mongoose.Schema({
         type: String, // PAYMENT, SAVING
         required: true
     },
-    banlance: {
+    balance: {
         type: String,
         required: true
     }

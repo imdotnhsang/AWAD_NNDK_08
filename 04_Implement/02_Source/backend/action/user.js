@@ -1,6 +1,6 @@
 
 var DBModel = require("../utils/DBModel.js")
-var User = require("../models/user.js")
+var User = require("../models/User.js")
 
 
 module.exports = {

@@ -11,9 +11,9 @@ const {createUser, getUser, updateUser, deleteUser} = require('../../action/user
 router.post('/',  async (req, res) => {
     let user = {
         full_name: "Nguyễn Hoàng Sang",
-        email: "nhsanghcmus@gmail.com",
-        phone_number: "0979279933",
-        password: "123456",
+        email: "im.nhsang@gmail.com",
+        phone_number: "0399029922",
+        password: "12345678",
         role: "CUSTOMER",
         payment_account_id: "1612556",
     }

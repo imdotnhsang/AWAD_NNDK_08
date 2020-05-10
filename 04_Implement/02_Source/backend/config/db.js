@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 const config = require('config')
 const db = config.get('mongoURI')
 
-// //  "mongoURI":"mongodb://admin:a123456@ds051841.mlab.com:51841/test-mongoose"
+// //  "mongoURI":"mongodb://admin:a123456@ds337718.mlab.com:37718/eight-db-test"
+// // "mongoURI":"mongodb://localhost:27017/daw"
 
 const connectDB = async () => {
     try {
