@@ -48,7 +48,8 @@ router.post('/', [
 
         user.password = await bcrypt.hash(password, salt)
 
-        await user.save()
+        // await user.save()
+        await userAction.createUser(user)
         // const response = await userAction.createUser(user)
         // return MakeResponse(req,res,response)
 

@@ -7,8 +7,8 @@ class DBModel {
     }
     Create(collection,data) {
         return new Promise((resolve, reject) => {
-            const modelName = colection.modelName
-            colection.create(data,(err,docs) => {
+            const modelName = collection.modelName
+            collection.create(data,(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
                         status: APIStatus.Error,
