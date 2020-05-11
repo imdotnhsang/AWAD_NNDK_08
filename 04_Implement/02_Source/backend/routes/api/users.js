@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken')
 const config = require('config')
 const { check, validationResult } = require('express-validator')
 
-var APIResponse = require('../../utils/APIResponse.js')
-const { createUser, getUser, updateUser, deleteUser } = require('../../action/user.js')
+var {APIStatus,MakeResponse} = require("../../utils/APIStatus.js")
+const userAction = require("../../action/user.js")
 
 const User = require('../../models/User')
 
@@ -49,8 +49,8 @@ router.post('/', [
         user.password = await bcrypt.hash(password, salt)
 
         await user.save()
-        // const response = await createUser(user)
-        // res.status(200).json(response)
+        // const response = await userAction.createUser(user)
+        // return MakeResponse(req,res,response)
 
         const payload = {
             user: {
@@ -73,14 +73,15 @@ router.post('/', [
     }
 })
 
+
 router.get("/", async (req, res) => {
     const user = {
         role: "CUSTOMER",
     }
 
-    const response = await getUser(user, null, 0, 1000, true, true)
-
-    res.status(200).json(response)
+    let response = await userAction.getUser(user, null, 0, 1000, true, true)
+    return MakeResponse(req, res, response)
+    // res.status(APIStatus.Ok).json(response)
 })
 
 router.put("/", async (req, res) => {
@@ -89,8 +90,8 @@ router.put("/", async (req, res) => {
         full_name: "Sơn"
     }
 
-    const response = await updateUser(input)
-    res.status(200).json(response)
+    let response = await userAction.updateUser(input)
+    return MakeResponse(req, res, response)
 
 })
 
@@ -99,8 +100,8 @@ router.delete("/", async (req, res) => {
         phone_number: "0979279933"
     }
 
-    const response = await deleteUser(input)
-    res.status(200).json(response)
+    let response = await userAction.deleteUser(input)
+    return MakeResponse(req, res, response)
 })
 
 module.exports = router
