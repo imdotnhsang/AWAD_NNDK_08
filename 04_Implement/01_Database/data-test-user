@@ -1,0 +1,18 @@
+{    
+    "full_name": "Nguyễn Hoàng Sang",
+    "email": "im.nhsang@gmail.com",
+    "phone_number": "0399029922",
+    "password": "12345678",
+    "role": "CUSTOMER",
+    "payment_account_id": "1612556"
+	
+}
+
+{    
+    "full_name": "Lê Hoàng Sang",
+    "email": "lhsanghcmus@gmail.com",
+    "phone_number": "0979279932",
+    "password": "12345678",
+    "role": "CUSTOMER",
+    "payment_account_id": "1612557"	
+}

@@ -1,7 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
-const { check, validationResult } = require('express-validator/check')
+const jwt = require('jsonwebtoken')
+const config = require('config')
+const { check, validationResult } = require('express-validator')
 
 var APIResponse = require('../../utils/APIResponse.js')
 const { createUser, getUser, updateUser, deleteUser } = require('../../action/user.js')
@@ -44,12 +46,27 @@ router.post('/', [
 
         const salt = await bcrypt.genSalt(10)
 
-        user.password = await bcrypt.hash(password,salt)
+        user.password = await bcrypt.hash(password, salt)
 
         await user.save()
+        // const response = await createUser(user)
+        // res.status(200).json(response)
 
-        const response = await createUser(user)
-        res.status(200).json(response)
+        const payload = {
+            user: {
+                id: user.id
+            }
+        }
+
+        jwt.sign(
+            payload,
+            config.get('jwtSecret'),
+            { expiresIn: 360000 },
+            (err, token) => {
+                if (err) throw err
+                res.json({ token })
+            }
+        )
     } catch (error) {
         console.log(error.message)
         res.status(500).send("Server error")

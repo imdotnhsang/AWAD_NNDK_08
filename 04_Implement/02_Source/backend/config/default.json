@@ -1,3 +1,4 @@
 {
-    "mongoURI": "mongodb://admin:a123456@ds337718.mlab.com:37718/eight-db-test"
+    "mongoURI": "mongodb://admin:a123456@ds337718.mlab.com:37718/eight-db-test",
+    "jwtSecret":"eightsjwtsecret"
 }
