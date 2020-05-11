@@ -1,53 +1,88 @@
 const express = require('express')
 const router = express.Router()
+const bcrypt = require('bcrypt')
+const { check, validationResult } = require('express-validator/check')
 
 var APIResponse = require('../../utils/APIResponse.js')
-const {createUser, getUser, updateUser, deleteUser} = require('../../action/user.js')
+const { createUser, getUser, updateUser, deleteUser } = require('../../action/user.js')
 
-// @route POST      api/users
-// @desc            Register user
-// @access          Public
+const User = require('../../models/User')
 
-router.post('/',  async (req, res) => {
-    let user = {
-        full_name: "Nguyễn Hoàng Sang",
-        email: "im.nhsang@gmail.com",
-        phone_number: "0399029922",
-        password: "12345678",
-        role: "CUSTOMER",
-        payment_account_id: "1612556",
+router.post('/', [
+    check('full_name', 'Full name is required').not().notEmpty(),
+    check('email', 'Please include a valid email').isEmail(),
+    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 })
+], async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).send(errors)
     }
-    let response = await createUser(user)
-    return res.status(200).json(response)
+
+    const {
+        full_name,
+        email,
+        phone_number,
+        password,
+        role,
+        payment_account_id
+    } = req.body
+
+    try {
+        let user = await User.findOne({ email })
+
+        if (user) {
+            res.status(400).json({
+                errors: [{
+                    msg: "User already exists"
+                }]
+            })
+        }
+
+        user = new User({
+            full_name, email, phone_number, password, role, payment_account_id
+        })
+
+        const salt = await bcrypt.genSalt(10)
+
+        user.password = await bcrypt.hash(password,salt)
+
+        await user.save()
+
+        const response = await createUser(user)
+        res.status(200).json(response)
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).send("Server error")
+    }
 })
 
-router.get("/", async (req,res) => {
-    let user = {
+router.get("/", async (req, res) => {
+    const user = {
         role: "CUSTOMER",
     }
 
-    let response = await getUser(user,null,0,1000,true,true)
+    const response = await getUser(user, null, 0, 1000, true, true)
 
     res.status(200).json(response)
 })
 
-router.put("/", async (req,res) => {
-    let input = {
+router.put("/", async (req, res) => {
+    const input = {
         role: "CUSTOMER",
         full_name: "Sơn"
     }
 
-    let response = await updateUser(input)
+    const response = await updateUser(input)
     res.status(200).json(response)
 
 })
 
-router.delete("/", async (req,res) => {
-    let input = {
+router.delete("/", async (req, res) => {
+    const input = {
         phone_number: "0979279933"
     }
 
-    let response = await deleteUser(input)
+    const response = await deleteUser(input)
     res.status(200).json(response)
 })
 

@@ -7,7 +7,7 @@ class DBModel {
     }
     Create(colection,data) {
         return new Promise((resolve, reject) => {
-            let modelName = colection.modelName
+            const modelName = colection.modelName
             colection.create(data,(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
@@ -26,7 +26,7 @@ class DBModel {
     }
     Query(colection,filter,select,offset,limit,reverse) {
         return new Promise((resolve,reject) => {
-            let modelName = colection.modelName
+            const modelName = colection.modelName
             colection.find(filter,select,{skip: offset, limit},(err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
@@ -45,7 +45,7 @@ class DBModel {
 
     Count(collection,filter) {
         return new Promise((resolve, reject) => {
-            let modelName = collection.modelName
+            const modelName = collection.modelName
             collection.estimatedDocumentCount(filter,(err,count) => {
                 if (err) {
                     resolve(new APIResponse({
@@ -65,7 +65,7 @@ class DBModel {
 
     UpdateOne(collection,filter,updater) {
         return new Promise((resolve,reject) => {
-            let modelName = collection.modelName
+            const modelName = collection.modelName
             collection.findOneAndUpdate(filter,updater,{new:false}, (err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
@@ -84,7 +84,7 @@ class DBModel {
 
     Update(collection,filter,updater) {
         return new Promise((resolve,reject) => {
-            let modelName = collection.modelName
+            const modelName = collection.modelName
             collection.update(filter,updater,{multi:true}, (err,docs) => {
                 if (err) {
                     resolve(new APIResponse({
@@ -103,7 +103,7 @@ class DBModel {
 
     Delete(collection,filter) {
         return new Promise((resolve, reject) => {
-            let modelName = collection.modelName
+            const modelName = collection.modelName
             collection.deleteMany(filter,(err) => {
                 if (err) {
                     resolve(new APIResponse({

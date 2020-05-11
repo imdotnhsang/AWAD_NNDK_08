@@ -13,15 +13,15 @@ const TransactionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    banlance_before_transfer: {
+    balance_before_transfer: {
         type: String,
         required: true
     },
-    banlance_after_transfer: {
+    balance_after_transfer: {
         type: String,
         required: true
     },
-    targer_bank: {
+    target_bank: {
         type: String,
         required: true
     }
