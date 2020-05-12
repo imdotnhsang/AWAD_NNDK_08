@@ -7,4 +7,4 @@ router.post('/', (req, res) => {
     res.send('Account Route')
 })
 
-module.exports = route
+module.exports = router
