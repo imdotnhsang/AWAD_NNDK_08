@@ -49,25 +49,25 @@ router.post('/', [
         user.password = await bcrypt.hash(password, salt)
 
         // await user.save()
-        await userAction.createUser(user)
-        // const response = await userAction.createUser(user)
-        // return MakeResponse(req,res,response)
+        // await userAction.createUser(user)
+        const response = await userAction.createUser(user)
+        return MakeResponse(req,res,response)
 
-        const payload = {
-            user: {
-                id: user.id
-            }
-        }
+        // const payload = {
+        //     user: {
+        //         id: user.id
+        //     }
+        // }
 
-        jwt.sign(
-            payload,
-            config.get('jwtSecret'),
-            { expiresIn: 360000 },
-            (err, token) => {
-                if (err) throw err
-                res.json({ token })
-            }
-        )
+        // jwt.sign(
+        //     payload,
+        //     config.get('jwtSecret'),
+        //     { expiresIn: 60 },
+        //     (err, token) => {
+        //         if (err) throw err
+        //         res.json({ token })
+        //     }
+        // )
     } catch (error) {
         console.log(error.message)
         res.status(500).send("Server error")
