@@ -2,16 +2,16 @@ const mongoose = require('mongoose')
 
 const AccountSchema = new mongoose.Schema({
     account_id: {
-        type: String,
+        type: Number,
         required: true,
         unique:true
     },
     account_type: {
-        type: String, // PAYMENT, SAVING
+        type: String, // DEFAULT, SAVING
         required: true
     },
     balance: {
-        type: String,
+        type: Number,
         required: true
     }
 })
