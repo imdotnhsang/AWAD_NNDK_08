@@ -7,7 +7,6 @@ var { APIStatus, MakeResponse } = require("../../utils/APIStatus.js")
 const Account = require('../../models/Account')
 
 router.post('/', [
-    check('account_type', 'Account type is required').not().notEmpty(),
     check('balance', 'Balance is required').not().notEmpty()
 ], async (req, res) => {
     const errors = validationResult(req)
@@ -15,8 +14,9 @@ router.post('/', [
         return res.status(400).send(errors)
     }
 
-    const { account_type, balance } = req.body
-    const account_id = 9579789919
+    const { balance } = req.body
+    const account_id = 1612558
+    const account_type = "SAVING"
 
     try {
         const account = new Account({ account_id, account_type, balance })

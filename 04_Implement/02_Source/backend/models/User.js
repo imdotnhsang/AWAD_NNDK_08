@@ -23,8 +23,8 @@ const UserSchema = new mongoose.Schema({
         type: String, // CUSTOMER, EMPLOYEE, ADMIN
         required: true
     },
-    payment_account_id: {
-        type: String,
+    default_account_id: {
+        type: Number,
         unique: true
     },
     saving_account_id: {

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const config = require('config')
 const { check, validationResult } = require('express-validator')
 
-var {APIStatus,MakeResponse} = require("../../utils/APIStatus.js")
+var { APIStatus, MakeResponse } = require("../../utils/APIStatus.js")
 const userAction = require("../../action/user.js")
 
 const User = require('../../models/User')
@@ -13,7 +13,8 @@ const User = require('../../models/User')
 router.post('/', [
     check('full_name', 'Full name is required').not().notEmpty(),
     check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 })
+    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
+    check('balance', 'Balance is required').not().notEmpty()
 ], async (req, res) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -26,30 +27,53 @@ router.post('/', [
         phone_number,
         password,
         role,
-        payment_account_id
+        balance
     } = req.body
+    const account_type = "DEFAULT"
+    const account_id = 1612556
 
     try {
-        let user = await User.findOne({ email })
+        let account = await Account.findOne({ account_id })
 
-        if (user) {
+        if (account) {
             res.status(400).json({
                 errors: [{
-                    msg: "User already exists"
+                    msg: "Account already exists"
                 }]
             })
         }
 
-        user = new User({
-            full_name, email, phone_number, password, role, payment_account_id
-        })
+        account = new Account({ account_id, account_type, balance })
+        
+        const responseAccountPost = await account.save()
 
-        const salt = await bcrypt.genSalt(10)
+        try {
+            let user = await User.findOne({ email })
 
-        user.password = await bcrypt.hash(password, salt)
+            if (user) {
+                res.status(400).json({
+                    errors: [{
+                        msg: "User already exists"
+                    }]
+                })
+            }
 
-        const response = await userAction.createUser(user)
-        return MakeResponse(req,res,response)
+            const default_account_id = responseAccountPost.account_id
+
+            user = new User({
+                full_name, email, phone_number, password, role, default_account_id
+            })
+
+            const salt = await bcrypt.genSalt(10)
+
+            user.password = await bcrypt.hash(password, salt)
+
+            const response = await userAction.createUser(user)
+            return MakeResponse(req, res, response)
+        } catch (error) {
+            console.log(error.message)
+            res.status(500).send("Server error")
+        }
     } catch (error) {
         console.log(error.message)
         res.status(500).send("Server error")
