@@ -104,13 +104,13 @@ router.put("/", async (req, res) => {
 
 })
 
-router.delete("/", async (req, res) => {
-    const input = {
-        phone_number: "0979279933"
-    }
+// router.delete("/", async (req, res) => {
+//     const input = {
+//         phone_number: "0979279933"
+//     }
 
-    let response = await userAction.deleteUser(input)
-    return MakeResponse(req, res, response)
-})
+//     let response = await userAction.deleteUser(input)
+//     return MakeResponse(req, res, response)
+// })
 
 module.exports = router

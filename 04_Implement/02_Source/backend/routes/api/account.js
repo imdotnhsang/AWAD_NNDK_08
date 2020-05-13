@@ -5,6 +5,7 @@ const { check, validationResult } = require('express-validator')
 var { APIStatus, MakeResponse } = require("../../utils/APIStatus.js")
 
 const Account = require('../../models/Account')
+const User = require('../../models/User')
 
 router.post('/', [
     check('balance', 'Balance is required').not().notEmpty()
@@ -30,6 +31,31 @@ router.post('/', [
 })
 
 router.get('/', async (req, res) => {
+    try {
+        const { account_id } = req.body
+
+        let full_name = (await User.findOne({ default_account_id: account_id }).select('full_name')).full_name.toLowerCase()
+        full_name = full_name.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+        full_name = full_name.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+        full_name = full_name.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+        full_name = full_name.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+        full_name = full_name.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+        full_name = full_name.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+        full_name = full_name.replace(/đ/g, "d");
+        full_name = full_name.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, " ");
+        full_name = full_name.replace(/ + /g, " ");
+        full_name = full_name.trim().toUpperCase();
+
+        const account = await Account.findOne({ account_id })
+
+        res.status(200).json({ full_name, account })
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ msg: 'Server error' })
+    }
+})
+
+router.put('/', async (req, res) => {
     try {
         const { account_id } = req.body
         const response = await Account.findOne({ account_id })
