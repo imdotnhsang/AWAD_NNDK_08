@@ -16,7 +16,7 @@ router.post('/', [
     }
 
     const { account_type, balance } = req.body
-    const account_id = 9579789916
+    const account_id = 9579789919
 
     try {
         const account = new Account({ account_id, account_type, balance })
@@ -39,4 +39,5 @@ router.get('/', async (req, res) => {
         res.status(500).json({ msg: 'Server error' })
     }
 })
+
 module.exports = router
