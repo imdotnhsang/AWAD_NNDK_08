@@ -42,9 +42,7 @@ router.get('/', async (req, res) => {
         full_name = full_name.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
         full_name = full_name.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
         full_name = full_name.replace(/đ/g, "d");
-        full_name = full_name.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g, " ");
-        full_name = full_name.replace(/ + /g, " ");
-        full_name = full_name.trim().toUpperCase();
+        full_name = full_name.toUpperCase();
 
         const account = await Account.findOne({ account_id })
 
