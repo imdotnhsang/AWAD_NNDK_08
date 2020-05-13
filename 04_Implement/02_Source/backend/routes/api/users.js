@@ -42,7 +42,7 @@ router.post('/', [
                 }]
             })
         }
-        
+
         let account = await Account.findOne({ account_id })
 
         if (account) {
@@ -68,8 +68,10 @@ router.post('/', [
 
             user.password = await bcrypt.hash(password, salt)
 
-            const response = await userAction.createUser(user)
-            return MakeResponse(req, res, response)
+            // const response = await userAction.createUser(user)
+            // return MakeResponse(req, res, response)
+            const response = await user.save()
+            res.status(200).json(response)
         } catch (error) {
             console.log(error.message)
             res.status(500).send("Server error")

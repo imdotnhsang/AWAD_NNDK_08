@@ -65,7 +65,7 @@ router.post('/', [
             { expiresIn: 3600 },
             (err, token) => {
                 if (err) throw err
-                res.json({ token })
+                res.status(200).json({ token })
             }
         )
     } catch (error) {
