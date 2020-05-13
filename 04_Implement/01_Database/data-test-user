@@ -4,7 +4,7 @@
     "phone_number": "0399029922",
     "password": "12345678",
     "role": "CUSTOMER",
-    "payment_account_id": "1612556"
+    "default_account_id": "1612556"
 	
 }
 
@@ -14,5 +14,5 @@
     "phone_number": "0979279932",
     "password": "12345678",
     "role": "CUSTOMER",
-    "payment_account_id": "1612557"	
+    "default_account_id": "1612557"	
 }
