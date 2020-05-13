@@ -30,7 +30,7 @@ router.post('/', [
         balance
     } = req.body
     const account_type = "DEFAULT"
-    const account_id = 1612556
+    const account_id = "1612556"
 
     try {
         let user = await User.findOne({ email })

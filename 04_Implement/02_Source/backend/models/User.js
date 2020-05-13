@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     default_account_id: {
-        type: Number,
+        type: String,
         unique: true
     },
     saving_account_id: {
