@@ -33,6 +33,16 @@ router.post('/', [
     const account_id = 1612556
 
     try {
+        let user = await User.findOne({ email })
+
+        if (user) {
+            res.status(400).json({
+                errors: [{
+                    msg: "User already exists"
+                }]
+            })
+        }
+        
         let account = await Account.findOne({ account_id })
 
         if (account) {
@@ -44,20 +54,10 @@ router.post('/', [
         }
 
         account = new Account({ account_id, account_type, balance })
-        
+
         const responseAccountPost = await account.save()
 
         try {
-            let user = await User.findOne({ email })
-
-            if (user) {
-                res.status(400).json({
-                    errors: [{
-                        msg: "User already exists"
-                    }]
-                })
-            }
-
             const default_account_id = responseAccountPost.account_id
 
             user = new User({
