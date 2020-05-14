@@ -14,10 +14,11 @@ app.get('/', (req, res) => {
 })
 
 // Defined Routes
-app.use('/api/users', require('./routes/api/users'))
-app.use('/api/profile', require('./routes/api/profile'))
-app.use('/api/auth', require('./routes/api/auth'))
-app.use('/api/account', require('./routes/api/account'))
+app.use('/users', require('./routes/api/users'))
+app.use('/profile', require('./routes/api/profile'))
+app.use('/auth', require('./routes/api/auth'))
+app.use('/accounts', require('./routes/api/accounts'))
+app.use('/transactions', require('./routes/api/transactions'))
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {

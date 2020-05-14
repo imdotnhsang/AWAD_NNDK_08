@@ -1,28 +1,32 @@
 const mongoose = require('mongoose')
 
 const TransactionSchema = new mongoose.Schema({
-    action_account_id: {
+    entry_time: {
         type: String,
         required: true
     },
-    target_account_id: {
+    from_account_id: {
+        type: String,
+        required: true
+    },
+    to_account_id: {
         type: String,
         require: true
     },
+    from_bank: {
+        type: String,
+        require: true
+    },
+    to_bank: {
+        type: String,
+        required: true
+    },
+    type_transfer: {
+        type: String, //SEND, RECEIVE
+        required: true
+    },
     amount_transfer: {
-        type: String,
-        required: true
-    },
-    balance_before_transfer: {
-        type: String,
-        required: true
-    },
-    balance_after_transfer: {
-        type: String,
-        required: true
-    },
-    target_bank: {
-        type: String,
+        type: Number,
         required: true
     }
 })
