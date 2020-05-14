@@ -7,7 +7,7 @@ var { APIStatus, MakeResponse } = require("../../utils/APIStatus.js")
 
 const Account = require('../../models/Account')
 const User = require('../../models/User')
-
+const Transaction = require('../../models/Transaction')
 // function change_alias(full_name) {
 //     let str = full_name
 //     str = str.toLowerCase()
@@ -45,13 +45,66 @@ router.get('/receiver-account/:account_id', async (req, res) => {
     }
 })
 
-router.put('/within-bank', async (req, res) => {
+router.put('/within-bank', auth, async (req, res) => {
+    const {
+        entry_time,
+        to_account_id,
+        to_account_fullname,
+        amount_transaction
+    } = req.body
+
     try {
-        const { account_id } = req.body
-        const response = await Account.findOneAndUpdate({ account_id }, { balance: 100000 }, {
+        const user = await User.findById(req.user.id)
+
+        if (!user) {
+            return res.status(400).json({
+                errors: [{
+                    msg: "User not exists"
+                }]
+            })
+        }
+
+        const from_account_fullname = user.full_name
+        const from_account_id = user.default_account_id
+
+        const transactionSender = new Transaction({
+            entry_time,
+            from_account_id,
+            from_account_fullname,
+            to_account_id,
+            to_account_fullname,
+            from_bank_id: "EIGHT",
+            to_bank_id: "EIGHT",
+            type_transaction: "SEND",
+            amount_transaction
+        })
+
+
+        const transactionReceiver = new Transaction({
+            entry_time,
+            from_account_id,
+            from_account_fullname,
+            to_account_id,
+            to_account_fullname,
+            from_bank_id: "EIGHT",
+            to_bank_id: "EIGHT",
+            type_transaction: "RECEIVE",
+            amount_transaction
+        })
+
+        const transactionSenderResponse = await transactionSender.save()
+
+        const transactionReceiverResponse = await transactionReceiver.save()
+
+        const accountSenderResponse = await Account.findOneAndUpdate({ account_id: from_account_id }, { $inc: { balance: -amount_transaction } }, {
             new: true
         })
-        res.status(200).json(response)
+
+        const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: to_account_id }, { $inc: { balance: amount_transaction } }, {
+            new: true
+        })
+
+        res.status(200).json({ transactionSenderResponse, transactionReceiverResponse, accountSenderResponse, accountReceiverResponse })
     } catch (error) {
         console.error(error.message)
         res.status(500).json({ msg: 'Server error' })
@@ -60,14 +113,7 @@ router.put('/within-bank', async (req, res) => {
 
 router.put('/interbank', async (req, res) => {
     try {
-        const { account_id } = req.body
-        const amount = 100000
-        const response = await Account.findOneAndUpdate(
-            { account_id },
-            amount === 100000 ? { $inc: { balance: amount } } : { $inc: { balance: -amount } },
-            { new: true }
-        )
-        res.status(200).json(response)
+        res.status(200).json({ msg: "interbank" })
     } catch (error) {
         console.error(error.message)
         res.status(500).json({ msg: 'Server error' })
