@@ -92,18 +92,18 @@ router.put('/within-bank', auth, async (req, res) => {
             amount_transaction
         })
 
-        const transactionSenderResponse = await transactionSender.save()
-
-        const transactionReceiverResponse = await transactionReceiver.save()
-
         const accountSenderResponse = await Account.findOneAndUpdate({ account_id: from_account_id }, { $inc: { balance: -amount_transaction } }, {
             new: true
         })
 
+        const transactionSenderResponse = await transactionSender.save()
+        
         const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: to_account_id }, { $inc: { balance: amount_transaction } }, {
             new: true
         })
-
+        
+        const transactionReceiverResponse = await transactionReceiver.save()
+        
         res.status(200).json({ transactionSenderResponse, transactionReceiverResponse, accountSenderResponse, accountReceiverResponse })
     } catch (error) {
         console.error(error.message)
@@ -111,7 +111,51 @@ router.put('/within-bank', auth, async (req, res) => {
     }
 })
 
-router.put('/interbank', async (req, res) => {
+router.put('/sending-interbank', auth, async (req, res) => {
+    const {
+        entry_time,
+        to_account_id,
+        to_account_fullname,
+        to_bank_id,
+        amount_transaction
+    } = req.body
+
+    try {
+        const user = await User.findById(req.user.id)
+
+        if (!user) {
+            return res.status(400).json({
+                errors: [{
+                    msg: "User not exists"
+                }]
+            })
+        }
+        const transactionSender = new Transaction({
+            entry_time,
+            from_account_id,
+            from_account_fullname,
+            to_account_id,
+            to_account_fullname,
+            from_bank_id: "EIGHT",
+            to_bank_id,
+            type_transaction: "SEND",
+            amount_transaction
+        })
+        
+        const accountSenderResponse = await Account.findOneAndUpdate({ account_id: from_account_id }, { $inc: { balance: -amount_transaction } }, {
+            new: true
+        })
+
+        const transactionSenderResponse = await transactionSender.save()
+
+        res.status(200).json({ transactionSenderResponse, accountSenderResponse })
+    } catch (error) {
+        console.error(error.message)
+        res.status(500).json({ msg: 'Server error' })
+    }
+})
+
+router.put('/receiving-interbank', async (req, res) => {
     const {
         entry_time,
         from_account_id,
@@ -135,11 +179,11 @@ router.put('/interbank', async (req, res) => {
             amount_transaction
         })
 
-        const transactionReceiverResponse = await transactionReceiver.save()
-
         const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: to_account_id }, { $inc: { balance: amount_transaction } }, {
             new: true
         })
+
+        const transactionReceiverResponse = await transactionReceiver.save()
 
         res.status(200).json({ transactionReceiverResponse, accountReceiverResponse })
     } catch (error) {
