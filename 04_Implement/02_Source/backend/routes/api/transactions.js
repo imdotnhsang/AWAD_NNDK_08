@@ -112,8 +112,36 @@ router.put('/within-bank', auth, async (req, res) => {
 })
 
 router.put('/interbank', async (req, res) => {
+    const {
+        entry_time,
+        from_account_id,
+        from_account_fullname,
+        to_account_id,
+        to_account_fullname,
+        from_bank_id,
+        amount_transaction,
+    } = req.body
+
     try {
-        res.status(200).json({ msg: "interbank" })
+        const transactionReceiver = new Transaction({
+            entry_time,
+            from_account_id,
+            from_account_fullname,
+            to_account_id,
+            to_account_fullname,
+            from_bank_id,
+            to_bank_id: "EIGHT",
+            type_transaction: "RECEIVE",
+            amount_transaction
+        })
+
+        const transactionReceiverResponse = await transactionReceiver.save()
+
+        const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: to_account_id }, { $inc: { balance: amount_transaction } }, {
+            new: true
+        })
+
+        res.status(200).json({ transactionReceiverResponse, accountReceiverResponse })
     } catch (error) {
         console.error(error.message)
         res.status(500).json({ msg: 'Server error' })
