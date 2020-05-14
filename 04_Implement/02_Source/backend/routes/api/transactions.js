@@ -48,7 +48,9 @@ router.get('/receiver-account/:account_id', async (req, res) => {
 router.put('/within-bank', async (req, res) => {
     try {
         const { account_id } = req.body
-        const response = await Account.findOne({ account_id })
+        const response = await Account.findOneAndUpdate({ account_id }, { balance: 100000 }, {
+            new: true
+        })
         res.status(200).json(response)
     } catch (error) {
         console.error(error.message)
@@ -59,7 +61,12 @@ router.put('/within-bank', async (req, res) => {
 router.put('/interbank', async (req, res) => {
     try {
         const { account_id } = req.body
-        const response = await Account.findOne({ account_id })
+        const amount = 100000
+        const response = await Account.findOneAndUpdate(
+            { account_id },
+            amount === 100000 ? { $inc: { balance: amount } } : { $inc: { balance: -amount } },
+            { new: true }
+        )
         res.status(200).json(response)
     } catch (error) {
         console.error(error.message)
