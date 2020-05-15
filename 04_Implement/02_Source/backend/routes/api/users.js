@@ -11,13 +11,13 @@ const User = require('../../models/User')
 const Account = require('../../models/Account')
 
 // @route     POST /users
-// @desc      Register user (BETA)
+// @desc      Đăng kí user mới (BETA)
 // @access    Public
 router.post('/', [
   check('fullName', 'Full name is required').not().notEmpty(),
   check('email', 'Please include a valid email').isEmail(),
   check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-  check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }),
+  check('balance', 'Please enter a balance with 0 or more').isAfter('49999')
 ], async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -30,7 +30,7 @@ router.post('/', [
     phoneNumber,
     password,
     role,
-    balance,
+    balance
   } = req.body
   const accountType = 'DEFAULT'
   const accountId = '1612567'
@@ -41,8 +41,8 @@ router.post('/', [
     if (user) {
       res.status(400).json({
         errors: [{
-          msg: 'User already exists',
-        }],
+          msg: 'User already exists'
+        }]
       })
     }
 
@@ -51,8 +51,8 @@ router.post('/', [
     if (account) {
       res.status(400).json({
         errors: [{
-          msg: 'Account already exists',
-        }],
+          msg: 'Account already exists'
+        }]
       })
     }
 
@@ -64,7 +64,7 @@ router.post('/', [
       const defaultAccountId = responseAccountPost.account_id
 
       user = new User({
-        full_name: fullName, email, phone_number: phoneNumber, password, role, default_account_id: defaultAccountId,
+        full_name: fullName, email, phone_number: phoneNumber, password, role, default_account_id: defaultAccountId
       })
 
       const salt = await bcrypt.genSalt(10)
@@ -82,11 +82,11 @@ router.post('/', [
 })
 
 // @route     GET /users
-// @desc      Get information of user (BETA)
+// @desc      Lấy thông tin của user (BETA)
 // @access    Public
 router.get('/', async (req, res) => {
   const user = {
-    role: 'CUSTOMER',
+    role: 'CUSTOMER'
   }
 
   const response = await userAction.getUser(user, null, 0, 1000, true, true)
@@ -95,12 +95,12 @@ router.get('/', async (req, res) => {
 })
 
 // @route     PUT /users
-// @desc      Update information of user (BETA)
+// @desc      Cập nhật thông tin user (BETA)
 // @access    Public
 router.put('/', async (req, res) => {
   const input = {
     role: 'CUSTOMER',
-    full_name: 'Sơn',
+    full_name: 'Sơn'
   }
 
   const response = await userAction.updateUser(input)

@@ -10,7 +10,7 @@ const auth = require('../../middleware/auth')
 const User = require('../../models/User')
 
 // @route     GET /auth
-// @desc      Get information after authenticating (BETA)
+// @desc      Lấy thông tin user sau khi đăng nhập thành công (BETA)
 // @access    Public
 router.get('/', auth, async (req, res) => {
   try {
@@ -22,11 +22,11 @@ router.get('/', auth, async (req, res) => {
 })
 
 // @route     POST /auth
-// @desc      Authenticate user and get access-token (BETA)
+// @desc      Xác thực đăng nhập của user và trả về access-token (BETA)
 // @access    Public
 router.post('/', [
   check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Password is required').exists(),
+  check('password', 'Password is required').exists()
 ], async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -35,7 +35,7 @@ router.post('/', [
 
   const {
     email,
-    password,
+    password
   } = req.body
 
   try {
@@ -44,8 +44,8 @@ router.post('/', [
     if (!user) {
       return res.status(400).json({
         errors: [{
-          msg: 'Invalid Credentials',
-        }],
+          msg: 'Invalid Credentials'
+        }]
       })
     }
 
@@ -54,21 +54,21 @@ router.post('/', [
     if (!isMatch) {
       return res.status(400).json({
         errors: [{
-          msg: 'Invalid Credentials',
-        }],
+          msg: 'Invalid Credentials'
+        }]
       })
     }
 
     const payload = {
       user: {
-        id: user.id,
-      },
+        id: user.id
+      }
     }
 
     const token = jwt.sign(
       payload,
       config.get('jwtSecret'),
-      { expiresIn: 3600 },
+      { expiresIn: 3600 }
     )
     return res.status(200).json({ 'access-token': token })
   } catch (error) {

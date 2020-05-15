@@ -20,7 +20,7 @@ module.exports = {
   },
   updateUser: async (input) => {
     const filter = {
-      role: input.role,
+      role: input.role
     }
 
     const response = await new DBModel().Update(User, filter, input)
@@ -29,5 +29,5 @@ module.exports = {
   deleteUser: async (input) => {
     const response = await new DBModel().Delete(User, input)
     return response
-  },
+  }
 }

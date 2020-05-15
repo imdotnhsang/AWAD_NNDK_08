@@ -1,22 +1,33 @@
 const express = require('express')
 
 const router = express.Router()
+const { check, validationResult } = require('express-validator')
 const auth = require('../../middleware/auth')
-// const { check, validationResult } = require('express-validator')
 
 const Account = require('../../models/Account')
 const User = require('../../models/User')
 const Transaction = require('../../models/Transaction')
 
-// @route     POST /transactions//transfering-within-bank
-// @desc      Transfer within bank (BETA)
+// @route     POST /transactions/transfering-within-bank
+// @desc      Chuyển khoản trong ngân hàng (BETA)
 // @access    Public
-router.post('/transfering-within-bank', auth, async (req, res) => {
+router.post('/transfering-within-bank', [
+  auth,
+  check('entryTime', 'Entry time is required').not().notEmpty(),
+  check('toAccountId', 'Receiver account is required').not().notEmpty(),
+  check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
+  check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
+], async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors)
+  }
+
   const {
     entryTime,
     toAccountId,
     toAccountFullname,
-    amountTransaction,
+    amountTransaction
   } = req.body
 
   try {
@@ -25,13 +36,33 @@ router.post('/transfering-within-bank', auth, async (req, res) => {
     if (!user) {
       return res.status(400).json({
         errors: [{
-          msg: 'User not exists',
-        }],
+          msg: 'User not exists'
+        }]
       })
     }
 
     const fromAccountFullname = user.full_name
     const fromAccountId = user.default_account_id
+
+    const accountSender = await Account.findOne({ account_id: fromAccountId })
+
+    const accountReceiver = await Account.findOne({ account_id: toAccountId })
+
+    if (!accountSender || !accountReceiver) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Account not exists'
+        }]
+      })
+    }
+
+    if (accountSender.balance - amountTransaction < 0) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Insufficient funds'
+        }]
+      })
+    }
 
     const transactionSender = new Transaction({
       entry_time: entryTime,
@@ -43,8 +74,9 @@ router.post('/transfering-within-bank', auth, async (req, res) => {
       to_bank_id: 'EIGHT',
       type_transaction: 'SEND',
       amount_transaction: amountTransaction,
+      balance_before_transaction: accountSender.balance,
+      balance_after_transaction: accountSender.balance - amountTransaction
     })
-
 
     const transactionReceiver = new Transaction({
       entry_time: entryTime,
@@ -56,22 +88,24 @@ router.post('/transfering-within-bank', auth, async (req, res) => {
       to_bank_id: 'EIGHT',
       type_transaction: 'RECEIVE',
       amount_transaction: amountTransaction,
+      balance_before_transaction: accountReceiver.balance,
+      balance_after_transaction: Number(accountReceiver.balance) + Number(amountTransaction)
     })
 
     const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
-      new: true,
+      new: true
     })
 
     const transactionSenderResponse = await transactionSender.save()
 
     const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: amountTransaction } }, {
-      new: true,
+      new: true
     })
 
     const transactionReceiverResponse = await transactionReceiver.save()
 
     return res.status(200).json({
-      transactionSenderResponse, transactionReceiverResponse, accountSenderResponse, accountReceiverResponse,
+      transactionSenderResponse, transactionReceiverResponse, accountSenderResponse, accountReceiverResponse
     })
   } catch (error) {
     return res.status(500).json({ msg: 'Server error' })
@@ -79,7 +113,7 @@ router.post('/transfering-within-bank', auth, async (req, res) => {
 })
 
 // @route     GET /transactions/receiver-withinbank/:accountId
-// @desc      Get full name of receiver within bank (BETA)
+// @desc      Lấy họ và tên người nhận khi chuyển khoản cùng ngân hàng (OFFICIAL)
 // @access    Public
 router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
   try {
@@ -90,23 +124,26 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
     if (!user) {
       return res.status(400).json({
         errors: [{
-          msg: 'User not exists',
-        }],
+          msg: 'User not exists'
+        }]
       })
     }
 
     const fullName = user.full_name
 
-    return res.status(200).json({ fullName })
+    return res.status(200).json({ full_name: fullName })
   } catch (error) {
     return res.status(500).json({ msg: 'Server error' })
   }
 })
 
 // @route     GET /transactions/receiver-interbank/:accountId
-// @desc      Get full name of receiver interbank (BETA)
+// @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản (BETA)
 // @access    Public
 router.get('/receiver-interbank/:accountId', async (req, res) => {
+  // Check from_bank_id is linked bank?
+  // ...
+
   try {
     const { accountId } = req.params
 
@@ -115,29 +152,41 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
     if (!user) {
       return res.status(400).json({
         errors: [{
-          msg: 'User not exists',
-        }],
+          msg: 'User not exists'
+        }]
       })
     }
 
     const fullName = user.full_name
 
-    return res.status(200).json({ fullName })
+    return res.status(200).json({ full_name: fullName })
   } catch (error) {
     return res.status(500).json({ msg: 'Server error' })
   }
 })
 
-// @route     POST /transactions/receiver-information/:accountId
-// @desc      Get full name of receiver (BETA)
+// @route     POST /transactions/sengding-interbank
+// @desc      Lưu lại giao dịch và cập nhật số tiền dư trong tài khoản sau chuyển khoản đến ngân hàng khác (BETA)
 // @access    Public
-router.post('/sending-interbank', auth, async (req, res) => {
+router.post('/sending-interbank', [
+  auth,
+  check('entryTime', 'Entry time is required').not().notEmpty(),
+  check('toAccountId', 'Receiver account is required').not().notEmpty(),
+  check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
+  check('toBankId', 'Receiver bank ID is required').not().notEmpty(),
+  check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
+], async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors)
+  }
+
   const {
     entryTime,
     toAccountId,
     toAccountFullname,
     toBankId,
-    amountTransaction,
+    amountTransaction
   } = req.body
 
   try {
@@ -146,13 +195,31 @@ router.post('/sending-interbank', auth, async (req, res) => {
     if (!user) {
       return res.status(400).json({
         errors: [{
-          msg: 'User not exists',
-        }],
+          msg: 'User not exists'
+        }]
       })
     }
 
     const fromAccountFullname = user.full_name
     const fromAccountId = user.default_account_id
+
+    const account = await Account.findOne({ account_id: fromAccountId })
+
+    if (!account) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Account not exists'
+        }]
+      })
+    }
+
+    if (account.balance - amountTransaction < 0) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Insufficient funds'
+        }]
+      })
+    }
 
     const transactionSender = new Transaction({
       entry_time: entryTime,
@@ -164,10 +231,15 @@ router.post('/sending-interbank', auth, async (req, res) => {
       to_bank_id: toBankId,
       type_transaction: 'SEND',
       amount_transaction: amountTransaction,
+      balance_before_transaction: account.balance,
+      balance_after_transaction: account.balance - amountTransaction
     })
 
+    // Call api transfer interbank from other bank
+    // ...
+
     const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
-      new: true,
+      new: true
     })
 
     const transactionSenderResponse = await transactionSender.save()
@@ -178,10 +250,23 @@ router.post('/sending-interbank', auth, async (req, res) => {
   }
 })
 
-// @route     POST /transactions/receiver-information/:accountId
-// @desc      Get full name of receiver (BETA)
+// @route     POST /transactions/receiving-interbank
+// @desc      Lưu lại giao dịch và cập nhật số tiền dư trong tài khoản sau khi ngân hàng khác chuyển khoản vào (BETA)
 // @access    Public
-router.post('/receiving-interbank', async (req, res) => {
+router.post('/receiving-interbank', [
+  check('entryTime', 'Entry time is required').not().notEmpty(),
+  check('toAccountId', 'Receiver account is required').not().notEmpty(),
+  check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
+  check('fromAccountId', 'Sender account is required').not().notEmpty(),
+  check('fromAccountFullname', 'Sender full name is required').not().notEmpty(),
+  check('fromBankId', 'Sender bank ID is required').not().notEmpty(),
+  check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
+], async (req, res) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors)
+  }
+
   const {
     entryTime,
     fromAccountId,
@@ -189,10 +274,20 @@ router.post('/receiving-interbank', async (req, res) => {
     toAccountId,
     toAccountFullname,
     fromBankId,
-    amountTransaction,
+    amountTransaction
   } = req.body
 
   try {
+    const account = await Account.findOne({ account_id: toAccountId })
+
+    if (!account) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Account not exists'
+        }]
+      })
+    }
+
     const transactionReceiver = new Transaction({
       entry_time: entryTime,
       from_account_id: fromAccountId,
@@ -203,17 +298,20 @@ router.post('/receiving-interbank', async (req, res) => {
       to_bank_id: 'EIGHT',
       type_transaction: 'RECEIVE',
       amount_transaction: amountTransaction,
+      balance_before_transaction: account.balance,
+      balance_after_transaction: Number(account.balance) + Number(amountTransaction)
     })
 
     const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: amountTransaction } }, {
-      new: true,
+      new: true
     })
 
     const transactionReceiverResponse = await transactionReceiver.save()
 
-    res.status(200).json({ transactionReceiverResponse, accountReceiverResponse })
+    return res.status(200).json({ transactionReceiverResponse, accountReceiverResponse })
   } catch (error) {
-    res.status(500).json({ msg: 'Server error' })
+    // console.log(error)
+    return res.status(500).json({ msg: 'Server error' })
   }
 })
 

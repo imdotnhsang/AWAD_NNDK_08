@@ -6,16 +6,16 @@ const AccountSchema = new mongoose.Schema({
   account_id: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   account_type: {
     type: String, // DEFAULT, SAVING
-    required: true,
+    required: true
   },
   balance: {
     type: Number,
-    required: true,
-  },
+    required: true
+  }
 })
 
 module.exports = Account = mongoose.model('account', AccountSchema)

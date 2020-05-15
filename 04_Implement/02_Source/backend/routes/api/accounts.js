@@ -22,9 +22,9 @@ const User = require('../../models/User')
 // }
 
 // @route     POST /accounts
-// @desc      Create bank account
+// @desc      Tạo tài khoản ngân hàng mới (BETA)
 // @access    Public
-router.post('/', [check('balance', 'Balance is required').not().notEmpty()], async (req, res) => {
+router.post('/', check('balance', 'Please enter a balance with 0 or more').isAfter('49999'), async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     return res.status(400).send(errors)
@@ -45,7 +45,7 @@ router.post('/', [check('balance', 'Balance is required').not().notEmpty()], asy
 })
 
 // @route     GET /accounts
-// @desc      Get information of bank account (BETA)
+// @desc      Lấy thông tin tài khoản ngân hàng (BETA)
 // @access    Public
 router.get('/', auth, async (req, res) => {
   try {
@@ -54,8 +54,8 @@ router.get('/', auth, async (req, res) => {
     if (!user) {
       return res.status(400).json({
         errors: [{
-          msg: 'User not exists',
-        }],
+          msg: 'User not exists'
+        }]
       })
     }
 
@@ -66,8 +66,8 @@ router.get('/', auth, async (req, res) => {
     if (!account) {
       return res.status(400).json({
         errors: [{
-          msg: 'Account not exists',
-        }],
+          msg: 'Account not exists'
+        }]
       })
     }
 
@@ -78,7 +78,7 @@ router.get('/', auth, async (req, res) => {
 })
 
 // @route     PUT /accounts
-// @desc      Update balance of bank account (BETA)
+// @desc      Cập nhật số tiền dư của tài khoản ngân hàng (BETA)
 // @access    Public
 router.put('/', async (req, res) => {
   try {
