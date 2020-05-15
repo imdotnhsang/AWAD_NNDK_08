@@ -8,21 +8,8 @@ var { APIStatus, MakeResponse } = require("../../utils/APIStatus.js")
 const Account = require('../../models/Account')
 const User = require('../../models/User')
 const Transaction = require('../../models/Transaction')
-// function change_alias(full_name) {
-//     let str = full_name
-//     str = str.toLowerCase()
-//     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a")
-//     str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e")
-//     str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i")
-//     str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o")
-//     str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u")
-//     str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y")
-//     str = str.replace(/đ/g, "d")
-//     str = str.toUpperCase()
-//     return str
-// }
 
-router.get('/receiver-account/:account_id', async (req, res) => {
+router.get('/receiver-within-bank/:account_id', auth, async (req, res) => {
     try {
         const { account_id } = req.params
 
@@ -45,7 +32,7 @@ router.get('/receiver-account/:account_id', async (req, res) => {
     }
 })
 
-router.put('/within-bank', auth, async (req, res) => {
+router.put('/transfering-within-bank', auth, async (req, res) => {
     const {
         entry_time,
         to_account_id,
@@ -97,17 +84,40 @@ router.put('/within-bank', auth, async (req, res) => {
         })
 
         const transactionSenderResponse = await transactionSender.save()
-        
+
         const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: to_account_id }, { $inc: { balance: amount_transaction } }, {
             new: true
         })
-        
+
         const transactionReceiverResponse = await transactionReceiver.save()
-        
+
         res.status(200).json({ transactionSenderResponse, transactionReceiverResponse, accountSenderResponse, accountReceiverResponse })
     } catch (error) {
         console.error(error.message)
         res.status(500).json({ msg: 'Server error' })
+    }
+})
+
+router.get('/receiver-interbank/:account_id', async (req, res) => {
+    try {
+        const { account_id } = req.params
+
+        const user = await User.findOne({ default_account_id: account_id })
+
+        if (!user) {
+            return res.status(400).json({
+                errors: [{
+                    msg: "User not exists"
+                }]
+            })
+        }
+
+        const { full_name } = user
+
+        return res.status(200).json({ full_name })
+    } catch (error) {
+        console.error(error.message)
+        return res.status(500).json({ msg: 'Server error' })
     }
 })
 
@@ -141,7 +151,7 @@ router.put('/sending-interbank', auth, async (req, res) => {
             type_transaction: "SEND",
             amount_transaction
         })
-        
+
         const accountSenderResponse = await Account.findOneAndUpdate({ account_id: from_account_id }, { $inc: { balance: -amount_transaction } }, {
             new: true
         })
