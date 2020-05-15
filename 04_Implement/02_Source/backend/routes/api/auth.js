@@ -64,7 +64,7 @@ router.post('/', [
       config.get('jwtSecret'),
       { expiresIn: 3600 },
     )
-    return res.status(200).json({ msg: token })
+    return res.status(200).json({ 'access-token': token })
   } catch (error) {
     return res.status(500).send('Server error')
   }
