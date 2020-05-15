@@ -149,7 +149,7 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản (BETA)
 // @access    Public
 router.get('/receiver-interbank/:accountId', async (req, res) => {
-  // Check from_bank_id is linked bank?
+  // Kiểm tra ngân hàng đã được liên kết chưa
   // ...
 
   try {
@@ -270,6 +270,9 @@ router.post('/receiving-interbank', [
   check('fromBankId', 'Sender bank ID is required').not().notEmpty(),
   check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
 ], async (req, res) => {
+  // Kiểm tra ngân hàng đã được liên kết chưa
+  // ...
+
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     return res.status(400).send(errors)
