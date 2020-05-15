@@ -10,7 +10,7 @@ connectDB()
 app.use(express.json({ extended: false }))
 
 app.get('/', (req, res) => {
-    res.send("API Running")
+  res.send('API Running')
 })
 
 // Defined Routes
@@ -22,5 +22,5 @@ app.use('/transactions', require('./routes/api/transactions'))
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`)
+  console.log(`Server started on port ${PORT}`)
 })

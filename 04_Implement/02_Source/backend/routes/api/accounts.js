@@ -1,15 +1,14 @@
 const express = require('express')
-const router = express.Router()
-const auth = require('../../middleware/auth')
-const { check, validationResult } = require('express-validator')
 
-var { APIStatus, MakeResponse } = require("../../utils/APIStatus.js")
+const router = express.Router()
+const { check, validationResult } = require('express-validator')
+const auth = require('../../middleware/auth')
 
 const Account = require('../../models/Account')
 const User = require('../../models/User')
 
-// function change_alias(full_name) {
-//     let str = full_name
+// function changeAlias(fullName) {
+//     let str = fullName
 //     str = str.toLowerCase()
 //     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a")
 //     str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e")
@@ -23,66 +22,63 @@ const User = require('../../models/User')
 // }
 
 router.post('/', [check('balance', 'Balance is required').not().notEmpty()], async (req, res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        return res.status(400).send(errors)
-    }
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors)
+  }
 
-    const { balance } = req.body
-    const account_id = 1612558
-    const account_type = "SAVING"
+  const { balance } = req.body
+  const accountId = 1612558
+  const accountType = 'SAVING'
 
-    try {
-        const account = new Account({ account_id, account_type, balance })
+  try {
+    const account = new Account({ accountId, accountType, balance })
 
-        const response = await account.save()
-        res.status(200).json(response)
-    } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ msg: 'Server error' })
-    }
+    const response = await account.save()
+    return res.status(200).json(response)
+  } catch (error) {
+    return res.status(500).json({ msg: 'Server error' })
+  }
 })
 
 router.get('/', auth, async (req, res) => {
-    try {
-        const user = (await User.findById(req.user.id))
+  try {
+    const user = (await User.findById(req.user.id))
 
-        if (!user) {
-            res.status(400).json({
-                errors: [{
-                    msg: "User not exists"
-                }]
-            })
-        }
-
-        const { full_name, default_account_id } = user
-
-        const account = await Account.findOne({ account_id: default_account_id })
-
-        if (!account) {
-            res.status(400).json({
-                errors: [{
-                    msg: "Account not exists"
-                }]
-            })
-        }
-
-        res.status(200).json({ full_name, account })
-    } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ msg: 'Server error' })
+    if (!user) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'User not exists',
+        }],
+      })
     }
+
+    const { fullName, defaultAccountId } = user
+
+    const account = await Account.findOne({ accountId: defaultAccountId })
+
+    if (!account) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Account not exists',
+        }],
+      })
+    }
+
+    return res.status(200).json({ fullName, account })
+  } catch (error) {
+    return res.status(500).json({ msg: 'Server error' })
+  }
 })
 
 router.put('/', async (req, res) => {
-    try {
-        const { account_id } = req.body
-        const response = await Account.findOne({ account_id })
-        res.status(200).json(response)
-    } catch (error) {
-        console.error(error.message)
-        res.status(500).json({ msg: 'Server error' })
-    }
+  try {
+    const { accountId } = req.body
+    const response = await Account.findOne({ accountId })
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(500).json({ msg: 'Server error' })
+  }
 })
 
 module.exports = router
