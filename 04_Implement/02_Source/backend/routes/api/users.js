@@ -10,6 +10,9 @@ const userAction = require('../../action/user.js')
 const User = require('../../models/User')
 const Account = require('../../models/Account')
 
+// @route     POST /users
+// @desc      Register user (BETA)
+// @access    Public
 router.post('/', [
   check('fullName', 'Full name is required').not().notEmpty(),
   check('email', 'Please include a valid email').isEmail(),
@@ -78,7 +81,9 @@ router.post('/', [
   }
 })
 
-
+// @route     GET /users
+// @desc      Get information of user (BETA)
+// @access    Public
 router.get('/', async (req, res) => {
   const user = {
     role: 'CUSTOMER',
@@ -89,6 +94,9 @@ router.get('/', async (req, res) => {
   // res.status(APIStatus.Ok).json(response)
 })
 
+// @route     PUT /users
+// @desc      Update information of user (BETA)
+// @access    Public
 router.put('/', async (req, res) => {
   const input = {
     role: 'CUSTOMER',

@@ -8,7 +8,10 @@ const Account = require('../../models/Account')
 const User = require('../../models/User')
 const Transaction = require('../../models/Transaction')
 
-router.put('/transfering-within-bank', auth, async (req, res) => {
+// @route     POST /transactions//transfering-within-bank
+// @desc      Transfer within bank (BETA)
+// @access    Public
+router.post('/transfering-within-bank', auth, async (req, res) => {
   const {
     entryTime,
     toAccountId,
@@ -27,32 +30,32 @@ router.put('/transfering-within-bank', auth, async (req, res) => {
       })
     }
 
-    const fromAccountFullname = user.fullName
-    const fromAccountId = user.defaultAccountId
+    const fromAccountFullname = user.full_name
+    const fromAccountId = user.default_account_id
 
     const transactionSender = new Transaction({
-      entryTime,
-      fromAccountId,
-      fromAccountFullname,
-      toAccountId,
-      toAccountFullname,
-      fromBankId: 'EIGHT',
-      toBankId: 'EIGHT',
-      typeTransaction: 'SEND',
-      amountTransaction,
+      entry_time: entryTime,
+      from_account_id: fromAccountId,
+      from_account_fullname: fromAccountFullname,
+      to_account_id: toAccountId,
+      to_account_fullname: toAccountFullname,
+      from_bank_id: 'EIGHT',
+      to_bank_id: 'EIGHT',
+      type_transaction: 'SEND',
+      amount_transaction: amountTransaction,
     })
 
 
     const transactionReceiver = new Transaction({
-      entryTime,
-      fromAccountId,
-      fromAccountFullname,
-      toAccountId,
-      toAccountFullname,
-      fromBankId: 'EIGHT',
-      toBankId: 'EIGHT',
-      typeTransaction: 'RECEIVE',
-      amountTransaction,
+      entry_time: entryTime,
+      from_account_id: fromAccountId,
+      from_account_fullname: fromAccountFullname,
+      to_account_id: toAccountId,
+      to_account_fullname: toAccountFullname,
+      from_bank_id: 'EIGHT',
+      to_bank_id: 'EIGHT',
+      type_transaction: 'RECEIVE',
+      amount_transaction: amountTransaction,
     })
 
     const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
@@ -75,6 +78,9 @@ router.put('/transfering-within-bank', auth, async (req, res) => {
   }
 })
 
+// @route     GET /transactions/receiver-information/:accountId
+// @desc      Get full name of receiver (BETA)
+// @access    Public
 router.get('/receiver-information/:accountId', auth, async (req, res) => {
   try {
     const { accountId } = req.params
@@ -97,7 +103,10 @@ router.get('/receiver-information/:accountId', auth, async (req, res) => {
   }
 })
 
-router.put('/sending-interbank', auth, async (req, res) => {
+// @route     POST /transactions/receiver-information/:accountId
+// @desc      Get full name of receiver (BETA)
+// @access    Public
+router.post('/sending-interbank', auth, async (req, res) => {
   const {
     entryTime,
     toAccountId,
@@ -117,19 +126,19 @@ router.put('/sending-interbank', auth, async (req, res) => {
       })
     }
 
-    const fromAccountFullname = user.fullName
-    const fromAccountId = user.defaultAccountId
+    const fromAccountFullname = user.full_name
+    const fromAccountId = user.default_account_id
 
     const transactionSender = new Transaction({
-      entryTime,
-      fromAccountId,
-      fromAccountFullname,
-      toAccountId,
-      toAccountFullname,
-      fromBankId: 'EIGHT',
-      toBankId,
-      typeTransaction: 'SEND',
-      amountTransaction,
+      entry_time: entryTime,
+      from_account_id: fromAccountId,
+      from_account_fullname: fromAccountFullname,
+      to_account_id: toAccountId,
+      to_account_fullname: toAccountFullname,
+      from_bank_id: 'EIGHT',
+      to_bank_id: toBankId,
+      type_transaction: 'SEND',
+      amount_transaction: amountTransaction,
     })
 
     const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
@@ -144,7 +153,10 @@ router.put('/sending-interbank', auth, async (req, res) => {
   }
 })
 
-router.put('/receiving-interbank', async (req, res) => {
+// @route     POST /transactions/receiver-information/:accountId
+// @desc      Get full name of receiver (BETA)
+// @access    Public
+router.post('/receiving-interbank', async (req, res) => {
   const {
     entryTime,
     fromAccountId,
@@ -157,18 +169,18 @@ router.put('/receiving-interbank', async (req, res) => {
 
   try {
     const transactionReceiver = new Transaction({
-      entryTime,
-      fromAccountId,
-      fromAccountFullname,
-      toAccountId,
-      toAccountFullname,
-      fromBankId,
-      toBankId: 'EIGHT',
-      typeTransaction: 'RECEIVE',
-      amountTransaction,
+      entry_time: entryTime,
+      from_account_id: fromAccountId,
+      from_account_fullname: fromAccountFullname,
+      to_account_id: toAccountId,
+      to_account_fullname: toAccountFullname,
+      from_bank_id: fromBankId,
+      to_bank_id: 'EIGHT',
+      type_transaction: 'RECEIVE',
+      amount_transaction: amountTransaction,
     })
 
-    const accountReceiverResponse = await Account.findOneAndUpdate({ accountId: toAccountId }, { $inc: { balance: amountTransaction } }, {
+    const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: amountTransaction } }, {
       new: true,
     })
 

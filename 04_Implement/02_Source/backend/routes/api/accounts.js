@@ -45,7 +45,7 @@ router.post('/', [check('balance', 'Balance is required').not().notEmpty()], asy
 })
 
 // @route     GET /accounts
-// @desc      Get information of bank account
+// @desc      Get information of bank account (BETA)
 // @access    Public
 router.get('/', auth, async (req, res) => {
   try {
@@ -78,7 +78,7 @@ router.get('/', auth, async (req, res) => {
 })
 
 // @route     PUT /accounts
-// @desc      Upate balance of bank account (CODING)
+// @desc      Update balance of bank account (BETA)
 // @access    Public
 router.put('/', async (req, res) => {
   try {

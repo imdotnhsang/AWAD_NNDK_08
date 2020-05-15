@@ -10,7 +10,7 @@ const auth = require('../../middleware/auth')
 const User = require('../../models/User')
 
 // @route     GET /auth
-// @desc      Get information after authenticating
+// @desc      Get information after authenticating (BETA)
 // @access    Public
 router.get('/', auth, async (req, res) => {
   try {
@@ -22,7 +22,7 @@ router.get('/', auth, async (req, res) => {
 })
 
 // @route     POST /auth
-// @desc      Authenticate user and get access-token
+// @desc      Authenticate user and get access-token (BETA)
 // @access    Public
 router.post('/', [
   check('email', 'Please include a valid email').isEmail(),
