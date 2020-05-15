@@ -44,6 +44,14 @@ router.post('/transfering-within-bank', [
     const fromAccountFullname = user.full_name
     const fromAccountId = user.default_account_id
 
+    if (fromAccountId === toAccountId) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'Beneficiary account cannot coincide with debit account'
+        }]
+      })
+    }
+
     const accountSender = await Account.findOne({ account_id: fromAccountId })
 
     const accountReceiver = await Account.findOne({ account_id: toAccountId })
