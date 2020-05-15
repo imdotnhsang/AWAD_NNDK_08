@@ -78,10 +78,35 @@ router.post('/transfering-within-bank', auth, async (req, res) => {
   }
 })
 
-// @route     GET /transactions/receiver-information/:accountId
-// @desc      Get full name of receiver (BETA)
+// @route     GET /transactions/receiver-withinbank/:accountId
+// @desc      Get full name of receiver within bank (BETA)
 // @access    Public
-router.get('/receiver-information/:accountId', auth, async (req, res) => {
+router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
+  try {
+    const { accountId } = req.params
+
+    const user = await User.findOne({ default_account_id: accountId })
+
+    if (!user) {
+      return res.status(400).json({
+        errors: [{
+          msg: 'User not exists',
+        }],
+      })
+    }
+
+    const fullName = user.full_name
+
+    return res.status(200).json({ fullName })
+  } catch (error) {
+    return res.status(500).json({ msg: 'Server error' })
+  }
+})
+
+// @route     GET /transactions/receiver-interbank/:accountId
+// @desc      Get full name of receiver interbank (BETA)
+// @access    Public
+router.get('/receiver-interbank/:accountId', async (req, res) => {
   try {
     const { accountId } = req.params
 
