@@ -55,13 +55,13 @@ router.put('/transfering-within-bank', auth, async (req, res) => {
       amountTransaction,
     })
 
-    const accountSenderResponse = await Account.findOneAndUpdate({ accountId: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
+    const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
       new: true,
     })
 
     const transactionSenderResponse = await transactionSender.save()
 
-    const accountReceiverResponse = await Account.findOneAndUpdate({ accountId: toAccountId }, { $inc: { balance: amountTransaction } }, {
+    const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: amountTransaction } }, {
       new: true,
     })
 
@@ -79,7 +79,7 @@ router.get('/receiver-information/:accountId', auth, async (req, res) => {
   try {
     const { accountId } = req.params
 
-    const user = await User.findOne({ defaultAccountId: accountId })
+    const user = await User.findOne({ default_account_id: accountId })
 
     if (!user) {
       return res.status(400).json({
@@ -89,7 +89,7 @@ router.get('/receiver-information/:accountId', auth, async (req, res) => {
       })
     }
 
-    const { fullName } = user
+    const fullName = user.full_name
 
     return res.status(200).json({ fullName })
   } catch (error) {
@@ -132,7 +132,7 @@ router.put('/sending-interbank', auth, async (req, res) => {
       amountTransaction,
     })
 
-    const accountSenderResponse = await Account.findOneAndUpdate({ accountId: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
+    const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
       new: true,
     })
 

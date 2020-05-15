@@ -21,6 +21,9 @@ const User = require('../../models/User')
 //     return str
 // }
 
+// @route     POST /accounts
+// @desc      Create bank account
+// @access    Public
 router.post('/', [check('balance', 'Balance is required').not().notEmpty()], async (req, res) => {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -28,11 +31,11 @@ router.post('/', [check('balance', 'Balance is required').not().notEmpty()], asy
   }
 
   const { balance } = req.body
-  const accountId = 1612558
+  const accountId = 1612559
   const accountType = 'SAVING'
 
   try {
-    const account = new Account({ accountId, accountType, balance })
+    const account = new Account({ account_id: accountId, account_type: accountType, balance })
 
     const response = await account.save()
     return res.status(200).json(response)
@@ -41,6 +44,9 @@ router.post('/', [check('balance', 'Balance is required').not().notEmpty()], asy
   }
 })
 
+// @route     GET /accounts
+// @desc      Get information of bank account
+// @access    Public
 router.get('/', auth, async (req, res) => {
   try {
     const user = (await User.findById(req.user.id))
@@ -71,6 +77,9 @@ router.get('/', auth, async (req, res) => {
   }
 })
 
+// @route     PUT /accounts
+// @desc      Upate balance of bank account (CODING)
+// @access    Public
 router.put('/', async (req, res) => {
   try {
     const { accountId } = req.body

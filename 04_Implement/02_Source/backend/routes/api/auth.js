@@ -9,6 +9,9 @@ const auth = require('../../middleware/auth')
 
 const User = require('../../models/User')
 
+// @route     GET /auth
+// @desc      Get information after authenticating
+// @access    Public
 router.get('/', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
@@ -18,6 +21,9 @@ router.get('/', auth, async (req, res) => {
   }
 })
 
+// @route     POST /auth
+// @desc      Authenticate user and get access-token
+// @access    Public
 router.post('/', [
   check('email', 'Please include a valid email').isEmail(),
   check('password', 'Password is required').exists(),

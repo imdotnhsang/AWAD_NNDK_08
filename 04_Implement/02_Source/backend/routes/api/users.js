@@ -11,7 +11,7 @@ const User = require('../../models/User')
 const Account = require('../../models/Account')
 
 router.post('/', [
-  check('full_name', 'Full name is required').not().notEmpty(),
+  check('fullName', 'Full name is required').not().notEmpty(),
   check('email', 'Please include a valid email').isEmail(),
   check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
   check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }),
@@ -30,7 +30,7 @@ router.post('/', [
     balance,
   } = req.body
   const accountType = 'DEFAULT'
-  const accountId = '1612556'
+  const accountId = '1612567'
 
   try {
     let user = await User.findOne({ email })
@@ -43,7 +43,7 @@ router.post('/', [
       })
     }
 
-    let account = await Account.findOne({ accountId })
+    let account = await Account.findOne({ account_id: accountId })
 
     if (account) {
       res.status(400).json({
@@ -53,7 +53,7 @@ router.post('/', [
       })
     }
 
-    account = new Account({ accountId, accountType, balance })
+    account = new Account({ account_id: accountId, account_type: accountType, balance })
 
     const responseAccountPost = await account.save()
 
@@ -61,7 +61,7 @@ router.post('/', [
       const defaultAccountId = responseAccountPost.account_id
 
       user = new User({
-        fullName, email, phoneNumber, password, role, defaultAccountId,
+        full_name: fullName, email, phone_number: phoneNumber, password, role, default_account_id: defaultAccountId,
       })
 
       const salt = await bcrypt.genSalt(10)
