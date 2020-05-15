@@ -9,29 +9,6 @@ const Account = require('../../models/Account')
 const User = require('../../models/User')
 const Transaction = require('../../models/Transaction')
 
-router.get('/receiver-within-bank/:account_id', auth, async (req, res) => {
-    try {
-        const { account_id } = req.params
-
-        const user = await User.findOne({ default_account_id: account_id })
-
-        if (!user) {
-            return res.status(400).json({
-                errors: [{
-                    msg: "User not exists"
-                }]
-            })
-        }
-
-        const { full_name } = user
-
-        return res.status(200).json({ full_name })
-    } catch (error) {
-        console.error(error.message)
-        return res.status(500).json({ msg: 'Server error' })
-    }
-})
-
 router.put('/transfering-within-bank', auth, async (req, res) => {
     const {
         entry_time,
@@ -98,7 +75,7 @@ router.put('/transfering-within-bank', auth, async (req, res) => {
     }
 })
 
-router.get('/receiver-interbank/:account_id', async (req, res) => {
+router.get('/receiver-information/:account_id', auth, async (req, res) => {
     try {
         const { account_id } = req.params
 
@@ -201,6 +178,5 @@ router.put('/receiving-interbank', async (req, res) => {
         res.status(500).json({ msg: 'Server error' })
     }
 })
-
 
 module.exports = router
