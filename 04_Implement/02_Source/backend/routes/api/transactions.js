@@ -174,7 +174,7 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 })
 
 // @route     POST /transactions/sengding-interbank
-// @desc      Lưu lại giao dịch và cập nhật số tiền dư trong tài khoản sau chuyển khoản đến ngân hàng khác (BETA)
+// @desc      Chuyển khoản đến ngân hàng khác (BETA)
 // @access    Public
 router.post('/sending-interbank', [
   auth,
@@ -243,7 +243,10 @@ router.post('/sending-interbank', [
       balance_after_transaction: account.balance - amountTransaction
     })
 
-    // Call api transfer interbank from other bank
+    // Kiểm tra ngân hàng người nhận có đúng mã id
+    // ...
+
+    // Gọi api chuyển  khoản vào ngân hàng khác
     // ...
 
     const accountSenderResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
@@ -259,7 +262,7 @@ router.post('/sending-interbank', [
 })
 
 // @route     POST /transactions/receiving-interbank
-// @desc      Lưu lại giao dịch và cập nhật số tiền dư trong tài khoản sau khi ngân hàng khác chuyển khoản vào (BETA)
+// @desc      Ngân hàng khác chuyển khoản vào (BETA)
 // @access    Public
 router.post('/receiving-interbank', [
   check('entryTime', 'Entry time is required').not().notEmpty(),
@@ -270,7 +273,10 @@ router.post('/receiving-interbank', [
   check('fromBankId', 'Sender bank ID is required').not().notEmpty(),
   check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
 ], async (req, res) => {
-  // Kiểm tra ngân hàng đã được liên kết chưa
+  // Kiểm tra id ngân hàng gửi đúng với các ngân hàng đã liên kết
+  // ...
+
+  // Kiểm tra xác thực mã bất đối xứng với ngân hàng đã liên kết
   // ...
 
   const errors = validationResult(req)
