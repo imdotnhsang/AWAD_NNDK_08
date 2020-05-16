@@ -15,6 +15,22 @@ const BankSchema = new mongoose.Schema({
   bank_public_key: {
     type: String,
     required: true
+  },
+  encrypt_type: {
+    type: String,
+    required: true
+  },
+  bank_host: {
+    type: String,
+    required: true
+  },
+  secret_key: {
+    type: String,
+    required: true
+  },
+  hash_algorithm: {
+    type: String,
+    required: true
   }
 })
 

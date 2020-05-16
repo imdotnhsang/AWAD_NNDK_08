@@ -3,10 +3,19 @@ const express = require('express')
 const router = express.Router()
 const { check, validationResult } = require('express-validator')
 const auth = require('../../middleware/auth')
+const crypto = require('crypto');
+
+const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 
 const Account = require('../../models/Account')
 const User = require('../../models/User')
 const Transaction = require('../../models/Transaction')
+const Bank = require('../../models/Bank')
+const CallHistory = require('../../models/CallHistory')
+const DBModel = require('../../utils/DBModel')
+
+
+const DBModelInstance = new DBModel()
 
 // @route     POST /transactions/transfering-within-bank
 // @desc      Chuyển khoản trong ngân hàng (BETA)
@@ -149,8 +158,74 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản (BETA)
 // @access    Public
 router.get('/receiver-interbank/:accountId', async (req, res) => {
-  // Kiểm tra ngân hàng đã được liên kết chưa
-  // ...
+  // Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
+  const bankInfo = await Bank.findOne({bank_host:"localhost"})
+  if (!bankInfo) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Unauthorized,
+      message: "Not allow to see info"
+    })
+  }
+
+  // Kiểm tra thời gian mà ngân hàng đối tác gửi request nhằm để check request này còn hạn hay không và check request này có bị chỉnh sửa hay không
+  const callTimeEncrypted = req.headers["x_call_time_encrypted"]
+  const callTimeDecrypted = req.headers["x_call_time_decrypted"]
+  if (!callTimeEncrypted || !callTimeDecrypted) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Invalid,
+      message: "Require calltime"
+    })
+  }
+
+  if (isNaN(callTimeDecrypted)) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Invalid,
+      message: "Calltime must be an unix number"
+    })
+  }
+
+  if (callTimeEncrypted != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(callTimeDecrypted).digest('hex')) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Invalid,
+      message: "Calltime is invalid"
+    })
+  }
+
+  let currentTime = Math.round((new Date()).getTime() / 1000);
+  if (callTimeDecrypted > currentTime) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Invalid,
+      message: "Calltime is invalid (calltime is greater than now)"
+    })
+  }
+
+  if (currentTime - callTimeDecrypted > 300) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Invalid,
+      message: "Your calltime is expired. Please try again"
+    })
+  }
+
+  const logInfo = await CallHistory.findOne({bank_id:bankInfo.bank_id, call_type: 'GET_INFO', call_time: callTimeDecrypted})
+  if (logInfo) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Invalid,
+      message: "Your call is calculated"
+    })
+  }
+
+  const saveCallHistoryResponse = await DBModelInstance.Create(CallHistory,{
+    bank_id:bankInfo.bank_id, 
+    call_type: 'GET_INFO', 
+    call_time: callTimeDecrypted
+  })
+
+  if (saveCallHistoryResponse.status != APIStatus.Ok) {
+    return MakeResponse(req,res,{
+      status: APIStatus.Error,
+      message: "Insert call history fail"
+    })
+  }
 
   try {
     const { accountId } = req.params
