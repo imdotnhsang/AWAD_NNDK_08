@@ -31,19 +31,19 @@ const TransactionSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	type_transaction: {
+	transaction_type: {
 		type: String, // TRANSFER, RECEIVE, REPAYMENT
 		required: true
 	},
-	amount_transaction: {
+	transaction_amount: {
 		type: Number,
 		required: true
 	},
-	balance_before_transaction: {
+	transaction_balance_before: {
 		type: Number,
 		required: true
 	},
-	balance_after_transaction: {
+	transaction_balance_after: {
 		type: Number,
 		required: true
 	}

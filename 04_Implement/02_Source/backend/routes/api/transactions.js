@@ -25,7 +25,7 @@ router.post('/transfering-within-bank', [
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
 	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
-	check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
+	check('transactionAmount', 'Amount Transaction is 50000 or more').isAfter('49999')
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
@@ -36,7 +36,7 @@ router.post('/transfering-within-bank', [
 		entryTime,
 		toAccountId,
 		toAccountFullname,
-		amountTransaction
+		transactionAmount
 	} = req.body
 
 	try {
@@ -73,7 +73,7 @@ router.post('/transfering-within-bank', [
 			})
 		}
 
-		if (accountTransferer.balance - amountTransaction < 0) {
+		if (accountTransferer.balance - transactionAmount < 0) {
 			return res.status(400).json({
 				errors: [{
 					msg: 'Insufficient funds'
@@ -89,10 +89,10 @@ router.post('/transfering-within-bank', [
 			to_account_fullname: toAccountFullname,
 			from_bank_id: 'EIGHT',
 			to_bank_id: 'EIGHT',
-			type_transaction: 'TRANSFER',
-			amount_transaction: amountTransaction,
-			balance_before_transaction: accountTransferer.balance,
-			balance_after_transaction: accountTransferer.balance - amountTransaction
+			transaction_type: 'TRANSFER',
+			transaction_amount: transactionAmount,
+			transaction_balance_before: accountTransferer.balance,
+			transaction_balance_after: accountTransferer.balance - transactionAmount
 		})
 
 		const transactionReceiver = new Transaction({
@@ -103,19 +103,19 @@ router.post('/transfering-within-bank', [
 			to_account_fullname: toAccountFullname,
 			from_bank_id: 'EIGHT',
 			to_bank_id: 'EIGHT',
-			type_transaction: 'RECEIVE',
-			amount_transaction: amountTransaction,
-			balance_before_transaction: accountReceiver.balance,
-			balance_after_transaction: Number(accountReceiver.balance) + Number(amountTransaction)
+			transaction_type: 'RECEIVE',
+			transaction_amount: transactionAmount,
+			transaction_balance_before: accountReceiver.balance,
+			transaction_balance_after: Number(accountReceiver.balance) + Number(transactionAmount)
 		})
 
-		const accountTransfererResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
+		const accountTransfererResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -transactionAmount } }, {
 			new: true
 		})
 
 		const transactionTransfererResponse = await transactionTransferer.save()
 
-		const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: amountTransaction } }, {
+		const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: transactionAmount } }, {
 			new: true
 		})
 
@@ -257,7 +257,7 @@ router.post('/transfering-interbank', [
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
 	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
 	check('toBankId', 'Receiver bank ID is required').not().notEmpty(),
-	check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
+	check('transactionAmount', 'Amount Transaction is 50000 or more').isAfter('49999')
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
@@ -269,7 +269,7 @@ router.post('/transfering-interbank', [
 		toAccountId,
 		toAccountFullname,
 		toBankId,
-		amountTransaction
+		transactionAmount
 	} = req.body
 
 	try {
@@ -296,7 +296,7 @@ router.post('/transfering-interbank', [
 			})
 		}
 
-		if (account.balance - amountTransaction < 0) {
+		if (account.balance - transactionAmount < 0) {
 			return res.status(400).json({
 				errors: [{
 					msg: 'Insufficient funds'
@@ -312,10 +312,10 @@ router.post('/transfering-interbank', [
 			to_account_fullname: toAccountFullname,
 			from_bank_id: 'EIGHT',
 			to_bank_id: toBankId,
-			type_transaction: 'TRANSFER',
-			amount_transaction: amountTransaction,
-			balance_before_transaction: account.balance,
-			balance_after_transaction: account.balance - amountTransaction
+			transaction_type: 'TRANSFER',
+			transaction_amount: transactionAmount,
+			transaction_balance_before: account.balance,
+			transaction_balance_after: account.balance - transactionAmount
 		})
 
 		// Kiểm tra ngân hàng người nhận có đúng mã id
@@ -324,7 +324,7 @@ router.post('/transfering-interbank', [
 		// Gọi api chuyển  khoản vào ngân hàng khác
 		// ...
 
-		const accountTransfererResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -amountTransaction } }, {
+		const accountTransfererResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -transactionAmount } }, {
 			new: true
 		})
 
@@ -346,7 +346,7 @@ router.post('/receiving-interbank', [
 	check('fromAccountId', 'Transferer account is required').not().notEmpty(),
 	check('fromAccountFullname', 'Transferer full name is required').not().notEmpty(),
 	check('fromBankId', 'Transferer bank ID is required').not().notEmpty(),
-	check('amountTransaction', 'Amount Transaction is 50000 or more').isAfter('49999')
+	check('transactionAmount', 'Amount Transaction is 50000 or more').isAfter('49999')
 ], async (req, res) => {
 	// Kiểm tra id ngân hàng gửi đúng với các ngân hàng đã liên kết
 	// ...
@@ -366,7 +366,7 @@ router.post('/receiving-interbank', [
 		toAccountId,
 		toAccountFullname,
 		fromBankId,
-		amountTransaction
+		transactionAmount
 	} = req.body
 
 	try {
@@ -388,13 +388,13 @@ router.post('/receiving-interbank', [
 			to_account_fullname: toAccountFullname,
 			from_bank_id: fromBankId,
 			to_bank_id: 'EIGHT',
-			type_transaction: 'RECEIVE',
-			amount_transaction: amountTransaction,
-			balance_before_transaction: account.balance,
-			balance_after_transaction: Number(account.balance) + Number(amountTransaction)
+			transaction_type: 'RECEIVE',
+			transaction_amount: transactionAmount,
+			transaction_balance_before: account.balance,
+			transaction_balance_after: Number(account.balance) + Number(transactionAmount)
 		})
 
-		const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: amountTransaction } }, {
+		const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: transactionAmount } }, {
 			new: true
 		})
 
