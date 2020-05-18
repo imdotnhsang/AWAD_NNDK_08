@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 const mongoose = require('mongoose')
 
-const BankSchema = new mongoose.Schema({
+const LinkedBankSchema = new mongoose.Schema({
 	bank_id: {
 		type: String,
 		required: true,
@@ -34,4 +34,4 @@ const BankSchema = new mongoose.Schema({
 	}
 })
 
-module.exports = Bank = mongoose.model('bank', BankSchema)
+module.exports = Bank = mongoose.model('linked_bank', LinkedBankSchema)

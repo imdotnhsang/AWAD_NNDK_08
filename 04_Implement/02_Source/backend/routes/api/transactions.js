@@ -10,8 +10,8 @@ const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 const Account = require('../../models/Account')
 const User = require('../../models/User')
 const Transaction = require('../../models/Transaction')
-const Bank = require('../../models/Bank')
-const CallHistory = require('../../models/CallHistory')
+const Bank = require('../../models/LinkedBank')
+const AccessedApiHistory = require('../../models/AccessedApiHistory')
 const DBModel = require('../../utils/DBModel')
 
 
@@ -168,45 +168,45 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 	}
 
 	// Kiểm tra thời gian mà ngân hàng đối tác gửi request nhằm để check request này còn hạn hay không và check request này có bị chỉnh sửa hay không
-	const callTimeEncrypted = req.headers['x_call_time_encrypted']
-	const callTimeDecrypted = req.headers['x_call_time_decrypted']
-	if (!callTimeEncrypted || !callTimeDecrypted) {
+	const entryTimeEncrypted = req.headers['x_entry_time_encrypted']
+	const entryTimeDecrypted = req.headers['x_entry_time_decrypted']
+	if (!entryTimeEncrypted || !entryTimeDecrypted) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'Require calltime'
+			message: 'Require entryTime'
 		})
 	}
 
-	if (isNaN(callTimeDecrypted)) {
+	if (isNaN(entryTimeDecrypted)) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'Calltime must be an unix number'
+			message: 'entryTime must be an unix number'
 		})
 	}
 
-	if (callTimeEncrypted != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(callTimeDecrypted).digest('hex')) {
+	if (entryTimeEncrypted != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'Calltime is invalid'
+			message: 'entryTime is invalid'
 		})
 	}
 
 	let currentTime = Math.round((new Date()).getTime() / 1000)
-	if (callTimeDecrypted > currentTime) {
+	if (entryTimeDecrypted > currentTime) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'Calltime is invalid (calltime is greater than now)'
+			message: 'entryTime is invalid (entryTime is greater than now)'
 		})
 	}
 
-	if (currentTime - callTimeDecrypted > 300) {
+	if (currentTime - entryTimeDecrypted > 300) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'Your calltime is expired. Please try again'
+			message: 'Your entryTime is expired. Please try again'
 		})
 	}
 
-	const logInfo = await CallHistory.findOne({bank_id:bankInfo.bank_id, call_type: 'GET_INFO', call_time: callTimeDecrypted})
+	const logInfo = await AccessedApiHistory.findOne({bank_id:bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted})
 	if (logInfo) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
@@ -214,13 +214,13 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 		})
 	}
 
-	const saveCallHistoryResponse = await DBModelInstance.Create(CallHistory,{
+	const saveAccessedApiHistoryResponse = await DBModelInstance.Create(AccessedApiHistory,{
 		bank_id:bankInfo.bank_id, 
-		call_type: 'GET_INFO', 
-		call_time: callTimeDecrypted
+		accessed_api_type: 'GET_INFO', 
+		entry_time: entryTimeDecrypted
 	})
 
-	if (saveCallHistoryResponse.status != APIStatus.Ok) {
+	if (saveAccessedApiHistoryResponse.status != APIStatus.Ok) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Error,
 			message: 'Insert call history fail'
