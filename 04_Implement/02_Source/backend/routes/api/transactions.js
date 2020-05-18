@@ -18,7 +18,7 @@ const DBModel = require('../../utils/DBModel')
 const DBModelInstance = new DBModel()
 
 // @route     POST /transactions/transfering-within-bank
-// @desc      Chuyển khoản trong ngân hàng (BETA)
+// @desc      Chuyển khoản trong ngân hàng
 // @access    Public
 router.post('/transfering-within-bank', [
 	auth,
@@ -130,7 +130,7 @@ router.post('/transfering-within-bank', [
 })
 
 // @route     GET /transactions/receiver-withinbank/:accountId
-// @desc      Lấy họ và tên người nhận khi chuyển khoản cùng ngân hàng (OFFICIAL)
+// @desc      Lấy họ và tên người nhận khi chuyển khoản cùng ngân hàng
 // @access    Public
 router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 	try {
@@ -155,7 +155,7 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 })
 
 // @route     GET /transactions/receiver-interbank/:accountId
-// @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản (BETA)
+// @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản
 // @access    Public
 router.get('/receiver-interbank/:accountId', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
@@ -249,7 +249,7 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 })
 
 // @route     POST /transactions/sengding-interbank
-// @desc      Chuyển khoản đến ngân hàng khác (BETA)
+// @desc      Chuyển khoản đến ngân hàng khác
 // @access    Public
 router.post('/sending-interbank', [
 	auth,
@@ -337,7 +337,7 @@ router.post('/sending-interbank', [
 })
 
 // @route     POST /transactions/receiving-interbank
-// @desc      Ngân hàng khác chuyển khoản vào (BETA)
+// @desc      Ngân hàng khác chuyển khoản vào
 // @access    Public
 router.post('/receiving-interbank', [
 	check('entryTime', 'Entry time is required').not().notEmpty(),

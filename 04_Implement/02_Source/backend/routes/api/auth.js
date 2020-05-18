@@ -10,7 +10,7 @@ const auth = require('../../middleware/auth')
 const User = require('../../models/User')
 
 // @route     GET /auth
-// @desc      Lấy thông tin user sau khi đăng nhập thành công (BETA)
+// @desc      Lấy thông tin user sau khi đăng nhập thành công
 // @access    Public
 router.get('/', auth, async (req, res) => {
 	try {
@@ -22,7 +22,7 @@ router.get('/', auth, async (req, res) => {
 })
 
 // @route     POST /auth
-// @desc      Xác thực đăng nhập của user và trả về access-token (BETA)
+// @desc      Xác thực đăng nhập của user và trả về access-token
 // @access    Public
 router.post(
 	'/',

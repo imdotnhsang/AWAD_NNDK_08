@@ -1,6 +1,7 @@
 const express = require('express')
 
 const router = express.Router()
+const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
 const auth = require('../../middleware/auth')
 
@@ -31,8 +32,11 @@ router.post('/', check('balance', 'Please enter a balance with 0 or more').isAft
 	}
 
 	const { balance } = req.body
-	const accountId = 1612559
 	const accountType = 'SAVING'
+
+	const nanoid = customAlphabet('1234567890', 14)
+	const accountId = nanoid()
+
 
 	try {
 		const account = new Account({ account_id: accountId, account_type: accountType, balance })
