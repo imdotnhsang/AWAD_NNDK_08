@@ -18,7 +18,7 @@ router.post('/', [
 	check('fullName', 'Full name is required').not().notEmpty(),
 	check('email', 'Please include a valid email').isEmail(),
 	check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-	check('balance', 'Please enter a balance with 0 or more').isAfter('49999')
+	check('balance', 'Please enter a balance with 50000 or more').isInt({ min: 50000 })
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
@@ -86,7 +86,7 @@ router.post('/', [
 			customer.password = await bcrypt.hash(password, salt)
 
 			const response = await customer.save()
-			
+
 			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).send('Server error')

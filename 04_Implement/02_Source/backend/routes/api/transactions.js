@@ -25,7 +25,7 @@ router.post('/transfering-within-bank', [
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
 	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
-	check('transactionAmount', 'Amount Transaction is 50000 or more').isAfter('49999')
+	check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({ min: 50000 })
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
@@ -159,9 +159,9 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @access    Public
 router.get('/receiver-interbank/:accountId', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
-	const bankInfo = await Bank.findOne({bank_host:'localhost'})
+	const bankInfo = await Bank.findOne({ bank_host: 'localhost' })
 	if (!bankInfo) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Unauthorized,
 			message: 'Not allow to see info'
 		})
@@ -171,21 +171,21 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 	const entryTimeEncrypted = req.headers['x_entry_time_encrypted']
 	const entryTimeDecrypted = req.headers['x_entry_time_decrypted']
 	if (!entryTimeEncrypted || !entryTimeDecrypted) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Require entryTime'
 		})
 	}
 
 	if (isNaN(entryTimeDecrypted)) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'entryTime must be an unix number'
 		})
 	}
 
-	if (entryTimeEncrypted != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
-		return MakeResponse(req,res,{
+	if (entryTimeEncrypted != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'entryTime is invalid'
 		})
@@ -193,35 +193,35 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 
 	let currentTime = Math.round((new Date()).getTime() / 1000)
 	if (entryTimeDecrypted > currentTime) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'entryTime is invalid (entryTime is greater than now)'
 		})
 	}
 
 	if (currentTime - entryTimeDecrypted > 300) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Your entryTime is expired. Please try again'
 		})
 	}
 
-	const logInfo = await AccessedApiHistory.findOne({bank_id:bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted})
+	const logInfo = await AccessedApiHistory.findOne({ bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted })
 	if (logInfo) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Your call is calculated'
 		})
 	}
 
-	const saveAccessedApiHistoryResponse = await DBModelInstance.Create(AccessedApiHistory,{
-		bank_id:bankInfo.bank_id, 
-		accessed_api_type: 'GET_INFO', 
+	const saveAccessedApiHistoryResponse = await DBModelInstance.Create(AccessedApiHistory, {
+		bank_id: bankInfo.bank_id,
+		accessed_api_type: 'GET_INFO',
 		entry_time: entryTimeDecrypted
 	})
 
 	if (saveAccessedApiHistoryResponse.status != APIStatus.Ok) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Error,
 			message: 'Insert call history fail'
 		})
@@ -257,7 +257,7 @@ router.post('/transfering-interbank', [
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
 	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
 	check('toBankId', 'Receiver bank ID is required').not().notEmpty(),
-	check('transactionAmount', 'Amount Transaction is 50000 or more').isAfter('49999')
+	check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({ min: 50000 })
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
