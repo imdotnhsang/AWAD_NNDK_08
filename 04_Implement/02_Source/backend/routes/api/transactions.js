@@ -160,9 +160,9 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @access    Public
 router.get('/receiver-interbank', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
-	const bankInfo = await LinkedBank.findOne({bank_host:'localhost'})
+	const bankInfo = await LinkedBank.findOne({ bank_host: 'localhost' })
 	if (!bankInfo) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Unauthorized,
 			message: 'Not allow to see info'
 		})
@@ -173,7 +173,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	const entryTimeEncrypted = req.headers['x_entry_time_encrypted']
 
 	if (!entryTimeHashed || !entryTimeEncrypted) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Require entrytime'
 		})
@@ -183,23 +183,23 @@ router.get('/receiver-interbank', async (req, res) => {
 	let entryTimeDecrypted = ''
 	if (bankInfo.encrypt_type == 'RSA') {
 		// eslint-disable-next-line no-undef
-		const buffer = Buffer.from(entryTimeEncrypted,'base64')
-		entryTimeDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
-		console.log('Entry time: '+ entryTimeDecrypted)
+		const buffer = Buffer.from(entryTimeEncrypted, 'base64')
+		entryTimeDecrypted = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
+		console.log('Entry time: ' + entryTimeDecrypted)
 	}
 
 
 	// Kiểm tra xem entryTime có hợp lệ hay không
 	if (isNaN(entryTimeDecrypted)) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Entrytime must be an unix number'
 		})
 	}
 
 	// Kiểm tra entryTime có bị chỉnh sửa hay không 
-	if (entryTimeHashed != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
-		return MakeResponse(req,res,{
+	if (entryTimeHashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Entrytime is invalid'
 		})
@@ -208,7 +208,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	// Kiểm tra entryTime có bị "sớm" hơn thời điểm hiện tại hay không
 	let currentTime = Math.round((new Date()).getTime() / 1000)
 	if (entryTimeDecrypted > currentTime) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Entrytime is invalid (entrytime is greater than now)'
 		})
@@ -227,7 +227,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	const accountIdEncrypted = req.headers['x_account_id_encrypted']
 
 	if (!accountIdHashed || !accountIdEncrypted) {
-		return MakeResponse(req,res,{
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Require account_id'
 		})
@@ -236,15 +236,15 @@ router.get('/receiver-interbank', async (req, res) => {
 	let accountIdDecrypted = ''
 	if (bankInfo.encrypt_type == 'RSA') {
 		// eslint-disable-next-line no-undef
-		const buffer = Buffer.from(accountIdEncrypted,'base64')
-		accountIdDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
+		const buffer = Buffer.from(accountIdEncrypted, 'base64')
+		accountIdDecrypted = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
 		console.log('Account ID: ' + accountIdDecrypted)
 	}
 
 
 	// Kiểm tra accountId có bị chỉnh sửa hay không 
-	if (accountIdHashed != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(accountIdDecrypted).digest('hex')) {
-		return MakeResponse(req,res,{
+	if (accountIdHashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(accountIdDecrypted).digest('hex')) {
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'AccountId is invalid'
 		})
@@ -252,29 +252,30 @@ router.get('/receiver-interbank', async (req, res) => {
 
 
 
-	const accessApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory,{bank_id:bankInfo.bank_id,accessed_api_type:'GET_INFO',entry_time:entryTimeDecrypted})
-	if (accessApiHistoryResp.status == APIStatus.Ok) {
-		return MakeResponse(req,res,{
+	const accessedApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory, { bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted })
+	if (accessedApiHistoryResp.status == APIStatus.Ok) {
+		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
 			message: 'Your access is solved. Please make another request'
 		})
 	}
 
-	const saveEntryHistoryResponse = await DBModelInstance.Create(AccessedApiHistory,{
-		bank_id:bankInfo.bank_id, 
-		accessed_api_type: 'GET_INFO', 
+	const saveAccessedHistoryResponse = await DBModelInstance.Create(AccessedApiHistory, {
+		bank_id: bankInfo.bank_id,
+		accessed_api_type: 'GET_INFO',
 		entry_time: entryTimeDecrypted
 	})
 
-	if (saveEntryHistoryResponse.status != APIStatus.Ok) {
-		return MakeResponse(req,res,{
+	if (saveAccessedHistoryResponse.status != APIStatus.Ok) {
+		return MakeResponse(req, res, {
 			status: APIStatus.Error,
-			message: saveEntryHistoryResponse.message
+			message: saveAccessedHistoryResponse.message
 		})
 	}
 
-	const queryCustomerResp = await DBModelInstance.Query(Customer,{ default_account_id: accountIdDecrypted },'full_name',0,1,false)
-	return MakeResponse(req,res,queryCustomerResp)
+	const queryCustomerResp = await DBModelInstance.Query(Customer, { default_account_id: accountIdDecrypted }, 'full_name', 0, 1, false)
+
+	return MakeResponse(req, res, queryCustomerResp)
 })
 
 // @route     POST /transactions/sengding-interbank
