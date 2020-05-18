@@ -2,6 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 const { check, validationResult } = require('express-validator')
+const NodeRSA = require('node-rsa');
 const auth = require('../../middleware/auth')
 const crypto = require('crypto')
 
@@ -10,7 +11,7 @@ const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 const Account = require('../../models/Account')
 const Customer = require('../../models/Customer')
 const Transaction = require('../../models/Transaction')
-const Bank = require('../../models/LinkedBank')
+const LinkedBank = require('../../models/LinkedBank')
 const AccessedApiHistory = require('../../models/AccessedApiHistory')
 const DBModel = require('../../utils/DBModel')
 
@@ -157,95 +158,121 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @route     GET /transactions/receiver-interbank/:accountId
 // @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản
 // @access    Public
-router.get('/receiver-interbank/:accountId', async (req, res) => {
+router.get('/receiver-interbank', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
-	const bankInfo = await Bank.findOne({ bank_host: 'localhost' })
+	const bankInfo = await LinkedBank.findOne({bank_host:"localhost"})
 	if (!bankInfo) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Unauthorized,
-			message: 'Not allow to see info'
+		return MakeResponse(req,res,{
+		status: APIStatus.Unauthorized,
+		message: "Not allow to see info"
 		})
 	}
 
-	// Kiểm tra thời gian mà ngân hàng đối tác gửi request nhằm để check request này còn hạn hay không và check request này có bị chỉnh sửa hay không
-	const entryTimeEncrypted = req.headers['x_entry_time_encrypted']
-	const entryTimeDecrypted = req.headers['x_entry_time_decrypted']
-	if (!entryTimeEncrypted || !entryTimeDecrypted) {
-		return MakeResponse(req, res, {
+	// Kiểm tra thời gian mà ngân hàng đối tác gửi request nhằm để check request này còn hạn hay không và check callTime này có bị chỉnh sửa hay không
+	const callTimeHashed = req.headers["x_call_time_hashed"]
+	const callTimeEncrypted = req.headers["x_call_time_encrypted"]
+
+	if (!callTimeHashed || !callTimeEncrypted) {
+		return MakeResponse(req,res,{
+		status: APIStatus.Invalid,
+		message: "Require calltime"
+		})
+	}
+
+	// Decrypt callTime bằng private key
+	let callTimeDecrypted = ""
+	if (bankInfo.encrypt_type == "RSA") {
+		const buffer = Buffer.from(callTimeEncrypted,'base64')
+		callTimeDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
+		console.log("Call time: "+ callTimeDecrypted)
+	}
+
+
+	// Kiểm tra xem callTime có hợp lệ hay không
+	if (isNaN(callTimeDecrypted)) {
+		return MakeResponse(req,res,{
+		status: APIStatus.Invalid,
+		message: "Calltime must be an unix number"
+		})
+	}
+
+	// Kiểm tra callTime có bị chỉnh sửa hay không 
+	if (callTimeHashed != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(callTimeDecrypted).digest('hex')) {
+		return MakeResponse(req,res,{
+		status: APIStatus.Invalid,
+		message: "Calltime is invalid"
+		})
+	}
+
+	// Kiểm tra callTime có bị "sớm" hơn thời điểm hiện tại hay không
+	let currentTime = Math.round((new Date()).getTime() / 1000);
+	if (callTimeDecrypted > currentTime) {
+		return MakeResponse(req,res,{
+		status: APIStatus.Invalid,
+		message: "Calltime is invalid (calltime is greater than now)"
+		})
+	}
+
+	// Kiểm tra callTime có bị quá 5 phút kể từ thời điểm hiện tại hay không, tạm khóa lại, 5 phút đi test lại mệt mỏi
+	// if (currentTime - callTimeDecrypted > 3000) {
+	// 	return MakeResponse(req,res,{
+	// 	status: APIStatus.Invalid,
+	// 	message: "Your calltime is expired. Please try again"
+	// 	})
+	// }
+
+	// Kiểm tra accountId mà ngân hàng đối tác gửi và kiểm tra accountId này có bị chỉnh sửa hay không ?
+	const accountIdHashed = req.headers["x_account_id_hashed"]
+	const accountIdEncrypted = req.headers["x_account_id_encrypted"]
+
+	if (!accountIdHashed || !accountIdEncrypted) {
+		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'Require entryTime'
+			message: "Require account_id"
 		})
 	}
 
-	if (isNaN(entryTimeDecrypted)) {
-		return MakeResponse(req, res, {
+	let accountIdDecrypted = ""
+	if (bankInfo.encrypt_type == "RSA") {
+		const buffer = Buffer.from(accountIdEncrypted,'base64')
+		accountIdDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
+		console.log("Account ID: " + accountIdDecrypted)
+	}
+
+
+	// Kiểm tra accountId có bị chỉnh sửa hay không 
+	if (accountIdHashed != crypto.createHmac(bankInfo.hash_algorithm,bankInfo.secret_key).update(accountIdDecrypted).digest('hex')) {
+		return MakeResponse(req,res,{
+		status: APIStatus.Invalid,
+		message: "AccountId is invalid"
+		})
+	}
+
+
+
+	const accessApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory,{bank_id:bankInfo.bank_id,accessed_api_type:'GET_INFO',entry_time:callTimeDecrypted})
+	if (accessApiHistoryResp.status == APIStatus.Ok) {
+		return MakeResponse(req,res,{
 			status: APIStatus.Invalid,
-			message: 'entryTime must be an unix number'
+			message: "Your call is solved. Please make another request"
 		})
 	}
 
-	if (entryTimeEncrypted != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Invalid,
-			message: 'entryTime is invalid'
-		})
-	}
-
-	let currentTime = Math.round((new Date()).getTime() / 1000)
-	if (entryTimeDecrypted > currentTime) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Invalid,
-			message: 'entryTime is invalid (entryTime is greater than now)'
-		})
-	}
-
-	if (currentTime - entryTimeDecrypted > 300) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Invalid,
-			message: 'Your entryTime is expired. Please try again'
-		})
-	}
-
-	const logInfo = await AccessedApiHistory.findOne({ bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted })
-	if (logInfo) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Invalid,
-			message: 'Your call is calculated'
-		})
-	}
-
-	const saveAccessedApiHistoryResponse = await DBModelInstance.Create(AccessedApiHistory, {
-		bank_id: bankInfo.bank_id,
-		accessed_api_type: 'GET_INFO',
-		entry_time: entryTimeDecrypted
+	const saveCallHistoryResponse = await DBModelInstance.Create(AccessedApiHistory,{
+		bank_id:bankInfo.bank_id, 
+		accessed_api_type: 'GET_INFO', 
+		entry_time: callTimeDecrypted
 	})
 
-	if (saveAccessedApiHistoryResponse.status != APIStatus.Ok) {
-		return MakeResponse(req, res, {
+	if (saveCallHistoryResponse.status != APIStatus.Ok) {
+		return MakeResponse(req,res,{
 			status: APIStatus.Error,
-			message: 'Insert call history fail'
+			message: saveCallHistoryResponse.message
 		})
 	}
 
-	try {
-		const { accountId } = req.params
-
-		const customer = await Customer.findOne({ default_account_id: accountId })
-
-		if (!customer) {
-			return res.status(400).json({
-				errors: [{
-					msg: 'Customer not exists'
-				}]
-			})
-		}
-
-		const fullName = customer.full_name
-
-		return res.status(200).json({ full_name: fullName })
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server error' })
-	}
+	const queryCustomerResp = await DBModelInstance.Query(Customer,{ default_account_id: accountIdDecrypted },"full_name",0,1,false)
+	return MakeResponse(req,res,queryCustomerResp)
 })
 
 // @route     POST /transactions/sengding-interbank

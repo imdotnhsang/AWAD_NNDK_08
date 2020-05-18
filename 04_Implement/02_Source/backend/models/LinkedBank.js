@@ -28,10 +28,14 @@ const LinkedBankSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	our_private_key: {
+		type: String,
+		required: true
+	},
 	hash_algorithm: {
 		type: String,
 		required: true
 	}
 })
 
-module.exports = Bank = mongoose.model('linked_bank', LinkedBankSchema)
+module.exports = LinkedBank = mongoose.model('linked_bank', LinkedBankSchema)

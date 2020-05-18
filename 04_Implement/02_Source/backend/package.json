@@ -17,7 +17,9 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.12",
     "nanoid": "^3.1.9",
-    "request": "^2.88.2"
+    "node-rsa": "^1.0.8",
+    "request": "^2.88.2",
+    "uuid": "^8.0.0"
   },
   "devDependencies": {
     "concurrently": "^5.2.0",
