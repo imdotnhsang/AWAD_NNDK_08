@@ -8,7 +8,7 @@ const crypto = require('crypto')
 const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 
 const Account = require('../../models/Account')
-const User = require('../../models/User')
+const Customer = require('../../models/Customer')
 const Transaction = require('../../models/Transaction')
 const Bank = require('../../models/LinkedBank')
 const AccessedApiHistory = require('../../models/AccessedApiHistory')
@@ -40,18 +40,18 @@ router.post('/transfering-within-bank', [
 	} = req.body
 
 	try {
-		const user = await User.findById(req.user.id)
+		const customer = await Customer.findById(req.user.id)
 
-		if (!user) {
+		if (!customer) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'User not exists'
+					msg: 'customer not exists'
 				}]
 			})
 		}
 
-		const fromAccountFullname = user.full_name
-		const fromAccountId = user.default_account_id
+		const fromAccountFullname = customer.full_name
+		const fromAccountId = customer.default_account_id
 
 		if (fromAccountId === toAccountId) {
 			return res.status(400).json({
@@ -136,17 +136,17 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 	try {
 		const { accountId } = req.params
 
-		const user = await User.findOne({ default_account_id: accountId })
+		const customer = await Customer.findOne({ default_account_id: accountId })
 
-		if (!user) {
+		if (!customer) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'User not exists'
+					msg: 'Customer not exists'
 				}]
 			})
 		}
 
-		const fullName = user.full_name
+		const fullName = customer.full_name
 
 		return res.status(200).json({ full_name: fullName })
 	} catch (error) {
@@ -230,17 +230,17 @@ router.get('/receiver-interbank/:accountId', async (req, res) => {
 	try {
 		const { accountId } = req.params
 
-		const user = await User.findOne({ default_account_id: accountId })
+		const customer = await Customer.findOne({ default_account_id: accountId })
 
-		if (!user) {
+		if (!customer) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'User not exists'
+					msg: 'Customer not exists'
 				}]
 			})
 		}
 
-		const fullName = user.full_name
+		const fullName = customer.full_name
 
 		return res.status(200).json({ full_name: fullName })
 	} catch (error) {
@@ -273,18 +273,18 @@ router.post('/transfering-interbank', [
 	} = req.body
 
 	try {
-		const user = await User.findById(req.user.id)
+		const customer = await Customer.findById(req.user.id)
 
-		if (!user) {
+		if (!customer) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'User not exists'
+					msg: 'Customer not exists'
 				}]
 			})
 		}
 
-		const fromAccountFullname = user.full_name
-		const fromAccountId = user.default_account_id
+		const fromAccountFullname = customer.full_name
+		const fromAccountId = customer.default_account_id
 
 		const account = await Account.findOne({ account_id: fromAccountId })
 

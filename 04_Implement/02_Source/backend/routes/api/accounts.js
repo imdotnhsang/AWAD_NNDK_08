@@ -6,7 +6,7 @@ const { check, validationResult } = require('express-validator')
 const auth = require('../../middleware/auth')
 
 const Account = require('../../models/Account')
-const User = require('../../models/User')
+const Customer = require('../../models/Customer')
 
 // function changeAlias(fullName) {
 //     let str = fullName
@@ -53,21 +53,21 @@ router.post('/', check('balance', 'Please enter a balance with 0 or more').isAft
 // @access    Public
 router.get('/', auth, async (req, res) => {
 	try {
-		const user = (await User.findById(req.user.id))
+		const customer = (await Customer.findById(req.user.id))
 
-		if (!user) {
+		if (!customer) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'User not exists'
+					msg: 'Customer not exists'
 				}]
 			})
 		}
 
-		const { fullName, defaultAccountId } = user
+		const { full_name: fullName, default_account_id: defaultAccountId } = customer
 
-		const account = await Account.findOne({ accountId: defaultAccountId })
+		const defaultAccount = await Account.findOne({ account_id: defaultAccountId })
 
-		if (!account) {
+		if (!defaultAccount) {
 			return res.status(400).json({
 				errors: [{
 					msg: 'Account not exists'
@@ -75,7 +75,7 @@ router.get('/', auth, async (req, res) => {
 			})
 		}
 
-		return res.status(200).json({ fullName, account })
+		return res.status(200).json({ fullName, defaultAccount })
 	} catch (error) {
 		return res.status(500).json({ msg: 'Server error' })
 	}
@@ -87,7 +87,7 @@ router.get('/', auth, async (req, res) => {
 router.put('/', async (req, res) => {
 	try {
 		const { accountId } = req.body
-		const response = await Account.findOne({ accountId })
+		const response = await Account.findOne({ account_id: accountId })
 		res.status(200).json(response)
 	} catch (error) {
 		res.status(500).json({ msg: 'Server error' })

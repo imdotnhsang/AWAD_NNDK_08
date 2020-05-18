@@ -6,13 +6,13 @@ const bcrypt = require('bcrypt')
 const { check, validationResult } = require('express-validator')
 
 const { MakeResponse } = require('../../utils/APIStatus.js')
-const userAction = require('../../action/user.js')
+const customerAction = require('../../action/customer.js')
 
-const User = require('../../models/User')
+const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 
-// @route     POST /users
-// @desc      Đăng kí user mới
+// @route     POST /customers
+// @desc      Đăng kí customer mới
 // @access    Public
 router.post('/', [
 	check('fullName', 'Full name is required').not().notEmpty(),
@@ -39,9 +39,9 @@ router.post('/', [
 	const accountId = nanoid()
 
 	try {
-		let user = await User.findOne({ email })
+		let customer = await Customer.findOne({ email })
 
-		if (user) {
+		if (customer) {
 			res.status(400).json({
 				errors: [{
 					msg: 'Email already exists'
@@ -49,10 +49,10 @@ router.post('/', [
 			})
 		}
 
-		user = undefined
-		user = await User.findOne({ phone_number: phoneNumber })
+		customer = undefined
+		customer = await Customer.findOne({ phone_number: phoneNumber })
 
-		if (user) {
+		if (customer) {
 			res.status(400).json({
 				errors: [{
 					msg: 'Phone number already exists'
@@ -77,15 +77,16 @@ router.post('/', [
 		try {
 			const defaultAccountId = responseAccountPost.account_id
 
-			user = new User({
+			customer = new Customer({
 				full_name: fullName, email, phone_number: phoneNumber, password, role, default_account_id: defaultAccountId
 			})
 
 			const salt = await bcrypt.genSalt(10)
 
-			user.password = await bcrypt.hash(password, salt)
+			customer.password = await bcrypt.hash(password, salt)
 
-			const response = await user.save()
+			const response = await customer.save()
+			
 			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).send('Server error')
@@ -95,21 +96,21 @@ router.post('/', [
 	}
 })
 
-// @route     GET /users
-// @desc      Lấy thông tin của user
+// @route     GET /customers
+// @desc      Lấy thông tin của customer
 // @access    Public
 router.get('/', async (req, res) => {
-	const user = {
+	const customer = {
 		role: 'CUSTOMER'
 	}
 
-	const response = await userAction.getUser(user, null, 0, 1000, true, true)
+	const response = await customerAction.getCustomer(customer, null, 0, 1000, true, true)
 
 	return res.status(200).json(response)
 })
 
-// @route     PUT /users
-// @desc      Cập nhật thông tin user
+// @route     PUT /customers
+// @desc      Cập nhật thông tin customer
 // @access    Public
 router.put('/', async (req, res) => {
 	const input = {
@@ -117,17 +118,8 @@ router.put('/', async (req, res) => {
 		full_name: 'Sơn'
 	}
 
-	const response = await userAction.updateUser(input)
+	const response = await customerAction.updateCustomer(input)
 	return MakeResponse(req, res, response)
 })
-
-// router.delete("/", async (req, res) => {
-//     const input = {
-//         phone_number: "0979279933"
-//     }
-
-//     let response = await userAction.deleteUser(input)
-//     return MakeResponse(req, res, response)
-// })
 
 module.exports = router

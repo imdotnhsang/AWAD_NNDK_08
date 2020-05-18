@@ -31,13 +31,17 @@ const TransactionSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	transaction_type: {
-		type: String, // TRANSFER, RECEIVE, REPAYMENT
+	transaction_type: { // TRANSFER, RECEIVE, REPAYMENT
+		type: String, 
 		required: true
 	},
 	transaction_amount: {
 		type: Number,
 		required: true
+	},
+	transaction_status: { // SUCCESS, FAILED, REFUND
+		type: String,
+		// require: true
 	},
 	transaction_balance_before: {
 		type: Number,

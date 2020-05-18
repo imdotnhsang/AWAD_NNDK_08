@@ -7,25 +7,26 @@ const config = require('config')
 const { check, validationResult } = require('express-validator')
 const auth = require('../../middleware/auth')
 
-const User = require('../../models/User')
+const Customer = require('../../models/Customer')
 
-// @route     GET /auth
-// @desc      Lấy thông tin user sau khi đăng nhập thành công
+// @route     GET /auth/customers
+// @desc      Lấy thông tin customer sau khi đăng nhập thành công
 // @access    Public
-router.get('/', auth, async (req, res) => {
+router.get('/customers', auth, async (req, res) => {
 	try {
-		const user = await User.findById(req.user.id)
-		res.json(user)
+		const customer = await Customer.findById(req.user.id)
+		res.json(customer)
 	} catch (error) {
+		console.log(error)
 		res.status(500).json({ msg: 'Server error' })
 	}
 })
 
-// @route     POST /auth
-// @desc      Xác thực đăng nhập của user và trả về access-token
+// @route     POST /auth/customers
+// @desc      Xác thực đăng nhập của customer và trả về access-token
 // @access    Public
 router.post(
-	'/',
+	'/customers',
 	[
 		check('email', 'Please include a valid email').isEmail(),
 		check('password', 'Password is required').exists(),
@@ -39,9 +40,9 @@ router.post(
 		const { email, password } = req.body
 
 		try {
-			const user = await User.findOne({ email })
+			const customer = await Customer.findOne({ email })
 
-			if (!user) {
+			if (!customer) {
 				return res.status(400).json({
 					errors: [
 						{
@@ -51,7 +52,7 @@ router.post(
 				})
 			}
 
-			const isMatch = await bcrypt.compare(password, user.password)
+			const isMatch = await bcrypt.compare(password, customer.password)
 
 			if (!isMatch) {
 				return res.status(400).json({
@@ -65,13 +66,14 @@ router.post(
 
 			const payload = {
 				user: {
-					id: user.id,
+					id: customer.id,
 				},
 			}
 
 			const token = jwt.sign(payload, config.get('jwtSecret'), {
 				expiresIn: 3600,
 			})
+
 			return res.status(200).json({ 'access-token': token })
 		} catch (error) {
 			return res.status(500).send('Server error')

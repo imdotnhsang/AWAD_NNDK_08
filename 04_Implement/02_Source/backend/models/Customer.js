@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 const mongoose = require('mongoose')
 
-const UserSchema = new mongoose.Schema({
+const CustomerSchema = new mongoose.Schema({
 	full_name: {
 		type: String,
 		required: true
@@ -21,17 +21,31 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	role: {
-		type: String, // CUSTOMER, EMPLOYEE, ADMIN
-		required: true
-	},
 	default_account_id: {
 		type: String,
 		unique: true
 	},
 	saving_account_id: {
 		type: Array
+	},
+	create_at: {
+		type: Number,
+		// require: true
+	},
+	is_active: {
+		type: Boolean,
+		// require: true
+	},
+	OTP: {
+		code: {
+			type: String,
+			// required: true
+		},
+		expiredAt: {
+			type: Number,
+			// required: true
+		}
 	}
 })
 
-module.exports = User = mongoose.model('user', UserSchema)
+module.exports = Customer = mongoose.model('customer', CustomerSchema)
