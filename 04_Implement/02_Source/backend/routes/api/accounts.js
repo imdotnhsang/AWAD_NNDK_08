@@ -25,7 +25,7 @@ const Customer = require('../../models/Customer')
 // @route     POST /accounts
 // @desc      Tạo tài khoản ngân hàng mới (BETA)
 // @access    Public
-router.post('/', check('balance', 'Please enter a balance with 0 or more').isAfter('49999'), async (req, res) => {
+router.post('/', check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }), async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
 		return res.status(400).send(errors)
