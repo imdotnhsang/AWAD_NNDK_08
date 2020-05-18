@@ -25,69 +25,69 @@ const User = require('../../models/User')
 // @desc      Tạo tài khoản ngân hàng mới (BETA)
 // @access    Public
 router.post('/', check('balance', 'Please enter a balance with 0 or more').isAfter('49999'), async (req, res) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    return res.status(400).send(errors)
-  }
+	const errors = validationResult(req)
+	if (!errors.isEmpty()) {
+		return res.status(400).send(errors)
+	}
 
-  const { balance } = req.body
-  const accountId = 1612559
-  const accountType = 'SAVING'
+	const { balance } = req.body
+	const accountId = 1612559
+	const accountType = 'SAVING'
 
-  try {
-    const account = new Account({ account_id: accountId, account_type: accountType, balance })
+	try {
+		const account = new Account({ account_id: accountId, account_type: accountType, balance })
 
-    const response = await account.save()
-    return res.status(200).json(response)
-  } catch (error) {
-    return res.status(500).json({ msg: 'Server error' })
-  }
+		const response = await account.save()
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error' })
+	}
 })
 
 // @route     GET /accounts
 // @desc      Lấy thông tin tài khoản ngân hàng (BETA)
 // @access    Public
 router.get('/', auth, async (req, res) => {
-  try {
-    const user = (await User.findById(req.user.id))
+	try {
+		const user = (await User.findById(req.user.id))
 
-    if (!user) {
-      return res.status(400).json({
-        errors: [{
-          msg: 'User not exists'
-        }]
-      })
-    }
+		if (!user) {
+			return res.status(400).json({
+				errors: [{
+					msg: 'User not exists'
+				}]
+			})
+		}
 
-    const { fullName, defaultAccountId } = user
+		const { fullName, defaultAccountId } = user
 
-    const account = await Account.findOne({ accountId: defaultAccountId })
+		const account = await Account.findOne({ accountId: defaultAccountId })
 
-    if (!account) {
-      return res.status(400).json({
-        errors: [{
-          msg: 'Account not exists'
-        }]
-      })
-    }
+		if (!account) {
+			return res.status(400).json({
+				errors: [{
+					msg: 'Account not exists'
+				}]
+			})
+		}
 
-    return res.status(200).json({ fullName, account })
-  } catch (error) {
-    return res.status(500).json({ msg: 'Server error' })
-  }
+		return res.status(200).json({ fullName, account })
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error' })
+	}
 })
 
 // @route     PUT /accounts
 // @desc      Cập nhật số tiền dư của tài khoản ngân hàng (BETA)
 // @access    Public
 router.put('/', async (req, res) => {
-  try {
-    const { accountId } = req.body
-    const response = await Account.findOne({ accountId })
-    res.status(200).json(response)
-  } catch (error) {
-    res.status(500).json({ msg: 'Server error' })
-  }
+	try {
+		const { accountId } = req.body
+		const response = await Account.findOne({ accountId })
+		res.status(200).json(response)
+	} catch (error) {
+		res.status(500).json({ msg: 'Server error' })
+	}
 })
 
 module.exports = router

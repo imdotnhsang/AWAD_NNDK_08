@@ -7,22 +7,22 @@ const db = config.get('mongoURI')
 // // "mongoURI":"mongodb://localhost:27017/daw"
 
 const connectDB = async () => {
-  try {
-    await mongoose.connect(db, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true
-    })
+	try {
+		await mongoose.connect(db, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+			useFindAndModify: false,
+			useCreateIndex: true
+		})
 
-    console.log('MongoDB Connected...')
-  } catch (err) {
-    console.error(err.message)
+		console.log('MongoDB Connected...')
+	} catch (err) {
+		console.error(err.message)
 
-    // Exit process with failure
-    // eslint-disable-next-line no-undef
-    process.exit(1)
-  }
+		// Exit process with failure
+		// eslint-disable-next-line no-undef
+		process.exit(1)
+	}
 }
 
 module.exports = connectDB
