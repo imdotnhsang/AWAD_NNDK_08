@@ -5,7 +5,7 @@ const { check, validationResult } = require('express-validator')
 // const NodeRSA = require('node-rsa')
 const auth = require('../../middleware/auth')
 const crypto = require('crypto')
-const openpgp = require('openpgp');
+const openpgp = require('openpgp')
 
 const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 
@@ -170,7 +170,7 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @access    Public
 router.get('/receiver-interbank', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
-	const bankInfo = await LinkedBank.findOne({bank_host:"localhost2"})
+	const bankInfo = await LinkedBank.findOne({bank_host:'localhost2'})
 	if (!bankInfo) {
 		return MakeResponse(req, res, {
 			status: APIStatus.Unauthorized,
@@ -191,25 +191,26 @@ router.get('/receiver-interbank', async (req, res) => {
 	}
 
 	// Decrypt entryTime bằng private key
-	let entryTimeDecrypted = ""
-	if (bankInfo.encrypt_type == "RSA") {
+	let entryTimeDecrypted = ''
+	if (bankInfo.encrypt_type == 'RSA') {
+		// eslint-disable-next-line no-undef
 		const buffer = Buffer.from(entryTimeEncrypted,'base64')
 		entryTimeDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
-		console.log("Entry time: "+ entryTimeDecrypted)
-	} else if (bankInfo.encrypt_type == "PGP") {
-		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key);
-		await privateKey.decrypt(bankInfo.passphrase);
+		console.log('Entry time: '+ entryTimeDecrypted)
+	} else if (bankInfo.encrypt_type == 'PGP') {
+		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
+		await privateKey.decrypt(bankInfo.passphrase)
 
-		entryTimeEncrypted = entryTimeEncrypted.replace(/\\n/g, "\n")
+		entryTimeEncrypted = entryTimeEncrypted.replace(/\\n/g, '\n')
 
 		const {data:decrypted} = await openpgp.decrypt({
 			message: await openpgp.message.readArmored(entryTimeEncrypted),             // parse armored message
 			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys, // for verification (optional)
 			privateKeys: [privateKey]                                           // for decryption
-		});
+		})
 
 		entryTimeDecrypted = decrypted
-		console.log("Entry time: "+ entryTimeDecrypted)
+		console.log('Entry time: '+ entryTimeDecrypted)
 	}
 
 
@@ -248,8 +249,8 @@ router.get('/receiver-interbank', async (req, res) => {
 
 	// Kiểm tra accountId mà ngân hàng đối tác gửi và kiểm tra accountId này có bị chỉnh sửa hay không ?
 
-	const accountIdHashed = req.headers["x_account_id_hashed"]
-	let accountIdEncrypted = req.headers["x_account_id_encrypted"]
+	const accountIdHashed = req.headers['x_account_id_hashed']
+	let accountIdEncrypted = req.headers['x_account_id_encrypted']
 
 	if (!accountIdHashed || !accountIdEncrypted) {
 		return MakeResponse(req, res, {
@@ -259,25 +260,26 @@ router.get('/receiver-interbank', async (req, res) => {
 	}
 
 
-	let accountIdDecrypted = ""
-	if (bankInfo.encrypt_type == "RSA") {
+	let accountIdDecrypted = ''
+	if (bankInfo.encrypt_type == 'RSA') {
+		// eslint-disable-next-line no-undef
 		const buffer = Buffer.from(accountIdEncrypted,'base64')
 		accountIdDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
-		console.log("Account ID: " + accountIdDecrypted)
-	} else if (bankInfo.encrypt_type == "PGP") {
-		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key);
-		await privateKey.decrypt(bankInfo.passphrase);
+		console.log('Account ID: ' + accountIdDecrypted)
+	} else if (bankInfo.encrypt_type == 'PGP') {
+		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
+		await privateKey.decrypt(bankInfo.passphrase)
 
-		accountIdEncrypted = accountIdEncrypted.replace(/\\n/g, "\n")
+		accountIdEncrypted = accountIdEncrypted.replace(/\\n/g, '\n')
 
 		const {data:decrypted} = await openpgp.decrypt({
 			message: await openpgp.message.readArmored(accountIdEncrypted),             // parse armored message
 			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys, // for verification (optional)
 			privateKeys: [privateKey]                                           // for decryption
-		});
+		})
 
 		accountIdDecrypted = decrypted
-		console.log("Account id: "+ accountIdDecrypted)
+		console.log('Account id: '+ accountIdDecrypted)
 	}
 
 
