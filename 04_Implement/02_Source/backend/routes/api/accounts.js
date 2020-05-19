@@ -8,48 +8,62 @@ const auth = require('../../middleware/auth')
 const Account = require('../../models/Account')
 const Customer = require('../../models/Customer')
 
-// function changeAlias(fullName) {
-//     let str = fullName
-//     str = str.toLowerCase()
-//     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a")
-//     str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e")
-//     str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i")
-//     str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o")
-//     str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u")
-//     str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y")
-//     str = str.replace(/đ/g, "d")
-//     str = str.toUpperCase()
-//     return str
-// }
-
 // @route     POST /accounts
-// @desc      Tạo tài khoản ngân hàng mới (BETA)
+// @desc      Tạo tài khoản ngân hàng với loại tiết kiệm cho một customer dựa trên default_account_id
 // @access    Public
-router.post('/', check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }), async (req, res) => {
+router.post('/', [
+	check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }),
+	check('defaultAccountId', 'Default account id is required').not().notEmpty()
+], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
 		return res.status(400).send(errors)
 	}
 
-	const { balance } = req.body
+	const { balance, defaultAccountId } = req.body
+
 	const accountType = 'SAVING'
 
 	const nanoid = customAlphabet('1234567890', 14)
 	const accountId = nanoid()
 
+	const checkErrorsMongoose = {
+		createSavingAccount: false
+	}
 
 	try {
+		const customer = await Customer.findOne({ default_account_id: defaultAccountId })
+
+		if (!customer) {
+			return res.status(400).json({
+				errors: [{
+					msg: 'Customer not exists'
+				}]
+			})
+		}
+
 		const account = new Account({ account_id: accountId, account_type: accountType, balance })
 
-		const response = await account.save()
-		return res.status(200).json(response)
+		const responseAccount = await account.save()
+
+		checkErrorsMongoose.createSavingAccount = { account_by_id: responseAccount._id }
+
+
+		customer.saving_account_id.push(responseAccount.account_id)
+		const updatedCustomer = await customer.save()
+
+		return res.status(200).json({ responseAccount, updatedCustomer })
 	} catch (error) {
+		if (checkErrorsMongoose.createSavingAccount.account_by_id !== false) {
+			await Account.findByIdAndRemove(checkErrorsMongoose.createSavingAccount.account_by_id)
+		}
+		
 		return res.status(500).json({ msg: 'Server error' })
 	}
 })
 
 // @route     GET /accounts
-// @desc      Lấy thông tin tài khoản ngân hàng (BETA)
+// @desc      Lấy thông tin tài khoản ngân hàng
 // @access    Public
 router.get('/', auth, async (req, res) => {
 	try {
@@ -63,32 +77,27 @@ router.get('/', auth, async (req, res) => {
 			})
 		}
 
-		const { full_name: fullName, default_account_id: defaultAccountId } = customer
+		const { full_name: fullName, default_account_id: defaultAccountId, saving_account_id: savingAccountsId } = customer
+
+		let savingAccounts = []
+		if (savingAccountsId.length !== 0) {
+			savingAccountsId.map(async (e) => savingAccounts.push(await Account.findOne({ account_id: e })))
+		}
 
 		const defaultAccount = await Account.findOne({ account_id: defaultAccountId })
 
-		if (!defaultAccount) {
-			return res.status(400).json({
-				errors: [{
-					msg: 'Account not exists'
-				}]
-			})
-		}
-
-		return res.status(200).json({ fullName, defaultAccount })
+		return res.status(200).json({ fullName, defaultAccount, savingAccounts })
 	} catch (error) {
 		return res.status(500).json({ msg: 'Server error' })
 	}
 })
 
 // @route     PUT /accounts
-// @desc      Cập nhật số tiền dư của tài khoản ngân hàng (BETA)
+// @desc      Cập nhật số tiền dư của tài khoản ngân hàng
 // @access    Public
 router.put('/', async (req, res) => {
 	try {
-		const { accountId } = req.body
-		const response = await Account.findOne({ account_id: accountId })
-		res.status(200).json(response)
+		res.status(200).json({ msg: 'PUT /accounts' })
 	} catch (error) {
 		res.status(500).json({ msg: 'Server error' })
 	}

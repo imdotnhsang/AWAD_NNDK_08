@@ -155,7 +155,7 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 	}
 })
 
-// @route     GET /transactions/receiver-interbank/:accountId
+// @route     GET /transactions/receiver-interbank/
 // @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản
 // @access    Public
 router.get('/receiver-interbank', async (req, res) => {
@@ -193,7 +193,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	if (isNaN(entryTimeDecrypted)) {
 		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
-			message: 'Entrytime must be an unix number'
+			message: 'Entry time must be an unix number'
 		})
 	}
 
@@ -201,7 +201,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	if (entryTimeHashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(entryTimeDecrypted).digest('hex')) {
 		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
-			message: 'Entrytime is invalid'
+			message: 'Entry time is invalid'
 		})
 	}
 
@@ -210,7 +210,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	if (entryTimeDecrypted > currentTime) {
 		return MakeResponse(req, res, {
 			status: APIStatus.Invalid,
-			message: 'Entrytime is invalid (entrytime is greater than now)'
+			message: 'Entry time is invalid (entrytime is greater than now)'
 		})
 	}
 
@@ -249,8 +249,6 @@ router.get('/receiver-interbank', async (req, res) => {
 			message: 'AccountId is invalid'
 		})
 	}
-
-
 
 	const accessedApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory, { bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted })
 	if (accessedApiHistoryResp.status == APIStatus.Ok) {

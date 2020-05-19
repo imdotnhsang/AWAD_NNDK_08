@@ -17,6 +17,7 @@ const Account = require('../../models/Account')
 router.post('/', [
 	check('fullName', 'Full name is required').not().notEmpty(),
 	check('email', 'Please include a valid email').isEmail(),
+	check('phoneNumber', 'Please include a valid phone number').isLength({ min: 10, max: 10 }),
 	check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
 	check('balance', 'Please enter a balance with 50000 or more').isInt({ min: 50000 })
 ], async (req, res) => {
