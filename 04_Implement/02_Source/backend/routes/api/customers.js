@@ -33,7 +33,6 @@ router.post('/', [
 		isActive,
 		OTP
 	} = req.body
-	const accountType = 'DEFAULT'
 
 	const nanoid = customAlphabet('1234567890', 14)
 	const accountId = nanoid()
@@ -70,7 +69,7 @@ router.post('/', [
 			})
 		}
 
-		account = new Account({ account_id: accountId, account_type: accountType, balance })
+		account = new Account({ account_id: accountId, account_type: 'DEFAULT', balance })
 
 		const responseAccountPost = await account.save()
 
