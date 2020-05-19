@@ -1,17 +1,23 @@
 {
-  "description":"Body: balance, email",
+  "description":"Body: balance, email, phoneNumber, defaultAccountId",
   "data":{
     "test01":{
       "balance":10000000,
-      "email":"nqhuan@gmail.com"
+      "email":"nqhuan@gmail.com",
+      "phoneNumber":"0122316123",
+      "defaultAccountId":"98482753982457"
     },
     "test02":{
       "balance":10000000,
-      "email":"nhsang@gmail.com"
+      "email":"nhsang@gmail.com",
+      "phoneNumber":"0125436123",
+      "defaultAccountId":"30152149459932"
     },
     "test03":{
       "balance":10000000,
-      "email":"lhsang@gmail.com"
+      "email":"lhsang@gmail.com",
+      "phoneNumber":"0125436099",
+      "defaultAccountId":"30590146786904"
     }
   }
 }

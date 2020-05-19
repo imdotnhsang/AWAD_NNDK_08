@@ -9,18 +9,20 @@ const Account = require('../../models/Account')
 const Customer = require('../../models/Customer')
 
 // @route     POST /accounts
-// @desc      Tạo tài khoản ngân hàng với loại tiết kiệm cho một customer dựa trên default_account_id
+// @desc      Tạo tài khoản ngân hàng với loại tiết kiệm cho một customer
 // @access    Public
 router.post('/', [
 	check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }),
-	check('email', 'Please include a valid email').isEmail()
+	check('email', 'Please include a valid email').isEmail(),
+	check('phoneNumber', 'Please include a valid phone number').isLength({ min: 10, max: 10 }),
+	check('defaultAccountId', 'Default account id is required').not().notEmpty()
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
 		return res.status(400).send(errors)
 	}
 
-	const { balance, email } = req.body
+	const { balance, email, phoneNumber, defaultAccountId } = req.body
 
 	const nanoid = customAlphabet('1234567890', 14)
 	const accountId = nanoid()
@@ -30,7 +32,11 @@ router.post('/', [
 	}
 
 	try {
-		const customer = await Customer.findOne({ email })
+		const customer = await Customer.findOne({
+			email,
+			phone_number: phoneNumber,
+			default_account_id: defaultAccountId
+		})
 
 		if (!customer) {
 			return res.status(400).json({
