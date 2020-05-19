@@ -48,12 +48,20 @@ router.post('/transfering-within-bank', [
 		if (!customer) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'customer not exists'
+					msg: 'Customer not exists'
 				}]
 			})
 		}
 
 		const fromAccountFullname = customer.full_name
+		const listAccountId = customer.saving_account_id.push(customer.default_account_id)
+		if (listAccountId.indexOf(fromAccountId) === -1) {
+			return res.status(400).json({
+				errors: [{
+					msg: 'Account id is not account\'s customer'
+				}]
+			})
+		}
 
 		if (fromAccountId === toAccountId) {
 			return res.status(400).json({
@@ -67,7 +75,7 @@ router.post('/transfering-within-bank', [
 
 		const accountReceiver = await Account.findOne({ account_id: toAccountId })
 
-		if (!accountTransferer || !accountReceiver) {
+		if (!accountTransferer && !accountReceiver) {
 			return res.status(400).json({
 				errors: [{
 					msg: 'Account not exists'
