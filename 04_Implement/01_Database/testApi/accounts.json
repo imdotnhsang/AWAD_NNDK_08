@@ -1,0 +1,17 @@
+{
+  "description":"Body: balance, email",
+  "data":{
+    "test01":{
+      "balance":10000000,
+      "email":"nqhuan@gmail.com"
+    },
+    "test02":{
+      "balance":10000000,
+      "email":"nhsang@gmail.com"
+    },
+    "test03":{
+      "balance":10000000,
+      "email":"lhsang@gmail.com"
+    }
+  }
+}

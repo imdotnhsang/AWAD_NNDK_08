@@ -24,6 +24,7 @@ const DBModelInstance = new DBModel()
 router.post('/transfering-within-bank', [
 	auth,
 	check('entryTime', 'Entry time is required').not().notEmpty(),
+	check('fromAccountId', 'Transferer account is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
 	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
 	check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({ min: 50000 })
@@ -35,6 +36,7 @@ router.post('/transfering-within-bank', [
 
 	const {
 		entryTime,
+		fromAccountId,
 		toAccountId,
 		toAccountFullname,
 		transactionAmount
@@ -52,7 +54,6 @@ router.post('/transfering-within-bank', [
 		}
 
 		const fromAccountFullname = customer.full_name
-		const fromAccountId = customer.default_account_id
 
 		if (fromAccountId === toAccountId) {
 			return res.status(400).json({

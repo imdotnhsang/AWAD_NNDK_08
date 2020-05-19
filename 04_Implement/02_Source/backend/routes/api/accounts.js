@@ -13,16 +13,14 @@ const Customer = require('../../models/Customer')
 // @access    Public
 router.post('/', [
 	check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }),
-	check('defaultAccountId', 'Default account id is required').not().notEmpty()
+	check('email', 'Please include a valid email').isEmail()
 ], async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
 		return res.status(400).send(errors)
 	}
 
-	const { balance, defaultAccountId } = req.body
-
-	const accountType = 'SAVING'
+	const { balance, email } = req.body
 
 	const nanoid = customAlphabet('1234567890', 14)
 	const accountId = nanoid()
@@ -32,7 +30,7 @@ router.post('/', [
 	}
 
 	try {
-		const customer = await Customer.findOne({ default_account_id: defaultAccountId })
+		const customer = await Customer.findOne({ email })
 
 		if (!customer) {
 			return res.status(400).json({
@@ -42,7 +40,7 @@ router.post('/', [
 			})
 		}
 
-		const account = new Account({ account_id: accountId, account_type: accountType, balance })
+		const account = new Account({ account_id: accountId, account_type: 'SAVING', balance })
 
 		const responseAccount = await account.save()
 

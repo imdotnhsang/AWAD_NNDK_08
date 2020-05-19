@@ -5,9 +5,6 @@ const { customAlphabet } = require('nanoid')
 const bcrypt = require('bcrypt')
 const { check, validationResult } = require('express-validator')
 
-const { MakeResponse } = require('../../utils/APIStatus.js')
-const customerAction = require('../../action/customer.js')
-
 const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 
@@ -31,8 +28,10 @@ router.post('/', [
 		email,
 		phoneNumber,
 		password,
-		role,
-		balance
+		balance,
+		createdAt,
+		isActive,
+		OTP
 	} = req.body
 	const accountType = 'DEFAULT'
 
@@ -75,24 +74,31 @@ router.post('/', [
 
 		const responseAccountPost = await account.save()
 
-		try {
-			const defaultAccountId = responseAccountPost.account_id
+		const defaultAccountId = responseAccountPost.account_id
 
-			customer = new Customer({
-				full_name: fullName, email, phone_number: phoneNumber, password, role, default_account_id: defaultAccountId
-			})
+		customer = new Customer({
+			full_name: fullName,
+			email,
+			phone_number: phoneNumber,
+			password,
+			default_account_id: defaultAccountId,
+			created_at: createdAt,
+			is_active: isActive,
+			OTP: {
+				code: OTP.code,
+				expired_at: OTP.expiredAt
+			}
+		})
 
-			const salt = await bcrypt.genSalt(10)
+		const salt = await bcrypt.genSalt(10)
 
-			customer.password = await bcrypt.hash(password, salt)
+		customer.password = await bcrypt.hash(password, salt)
 
-			const response = await customer.save()
+		const response = await customer.save()
 
-			return res.status(200).json(response)
-		} catch (error) {
-			return res.status(500).send('Server error')
-		}
+		return res.status(200).json(response)
 	} catch (error) {
+		console.log(error)
 		return res.status(500).send('Server error')
 	}
 })
@@ -101,26 +107,14 @@ router.post('/', [
 // @desc      Lấy thông tin của customer
 // @access    Public
 router.get('/', async (req, res) => {
-	const customer = {
-		role: 'CUSTOMER'
-	}
-
-	const response = await customerAction.getCustomer(customer, null, 0, 1000, true, true)
-
-	return res.status(200).json(response)
+	return res.status(200).json({ msg: 'GET /customers' })
 })
 
 // @route     PUT /customers
 // @desc      Cập nhật thông tin customer
 // @access    Public
 router.put('/', async (req, res) => {
-	const input = {
-		role: 'CUSTOMER',
-		full_name: 'Sơn'
-	}
-
-	const response = await customerAction.updateCustomer(input)
-	return MakeResponse(req, res, response)
+	return res.status(200).json({ msg: 'PUT /customers' })
 })
 
 module.exports = router

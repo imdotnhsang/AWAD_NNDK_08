@@ -28,22 +28,22 @@ const CustomerSchema = new mongoose.Schema({
 	saving_account_id: {
 		type: Array
 	},
-	create_at: {
+	created_at: {
 		type: Number,
-		// require: true
+		require: true
 	},
 	is_active: {
 		type: Boolean,
-		// require: true
+		require: true
 	},
 	OTP: {
 		code: {
 			type: String,
-			// required: true
+			required: true
 		},
-		expiredAt: {
+		expired_at: {
 			type: Number,
-			// required: true
+			required: true
 		}
 	}
 })

@@ -1,0 +1,44 @@
+{
+  "description":"Body: fullName, email, phoneNumber, password, balance, createdAt, isActive, OTP",
+  "data":{
+    "test01":{
+      "fullName":"Lê Hoàng Sang",
+      "email":"lhsang@gmail.com",
+      "phoneNumber":"0125436099",
+      "password":"123456",
+      "balance":"5000000",
+      "createdAt":1589898573423,
+      "isActive": true,
+      "OTP":{
+        "code":"123456",
+        "expiredAt": 1589898573423
+      }
+    },
+    "test02":{
+      "fullName":"Nguyễn Hoàng Sang",
+      "email":"nhsang@gmail.com",
+      "phoneNumber":"0125436123",
+      "password":"123456",
+      "balance":"5000000",
+      "createdAt":1589898573423,
+      "isActive": true,
+      "OTP":{
+        "code":"123456",
+        "expiredAt": 1589898573423
+      }
+    },
+    "test03":{
+      "fullName":"Nguyễn Quang Huân",
+      "email":"nqhuan@gmail.com",
+      "phoneNumber":"0122316123",
+      "password":"123456",
+      "balance": "5000000",
+      "createdAt":1589898573423,
+      "isActive": true,
+      "OTP":{
+        "code":"123456",
+        "expiredAt": 1589898573423
+      }
+    }
+  }
+}
