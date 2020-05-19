@@ -35,6 +35,9 @@ const LinkedBankSchema = new mongoose.Schema({
 	hash_algorithm: {
 		type: String,
 		required: true
+	},
+	passphrase: {
+		type: String
 	}
 })
 

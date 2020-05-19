@@ -35,6 +35,12 @@ class DBModel {
             message: err,
           }))
         }
+        if (docs.length == 0) {
+          resolve(new APIResponse({
+            status: APIStatus.NotFound,
+            message: `Not found any matched ${modelName}`
+          }))
+        }
         resolve(new APIResponse({
           status: APIStatus.Ok,
           data: Array.isArray(docs) ? docs : [docs],
@@ -52,6 +58,12 @@ class DBModel {
           resolve(new APIResponse({
             status: APIStatus.Error,
             message: err,
+          }))
+        }
+        if (docs.length == 0) {
+          resolve(new APIResponse({
+            status: APIStatus.NotFound,
+            message: `Not found any matched ${modelName}`
           }))
         }
         resolve(new APIResponse({
