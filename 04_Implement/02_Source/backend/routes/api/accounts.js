@@ -48,7 +48,6 @@ router.post('/', [
 
 		checkErrorsMongoose.createSavingAccount = { account_by_id: responseAccount._id }
 
-
 		customer.saving_account_id.push(responseAccount.account_id)
 		const updatedCustomer = await customer.save()
 
@@ -57,7 +56,7 @@ router.post('/', [
 		if (checkErrorsMongoose.createSavingAccount.account_by_id !== false) {
 			await Account.findByIdAndRemove(checkErrorsMongoose.createSavingAccount.account_by_id)
 		}
-		
+
 		return res.status(500).json({ msg: 'Server error' })
 	}
 })
