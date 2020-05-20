@@ -39,9 +39,9 @@ const TransactionSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	transaction_status: { // SUCCESS, FAILED, REFUND
+	transaction_status: { // SUCCESS, FAILED, REFUND, PENDING
 		type: String,
-		// require: true
+		require: true
 	},
 	transaction_balance_before: {
 		type: Number,

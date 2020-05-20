@@ -27,10 +27,6 @@ router.post('/', [
 	const nanoid = customAlphabet('1234567890', 14)
 	const accountId = nanoid()
 
-	const checkErrorsMongoose = {
-		createSavingAccount: false
-	}
-
 	try {
 		const customer = await Customer.findOne({
 			email,
@@ -50,17 +46,11 @@ router.post('/', [
 
 		const responseAccount = await account.save()
 
-		checkErrorsMongoose.createSavingAccount = { account_by_id: responseAccount._id }
-
 		customer.saving_account_id.push(responseAccount.account_id)
 		const updatedCustomer = await customer.save()
 
 		return res.status(200).json({ responseAccount, updatedCustomer })
 	} catch (error) {
-		if (checkErrorsMongoose.createSavingAccount.account_by_id !== false) {
-			await Account.findByIdAndRemove(checkErrorsMongoose.createSavingAccount.account_by_id)
-		}
-
 		return res.status(500).json({ msg: 'Server error' })
 	}
 })

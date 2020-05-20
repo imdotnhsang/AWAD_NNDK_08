@@ -46,7 +46,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Invalid Credentials',
+							msg: 'Email not exists',
 						},
 					],
 				})
@@ -58,7 +58,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Invalid Credentials',
+							msg: 'Password is incorrect',
 						},
 					],
 				})

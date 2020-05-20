@@ -43,6 +43,12 @@ router.post('/transfering-within-bank', [
 		transactionAmount
 	} = req.body
 
+	const checkErrorsMongoose = {
+		updateTransfererAccount: false,
+		createTransfererTransaction: false,
+		updateReceiverAccount: false
+	}
+
 	try {
 		const customer = await Customer.findById(req.user.id)
 
@@ -55,11 +61,12 @@ router.post('/transfering-within-bank', [
 		}
 
 		const fromAccountFullname = customer.full_name
-		const listAccountId = customer.saving_account_id.push(customer.default_account_id)
+		const listAccountId = [...customer.saving_account_id, customer.default_account_id]
+
 		if (listAccountId.indexOf(fromAccountId) === -1) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'Account id is not account\'s customer'
+					msg: 'Transfering account id is not account\'s customer'
 				}]
 			})
 		}
@@ -76,15 +83,15 @@ router.post('/transfering-within-bank', [
 
 		const accountReceiver = await Account.findOne({ account_id: toAccountId })
 
-		if (!accountTransferer && !accountReceiver) {
+		if (!accountTransferer || !accountReceiver) {
 			return res.status(400).json({
 				errors: [{
-					msg: 'Account not exists'
+					msg: 'Account transferer or account receiver not exists'
 				}]
 			})
 		}
 
-		if (accountTransferer.balance - transactionAmount < 0) {
+		if (accountTransferer.balance - transactionAmount < 50000) {
 			return res.status(400).json({
 				errors: [{
 					msg: 'Insufficient funds'
@@ -102,8 +109,7 @@ router.post('/transfering-within-bank', [
 			to_bank_id: 'EIGHT',
 			transaction_type: 'TRANSFER',
 			transaction_amount: transactionAmount,
-			transaction_balance_before: accountTransferer.balance,
-			transaction_balance_after: accountTransferer.balance - transactionAmount
+			transaction_balance_before: accountTransferer.balance
 		})
 
 		const transactionReceiver = new Transaction({
@@ -117,25 +123,60 @@ router.post('/transfering-within-bank', [
 			transaction_type: 'RECEIVE',
 			transaction_amount: transactionAmount,
 			transaction_balance_before: accountReceiver.balance,
-			transaction_balance_after: Number(accountReceiver.balance) + Number(transactionAmount)
 		})
 
-		const accountTransfererResponse = await Account.findOneAndUpdate({ account_id: fromAccountId }, { $inc: { balance: -transactionAmount } }, {
-			new: true
-		})
+		const accountTransfererResponse = await Account.findOneAndUpdate(
+			{ account_id: fromAccountId },
+			{ $inc: { balance: -transactionAmount } },
+			{ new: true }
+		)
 
-		const transactionTransfererResponse = await transactionTransferer.save()
+		checkErrorsMongoose.updateTransfererAccount = { account_id: accountTransfererResponse.account_id }
 
-		const accountReceiverResponse = await Account.findOneAndUpdate({ account_id: toAccountId }, { $inc: { balance: transactionAmount } }, {
-			new: true
-		})
+		const accountReceiverResponse = await Account.findOneAndUpdate(
+			{ account_id: toAccountId },
+			{ $inc: { balance: transactionAmount } },
+			{ new: true }
+		)
 
-		const transactionReceiverResponse = await transactionReceiver.save()
+		checkErrorsMongoose.updateReceiverAccount = { account_id: accountReceiverResponse.account_id }
+
+		const transactionTransfererResponse = await Transaction({
+			...transactionTransferer._doc,
+			transaction_balance_after: accountTransfererResponse.balance,
+			transaction_status: 'PENDING'
+		}).save()
+
+		checkErrorsMongoose.createTransfererTransaction = transactionTransfererResponse
+
+		const transactionReceiverResponse = await Transaction({
+			...transactionReceiver._doc,
+			transaction_balance_after: accountReceiverResponse.balance,
+			transaction_status: 'PENDING'
+		}).save()
+
+		transactionTransfererResponse.transaction_status = 'SUCCESS'
+		transactionTransfererResponse.save()
+
+		transactionReceiverResponse.transaction_status = 'SUCCESS'
+		transactionReceiverResponse.save()
+
+		console.log(checkErrorsMongoose)
 
 		return res.status(200).json({
 			transactionTransfererResponse, transactionReceiverResponse, accountTransfererResponse, accountReceiverResponse
 		})
 	} catch (error) {
+		if (checkErrorsMongoose.createTransfererTransaction !== false) {
+			console.log('1')
+		} else if (checkErrorsMongoose.updateReceiverAccount !== false) {
+			checkErrorsMongoose.createTransfererTransaction.transaction_status = 'FAILED'
+			Transaction(checkErrorsMongoose.createTransfererTransaction).save()
+		} else if (checkErrorsMongoose.updateTransfererAccount !== false) {
+			console.log('3')
+		}
+
+
 		return res.status(500).json({ msg: 'Server error' })
 	}
 })
@@ -170,7 +211,7 @@ router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
 // @access    Public
 router.get('/receiver-interbank', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
-	const bankInfo = await LinkedBank.findOne({bank_host:'localhost2'})
+	const bankInfo = await LinkedBank.findOne({ bank_host: 'localhost2' })
 	if (!bankInfo) {
 		return MakeResponse(req, res, {
 			status: APIStatus.Unauthorized,
@@ -194,23 +235,23 @@ router.get('/receiver-interbank', async (req, res) => {
 	let entryTimeDecrypted = ''
 	if (bankInfo.encrypt_type == 'RSA') {
 		// eslint-disable-next-line no-undef
-		const buffer = Buffer.from(entryTimeEncrypted,'base64')
-		entryTimeDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
-		console.log('Entry time: '+ entryTimeDecrypted)
+		const buffer = Buffer.from(entryTimeEncrypted, 'base64')
+		entryTimeDecrypted = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
+		console.log('Entry time: ' + entryTimeDecrypted)
 	} else if (bankInfo.encrypt_type == 'PGP') {
 		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
 		await privateKey.decrypt(bankInfo.passphrase)
 
 		entryTimeEncrypted = entryTimeEncrypted.replace(/\\n/g, '\n')
 
-		const {data:decrypted} = await openpgp.decrypt({
+		const { data: decrypted } = await openpgp.decrypt({
 			message: await openpgp.message.readArmored(entryTimeEncrypted),             // parse armored message
 			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys, // for verification (optional)
-			privateKeys: [privateKey]                                           // for decryption
+			privateKeys: [privateKey]                                           				// for decryption
 		})
 
 		entryTimeDecrypted = decrypted
-		console.log('Entry time: '+ entryTimeDecrypted)
+		console.log('Entry time: ' + entryTimeDecrypted)
 	}
 
 
@@ -263,8 +304,8 @@ router.get('/receiver-interbank', async (req, res) => {
 	let accountIdDecrypted = ''
 	if (bankInfo.encrypt_type == 'RSA') {
 		// eslint-disable-next-line no-undef
-		const buffer = Buffer.from(accountIdEncrypted,'base64')
-		accountIdDecrypted = crypto.privateDecrypt({key: bankInfo.our_private_key, padding:crypto.constants.RSA_PKCS1_PADDING},buffer).toString('utf-8')
+		const buffer = Buffer.from(accountIdEncrypted, 'base64')
+		accountIdDecrypted = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
 		console.log('Account ID: ' + accountIdDecrypted)
 	} else if (bankInfo.encrypt_type == 'PGP') {
 		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
@@ -272,14 +313,14 @@ router.get('/receiver-interbank', async (req, res) => {
 
 		accountIdEncrypted = accountIdEncrypted.replace(/\\n/g, '\n')
 
-		const {data:decrypted} = await openpgp.decrypt({
+		const { data: decrypted } = await openpgp.decrypt({
 			message: await openpgp.message.readArmored(accountIdEncrypted),             // parse armored message
 			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys, // for verification (optional)
 			privateKeys: [privateKey]                                           // for decryption
 		})
 
 		accountIdDecrypted = decrypted
-		console.log('Account id: '+ accountIdDecrypted)
+		console.log('Account id: ' + accountIdDecrypted)
 	}
 
 
