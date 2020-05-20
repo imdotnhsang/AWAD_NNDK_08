@@ -1,0 +1,13 @@
+---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: wmc-service
+    spec:
+      type: LoadBalancer
+      ports:
+      - name: http
+        port: 80
+        targetPort: 5000
+      selector:
+          name: wmc-app
