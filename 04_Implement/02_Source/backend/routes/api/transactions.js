@@ -389,6 +389,7 @@ router.post('/transfering-interbank', [
 
 	const {
 		entryTime,
+		fromAccountId,
 		toAccountId,
 		toAccountFullname,
 		toBankId,
@@ -407,7 +408,6 @@ router.post('/transfering-interbank', [
 		}
 
 		const fromAccountFullname = customer.full_name
-		const fromAccountId = customer.default_account_id
 
 		const account = await Account.findOne({ account_id: fromAccountId })
 
