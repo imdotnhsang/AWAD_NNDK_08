@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
-const auth = require('../../middleware/auth')
+const authCustomer = require('../../middleware/authCustomer')
 
 const Account = require('../../models/Account')
 const Customer = require('../../models/Customer')
@@ -58,7 +58,7 @@ router.post('/', [
 // @route     GET /accounts
 // @desc      Lấy thông tin tài khoản ngân hàng
 // @access    Public
-router.get('/', auth, async (req, res) => {
+router.get('/', authCustomer, async (req, res) => {
 	try {
 		const customer = (await Customer.findById(req.user.id))
 

@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const { check, validationResult } = require('express-validator')
 // const NodeRSA = require('node-rsa')
-const auth = require('../../middleware/auth')
+const authCustomer = require('../../middleware/authCustomer')
 const crypto = require('crypto')
 const openpgp = require('openpgp')
 
@@ -23,7 +23,7 @@ const DBModelInstance = new DBModel()
 // @desc      Chuyển khoản trong ngân hàng
 // @access    Public
 router.post('/transfering-within-bank', [
-	auth,
+	authCustomer,
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('fromAccountId', 'Transferer account is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
@@ -197,7 +197,7 @@ router.post('/transfering-within-bank', [
 // @route     GET /transactions/receiver-withinbank/:accountId
 // @desc      Lấy họ và tên người nhận khi chuyển khoản cùng ngân hàng
 // @access    Public
-router.get('/receiver-withinbank/:accountId', auth, async (req, res) => {
+router.get('/receiver-withinbank/:accountId', authCustomer, async (req, res) => {
 	try {
 		const { accountId } = req.params
 
@@ -375,7 +375,7 @@ router.get('/receiver-interbank', async (req, res) => {
 // @desc      Chuyển khoản đến ngân hàng khác
 // @access    Public
 router.post('/transfering-interbank', [
-	auth,
+	authCustomer,
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
 	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
