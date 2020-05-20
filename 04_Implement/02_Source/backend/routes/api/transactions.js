@@ -239,7 +239,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	if (!accessToken) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Unauthorized,
-			message: "Not allow to access this api"
+			message: 'Not allow to access this api'
 		})
 	}
 
@@ -247,7 +247,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	if (!bankInfo) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Unauthorized,
-			message: "Not allow to access this api"
+			message: 'Not allow to access this api'
 		})
 	}
 
@@ -255,7 +255,7 @@ router.get('/receiver-interbank', async (req, res) => {
 	if (!digitalSignature) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Forbidden,
-			message: "Require digital signature"
+			message: 'Require digital signature'
 		})
 	}
 
@@ -312,8 +312,10 @@ router.get('/receiver-interbank', async (req, res) => {
 	//  console.log(bufferTest.toString('base64'))
 
 	// Kiểm tra chữ ký có hợp lệ hay không
-	if (bankInfo.encrypt_type == "RSA") {
+	if (bankInfo.encrypt_type == 'RSA') {
+		// eslint-disable-next-line no-undef
 		const bufferAccountId = Buffer.from(accountIdHashed, 'base64')
+		// eslint-disable-next-line no-undef
 		const bufferSignature = Buffer.from(digitalSignature,'base64')
 		const check = crypto.verify(
 			bankInfo.hash_algorithm,
@@ -328,13 +330,13 @@ router.get('/receiver-interbank', async (req, res) => {
 		if (!check) {
 			return MakeResponse(req,res,{
 				status: APIStatus.Invalid,
-				message: "Signature is invalid"
+				message: 'Signature is invalid'
 			})
 		}
-	} else if (bankInfo.encrypt_type == "PGP") {
+	} else if (bankInfo.encrypt_type == 'PGP') {
 
-		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key);
-		await privateKey.decrypt(bankInfo.passphrase);
+		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
+		await privateKey.decrypt(bankInfo.passphrase)
 
 		// đoạn này lưu lại để hướng dẫn mấy nhóm khác tạo chữ ký
 		// const { data: cleartext } = await openpgp.sign({
@@ -350,12 +352,12 @@ router.get('/receiver-interbank', async (req, res) => {
 		const verified = await openpgp.verify({
 			message: await openpgp.cleartext.readArmored(digitalSignature),           // parse armored message
 			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys // for verification
-		});
-		const { valid } = verified.signatures[0];
+		})
+		const { valid } = verified.signatures[0]
 		if (!valid) {
 			return MakeResponse(req,res,{
 				stauts: APIStatus.Invalid,
-				message: "Signature is invalid"
+				message: 'Signature is invalid'
 			})
 		}
 	}
