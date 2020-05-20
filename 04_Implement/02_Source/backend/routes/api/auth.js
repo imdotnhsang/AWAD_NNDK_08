@@ -64,6 +64,16 @@ router.post(
 				})
 			}
 
+			if (!customer.is_active) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Account is not active',
+						},
+					],
+				})
+			}
+
 			const payload = {
 				user: {
 					id: customer.id,
