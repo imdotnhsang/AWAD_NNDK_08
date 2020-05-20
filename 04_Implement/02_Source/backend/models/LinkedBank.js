@@ -20,7 +20,7 @@ const LinkedBankSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	bank_host: {
+	access_token: {
 		type: String,
 		required: true
 	},

@@ -224,13 +224,115 @@ router.get('/receiver-withinbank/:accountId', authCustomer, async (req, res) => 
 // @access    Public
 router.get('/receiver-interbank', async (req, res) => {
 	// Kiểm tra ngân hàng đã được liên kết chưa. Ý tưởng: check ip nơi gọi xem đã có trong db chưa. Do các nhóm kia chưa deploy nên tạm pass bước này
-	const bankInfo = await LinkedBank.findOne({ bank_host: 'localhost2' })
-	if (!bankInfo) {
-		return MakeResponse(req, res, {
+	// const bankInfo = await LinkedBank.findOne({ bank_host: 'localhost2' })
+	// if (!bankInfo) {
+	// 	return MakeResponse(req, res, {
+	// 		status: APIStatus.Unauthorized,
+	// 		message: 'Not allow to see info'
+	// 	})
+	// }
+
+	// Kiểm tra ngân hàng đã được liên kết hay chưa ?. Ý tưởng: cung cấp cho các ngân hàng access_token để gọi api.
+	// nếu access token tồn tại thì tiếp tục verify chữ ký bất đối xứng của ngân hàng đó.
+
+	const accessToken = req.headers['x_access_token']
+	if (!accessToken) {
+		return MakeResponse(req,res,{
 			status: APIStatus.Unauthorized,
-			message: 'Not allow to see info'
+			message: "Not allow to access this api"
 		})
 	}
+
+	const bankInfo = await LinkedBank.findOne({access_token: accessToken})
+	if (!bankInfo) {
+		return MakeResponse(req,res,{
+			status: APIStatus.Unauthorized,
+			message: "Not allow to access this api"
+		})
+	}
+
+	const digitalSignature = req.headers['x_siginature']
+	if (!digitalSignature) {
+		return MakeResponse(req,res,{
+			status: APIStatus.Forbidden,
+			message: "Require digital signature"
+		})
+	}
+
+	// Kiểm tra accountId mà ngân hàng đối tác gửi và kiểm tra accountId này có bị chỉnh sửa hay không ?
+	const accountIdHashed = req.headers['x_account_id_hashed']
+	let accountIdEncrypted = req.headers['x_account_id_encrypted']
+
+	if (!accountIdHashed || !accountIdEncrypted) {
+		return MakeResponse(req, res, {
+			status: APIStatus.Invalid,
+			message: 'Require account_id'
+		})
+	}
+
+
+	let accountIdDecrypted = ''
+	if (bankInfo.encrypt_type == 'RSA') {
+		// eslint-disable-next-line no-undef
+		const buffer = Buffer.from(accountIdEncrypted, 'base64')
+		accountIdDecrypted = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
+		console.log('Account ID: ' + accountIdDecrypted)
+	} else if (bankInfo.encrypt_type == 'PGP') {
+		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
+		await privateKey.decrypt(bankInfo.passphrase)
+
+		accountIdEncrypted = accountIdEncrypted.replace(/\\n/g, '\n')
+
+		const { data: decrypted } = await openpgp.decrypt({
+			message: await openpgp.message.readArmored(accountIdEncrypted),             // parse armored message
+			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys, // for verification (optional)
+			privateKeys: [privateKey]                                           // for decryption
+		})
+
+		accountIdDecrypted = decrypted
+		console.log('Account id: ' + accountIdDecrypted)
+	}
+
+
+	// Kiểm tra accountId có bị chỉnh sửa hay không 
+	if (accountIdHashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(accountIdDecrypted).digest('hex')) {
+		return MakeResponse(req, res, {
+			status: APIStatus.Invalid,
+			message: 'AccountId is invalid'
+		})
+	}
+
+
+	// let bufferTest = crypto.sign(
+	// 	null,
+	// 	Buffer.from(accountIdHashed,'base64'),
+	// 	{ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }
+	// )
+
+	// console.log(bufferTest.toString('base64'))
+
+	// Kiểm tra chữ ký có hợp lệ hay không
+	if (bankInfo.encrypt_type == "RSA") {
+		const bufferAccountId = Buffer.from(accountIdHashed, 'base64')
+		const bufferSignature = Buffer.from(digitalSignature,'base64')
+		const check = crypto.verify(
+			null,
+			bufferAccountId,
+			{
+				key: bankInfo.bank_public_key,
+				padding: crypto.constants.RSA_PKCS1_PADDING
+			},
+			//bufferTest
+			bufferSignature
+		)
+		if (!check) {
+			return MakeResponse(req,res,{
+				status: APIStatus.Invalid,
+				message: "Signature is invalid"
+			})
+		}
+	}
+	
 
 	// Kiểm tra thời gian mà ngân hàng đối tác gửi request nhằm để check request này còn hạn hay không và check entryTime này có bị chỉnh sửa hay không
 	const entryTimeHashed = req.headers['x_entry_time_hashed']
@@ -301,49 +403,6 @@ router.get('/receiver-interbank', async (req, res) => {
 	// 	})
 	// }
 
-	// Kiểm tra accountId mà ngân hàng đối tác gửi và kiểm tra accountId này có bị chỉnh sửa hay không ?
-
-	const accountIdHashed = req.headers['x_account_id_hashed']
-	let accountIdEncrypted = req.headers['x_account_id_encrypted']
-
-	if (!accountIdHashed || !accountIdEncrypted) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Invalid,
-			message: 'Require account_id'
-		})
-	}
-
-
-	let accountIdDecrypted = ''
-	if (bankInfo.encrypt_type == 'RSA') {
-		// eslint-disable-next-line no-undef
-		const buffer = Buffer.from(accountIdEncrypted, 'base64')
-		accountIdDecrypted = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
-		console.log('Account ID: ' + accountIdDecrypted)
-	} else if (bankInfo.encrypt_type == 'PGP') {
-		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
-		await privateKey.decrypt(bankInfo.passphrase)
-
-		accountIdEncrypted = accountIdEncrypted.replace(/\\n/g, '\n')
-
-		const { data: decrypted } = await openpgp.decrypt({
-			message: await openpgp.message.readArmored(accountIdEncrypted),             // parse armored message
-			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys, // for verification (optional)
-			privateKeys: [privateKey]                                           // for decryption
-		})
-
-		accountIdDecrypted = decrypted
-		console.log('Account id: ' + accountIdDecrypted)
-	}
-
-
-	// Kiểm tra accountId có bị chỉnh sửa hay không 
-	if (accountIdHashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(accountIdDecrypted).digest('hex')) {
-		return MakeResponse(req, res, {
-			status: APIStatus.Invalid,
-			message: 'AccountId is invalid'
-		})
-	}
 
 	const accessedApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory, { bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted })
 	if (accessedApiHistoryResp.status == APIStatus.Ok) {
