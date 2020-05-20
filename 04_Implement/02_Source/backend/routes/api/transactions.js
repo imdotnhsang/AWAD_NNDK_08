@@ -251,7 +251,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		})
 	}
 
-	const digitalSignature = req.headers['x_siginature']
+	let digitalSignature = req.headers['x_siginature']
 	if (!digitalSignature) {
 		return MakeResponse(req,res,{
 			status: APIStatus.Forbidden,
@@ -328,6 +328,33 @@ router.get('/receiver-interbank', async (req, res) => {
 		if (!check) {
 			return MakeResponse(req,res,{
 				status: APIStatus.Invalid,
+				message: "Signature is invalid"
+			})
+		}
+	} else if (bankInfo.encrypt_type == "PGP") {
+
+		const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key);
+		await privateKey.decrypt(bankInfo.passphrase);
+
+		// đoạn này lưu lại để hướng dẫn mấy nhóm khác tạo chữ ký
+		// const { data: cleartext } = await openpgp.sign({
+		// 	message: openpgp.cleartext.fromText(accountIdHashed), // CleartextMessage or Message object
+		// 	privateKeys: [privateKey]                             // for signing
+		// });
+
+		// console.log(cleartext)
+
+		digitalSignature = digitalSignature.replace(/\\n/g, '\n')
+
+
+		const verified = await openpgp.verify({
+			message: await openpgp.cleartext.readArmored(digitalSignature),           // parse armored message
+			publicKeys: (await openpgp.key.readArmored(bankInfo.bank_public_key)).keys // for verification
+		});
+		const { valid } = verified.signatures[0];
+		if (!valid) {
+			return MakeResponse(req,res,{
+				stauts: APIStatus.Invalid,
 				message: "Signature is invalid"
 			})
 		}
