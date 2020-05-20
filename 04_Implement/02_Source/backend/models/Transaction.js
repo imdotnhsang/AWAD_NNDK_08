@@ -39,7 +39,7 @@ const TransactionSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	transaction_status: { // SUCCESS, FAILED, REFUND, PENDING
+	transaction_status: { // SUCCESS, FAILED, REFUND
 		type: String,
 		require: true
 	},
