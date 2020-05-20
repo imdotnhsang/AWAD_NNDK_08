@@ -304,26 +304,26 @@ router.get('/receiver-interbank', async (req, res) => {
 
 
 	// let bufferTest = crypto.sign(
-	// 	null,
+	// 	'SHA1',
 	// 	Buffer.from(accountIdHashed,'base64'),
 	// 	{ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }
 	// )
 
-	// console.log(bufferTest.toString('base64'))
+	//  console.log(bufferTest.toString('base64'))
 
 	// Kiểm tra chữ ký có hợp lệ hay không
 	if (bankInfo.encrypt_type == "RSA") {
 		const bufferAccountId = Buffer.from(accountIdHashed, 'base64')
 		const bufferSignature = Buffer.from(digitalSignature,'base64')
 		const check = crypto.verify(
-			null,
+			bankInfo.hash_algorithm,
 			bufferAccountId,
 			{
 				key: bankInfo.bank_public_key,
 				padding: crypto.constants.RSA_PKCS1_PADDING
 			},
-			//bufferTest
-			bufferSignature
+			bufferTest
+			// bufferSignature
 		)
 		if (!check) {
 			return MakeResponse(req,res,{
