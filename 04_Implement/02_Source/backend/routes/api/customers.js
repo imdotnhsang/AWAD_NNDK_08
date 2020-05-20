@@ -38,23 +38,12 @@ router.post('/', [
 	const accountId = nanoid()
 
 	try {
-		let customer = await Customer.findOne({ email })
+		const isExist = await Customer.countDocuments({ $or: [{ email }, { phone_number: phoneNumber }] })
 
-		if (customer) {
+		if (isExist) {
 			res.status(400).json({
 				errors: [{
-					msg: 'Email already exists'
-				}]
-			})
-		}
-
-		customer = undefined
-		customer = await Customer.findOne({ phone_number: phoneNumber })
-
-		if (customer) {
-			res.status(400).json({
-				errors: [{
-					msg: 'Phone number already exists'
+					msg: 'Email or phone number already exists'
 				}]
 			})
 		}
@@ -75,7 +64,7 @@ router.post('/', [
 
 		const defaultAccountId = responseAccountPost.account_id
 
-		customer = new Customer({
+		const customer = new Customer({
 			full_name: fullName,
 			email,
 			phone_number: phoneNumber,
