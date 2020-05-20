@@ -322,8 +322,8 @@ router.get('/receiver-interbank', async (req, res) => {
 				key: bankInfo.bank_public_key,
 				padding: crypto.constants.RSA_PKCS1_PADDING
 			},
-			bufferTest
-			// bufferSignature
+			//bufferTest
+			bufferSignature
 		)
 		if (!check) {
 			return MakeResponse(req,res,{
