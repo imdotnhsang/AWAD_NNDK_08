@@ -99,7 +99,7 @@ router.post('/transfering-within-bank', [
 			})
 		}
 
-		const transactionTransferer = new Transaction({
+		const transactionTransferer = {
 			entry_time: entryTime,
 			from_account_id: fromAccountId,
 			from_account_fullname: fromAccountFullname,
@@ -110,7 +110,7 @@ router.post('/transfering-within-bank', [
 			transaction_type: 'TRANSFER',
 			transaction_amount: transactionAmount,
 			transaction_balance_before: accountTransferer.balance
-		})
+		}
 
 		const transactionReceiver = new Transaction({
 			entry_time: entryTime,
@@ -131,7 +131,20 @@ router.post('/transfering-within-bank', [
 			{ new: true }
 		)
 
-		checkErrorsMongoose.updateTransfererAccount = { account_id: accountTransfererResponse.account_id }
+		checkErrorsMongoose.updateTransfererAccount = { account_id: accountTransfererResponse.account_id, transaction_amount: transactionAmount }
+
+		const transactionTransfererResponse = await new Transaction({
+			...transactionTransferer,
+			transaction_balance_after: accountTransfererResponse.balance,
+			transaction_status: 'FAILED'
+		}).save()
+
+		checkErrorsMongoose.createTransfererTransaction = {
+			...transactionTransferer,
+			transaction_balance_before: accountTransfererResponse.balance,
+			transaction_balance_after: accountTransferer.balance,
+			transaction_status: 'REFUND'
+		}
 
 		const accountReceiverResponse = await Account.findOneAndUpdate(
 			{ account_id: toAccountId },
@@ -139,20 +152,12 @@ router.post('/transfering-within-bank', [
 			{ new: true }
 		)
 
-		checkErrorsMongoose.updateReceiverAccount = { account_id: accountReceiverResponse.account_id }
-
-		const transactionTransfererResponse = await Transaction({
-			...transactionTransferer._doc,
-			transaction_balance_after: accountTransfererResponse.balance,
-			transaction_status: 'PENDING'
-		}).save()
-
-		checkErrorsMongoose.createTransfererTransaction = transactionTransfererResponse
+		checkErrorsMongoose.updateReceiverAccount = { account_id: accountReceiverResponse.account_id, transaction_amount: transactionAmount }
 
 		const transactionReceiverResponse = await Transaction({
 			...transactionReceiver._doc,
 			transaction_balance_after: accountReceiverResponse.balance,
-			transaction_status: 'PENDING'
+			transaction_status: 'FAILED'
 		}).save()
 
 		transactionTransfererResponse.transaction_status = 'SUCCESS'
@@ -161,21 +166,29 @@ router.post('/transfering-within-bank', [
 		transactionReceiverResponse.transaction_status = 'SUCCESS'
 		transactionReceiverResponse.save()
 
-		console.log(checkErrorsMongoose)
-
 		return res.status(200).json({
 			transactionTransfererResponse, transactionReceiverResponse, accountTransfererResponse, accountReceiverResponse
 		})
 	} catch (error) {
-		if (checkErrorsMongoose.createTransfererTransaction !== false) {
-			console.log('1')
-		} else if (checkErrorsMongoose.updateReceiverAccount !== false) {
-			checkErrorsMongoose.createTransfererTransaction.transaction_status = 'FAILED'
-			Transaction(checkErrorsMongoose.createTransfererTransaction).save()
-		} else if (checkErrorsMongoose.updateTransfererAccount !== false) {
-			console.log('3')
+		if (checkErrorsMongoose.updateReceiverAccount !== false) {
+			await Account.findOneAndUpdate(
+				{ account_id: checkErrorsMongoose.updateReceiverAccount.account_id },
+				{ $inc: { balance: -checkErrorsMongoose.updateReceiverAccount.transaction_amount } },
+				{ new: true }
+			)
 		}
 
+		if (checkErrorsMongoose.updateTransfererAccount !== false) {
+			await Account.findOneAndUpdate(
+				{ account_id: checkErrorsMongoose.updateTransfererAccount.account_id },
+				{ $inc: { balance: checkErrorsMongoose.updateTransfererAccount.transaction_amount } },
+				{ new: true }
+			)
+		}
+
+		if (checkErrorsMongoose.createTransfererTransaction !== false) {
+			await new Transaction(checkErrorsMongoose.createTransfererTransaction).save()
+		}
 
 		return res.status(500).json({ msg: 'Server error' })
 	}
