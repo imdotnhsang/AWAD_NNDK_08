@@ -27,7 +27,7 @@ router.post('/transfering-within-bank', [
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('fromAccountId', 'Transferer account is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
-	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
+	check('toFullName', 'Receiver full name is required').not().notEmpty(),
 	check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({ min: 50000 })
 ], async (req, res) => {
 	const errors = validationResult(req)
@@ -39,7 +39,7 @@ router.post('/transfering-within-bank', [
 		entryTime,
 		fromAccountId,
 		toAccountId,
-		toAccountFullname,
+		toFullName,
 		transactionAmount
 	} = req.body
 
@@ -60,7 +60,7 @@ router.post('/transfering-within-bank', [
 			})
 		}
 
-		const fromAccountFullname = customer.full_name
+		const fromFullName = customer.full_name
 		const listAccountId = [...customer.saving_account_id, customer.default_account_id]
 
 		if (listAccountId.indexOf(fromAccountId) === -1) {
@@ -102,9 +102,9 @@ router.post('/transfering-within-bank', [
 		const transactionTransferer = {
 			entry_time: entryTime,
 			from_account_id: fromAccountId,
-			from_account_fullname: fromAccountFullname,
+			from_fullname: fromFullName,
 			to_account_id: toAccountId,
-			to_account_fullname: toAccountFullname,
+			to_fullname: toFullName,
 			from_bank_id: 'EIGHT',
 			to_bank_id: 'EIGHT',
 			transaction_type: 'TRANSFER',
@@ -115,9 +115,9 @@ router.post('/transfering-within-bank', [
 		const transactionReceiver = new Transaction({
 			entry_time: entryTime,
 			from_account_id: fromAccountId,
-			from_account_fullname: fromAccountFullname,
+			from_fullname: fromFullName,
 			to_account_id: toAccountId,
-			to_account_fullname: toAccountFullname,
+			to_fullname: toFullName,
 			from_bank_id: 'EIGHT',
 			to_bank_id: 'EIGHT',
 			transaction_type: 'RECEIVE',
@@ -466,7 +466,7 @@ router.post('/transfering-interbank', [
 	authCustomer,
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
-	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
+	check('toFullName', 'Receiver full name is required').not().notEmpty(),
 	check('toBankId', 'Receiver bank ID is required').not().notEmpty(),
 	check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({ min: 50000 })
 ], async (req, res) => {
@@ -479,7 +479,7 @@ router.post('/transfering-interbank', [
 		entryTime,
 		fromAccountId,
 		toAccountId,
-		toAccountFullname,
+		toFullName,
 		toBankId,
 		transactionAmount
 	} = req.body
@@ -495,7 +495,7 @@ router.post('/transfering-interbank', [
 			})
 		}
 
-		const fromAccountFullname = customer.full_name
+		const fromFullName = customer.full_name
 
 		const account = await Account.findOne({ account_id: fromAccountId })
 
@@ -518,9 +518,9 @@ router.post('/transfering-interbank', [
 		const transactionTransferer = new Transaction({
 			entry_time: entryTime,
 			from_account_id: fromAccountId,
-			from_account_fullname: fromAccountFullname,
+			from_fullname: fromFullName,
 			to_account_id: toAccountId,
-			to_account_fullname: toAccountFullname,
+			to_fullname: toFullName,
 			from_bank_id: 'EIGHT',
 			to_bank_id: toBankId,
 			transaction_type: 'TRANSFER',
@@ -553,9 +553,9 @@ router.post('/transfering-interbank', [
 router.post('/receiving-interbank', [
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('toAccountId', 'Receiver account is required').not().notEmpty(),
-	check('toAccountFullname', 'Receiver full name is required').not().notEmpty(),
+	check('toFullName', 'Receiver full name is required').not().notEmpty(),
 	check('fromAccountId', 'Transferer account is required').not().notEmpty(),
-	check('fromAccountFullname', 'Transferer full name is required').not().notEmpty(),
+	check('fromFullName', 'Transferer full name is required').not().notEmpty(),
 	check('fromBankId', 'Transferer bank ID is required').not().notEmpty(),
 	check('transactionAmount', 'Amount Transaction is 50000 or more').isAfter('49999')
 ], async (req, res) => {
@@ -573,9 +573,9 @@ router.post('/receiving-interbank', [
 	const {
 		entryTime,
 		fromAccountId,
-		fromAccountFullname,
+		fromFullName,
 		toAccountId,
-		toAccountFullname,
+		toFullName,
 		fromBankId,
 		transactionAmount
 	} = req.body
@@ -594,9 +594,9 @@ router.post('/receiving-interbank', [
 		const transactionReceiver = new Transaction({
 			entry_time: entryTime,
 			from_account_id: fromAccountId,
-			from_account_fullname: fromAccountFullname,
+			from_fullname: fromFullName,
 			to_account_id: toAccountId,
-			to_account_fullname: toAccountFullname,
+			to_fullname: toFullName,
 			from_bank_id: fromBankId,
 			to_bank_id: 'EIGHT',
 			transaction_type: 'RECEIVE',

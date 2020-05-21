@@ -28,6 +28,9 @@ const CustomerSchema = new mongoose.Schema({
 	saving_account_id: {
 		type: Array
 	},
+	list_receiver: {
+		type: Array
+	},
 	created_at: {
 		type: Number,
 		require: true

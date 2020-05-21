@@ -11,7 +11,7 @@ const TransactionSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	from_account_fullname: {
+	from_fullname: {
 		type: String,
 		required: true
 	},
@@ -19,7 +19,7 @@ const TransactionSchema = new mongoose.Schema({
 		type: String,
 		require: true
 	},
-	to_account_fullname: {
+	to_fullname: {
 		type: String,
 		require: true
 	},
