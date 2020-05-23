@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
-const authCustomer = require('../../middleware/authCustomer')
+const authCustomer = require('../../middlewares/authCustomer')
 
 const Account = require('../../models/Account')
 const Customer = require('../../models/Customer')

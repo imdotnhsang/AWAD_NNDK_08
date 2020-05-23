@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 const { check, validationResult } = require('express-validator')
 // const NodeRSA = require('node-rsa')
-const authCustomer = require('../../middleware/authCustomer')
+const authCustomer = require('../../middlewares/authCustomer')
 const crypto = require('crypto')
 const openpgp = require('openpgp')
 
