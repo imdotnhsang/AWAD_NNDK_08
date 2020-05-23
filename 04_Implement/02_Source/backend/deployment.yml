@@ -2,20 +2,20 @@
     apiVersion: apps/v1
     kind: Deployment
     metadata:
-        name: wmc
+      name: wmc
     spec:
-        replicas: 2
-        selector:
+      replicas: 2
+      selector:
         matchLabels:
-            name: wmc-app
-        template:
+          name: wmc-app
+      template:
         metadata:
-            labels:
+          labels:
             name: wmc-app
         spec:
-            containers:
+          containers:
             - name: application
-                image: 20191612557/wmc:v1.8
-                imagePullPolicy: IfNotPresent
-                ports:
+              image: 20191612557/wmc:v1.8
+              imagePullPolicy: IfNotPresent
+              ports:
                 - containerPort: 5000
