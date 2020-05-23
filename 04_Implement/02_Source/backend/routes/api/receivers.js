@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 router.post('/', (req, res) => {
-	res.send('Profile route')
+	res.send('Receiver route')
 })
 
 module.exports = router
