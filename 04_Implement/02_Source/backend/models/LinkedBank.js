@@ -24,7 +24,7 @@ const LinkedBankSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	access_token: {
+	partner_code: {
 		type: String,
 		required: true
 	},
