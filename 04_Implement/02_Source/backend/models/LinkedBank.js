@@ -12,7 +12,11 @@ const LinkedBankSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	bank_public_key: {
+	our_public_key: {
+		type: String,
+		required: true
+	},
+	partner_public_key: {
 		type: String,
 		required: true
 	},
