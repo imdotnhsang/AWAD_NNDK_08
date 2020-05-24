@@ -1,11 +1,11 @@
 /* eslint-disable no-undef */
 const express = require('express')
-const connectDB = require('./config/db')
+const connectDB= require('./config/mongodb')
 
 const app = express()
 
 
-// Connect Datavase
+// Connect Database
 connectDB()
 
 // Init Middleware

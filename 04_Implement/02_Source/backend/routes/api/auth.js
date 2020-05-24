@@ -81,7 +81,7 @@ async (req, res) => {
 		}
 
 		const accessToken = jwt.sign(payload, config.get('jwtSecret'), {
-			expiresIn: 30,
+			expiresIn: config.get('jwtAccessExpiration'),
 		})
 
 		const RFSZ = 80
@@ -98,40 +98,6 @@ async (req, res) => {
 		return res.status(200).json({
 			'access-token': accessToken,
 			'refresh-token': refreshToken.refresh_token
-		})
-	} catch (error) {
-		return res.status(500).send('Server error')
-	}
-})
-
-// @route     POST /auth/refresh
-// @desc      Khi access-token hết hạn chạy api để refresh token tiếp tục sử dụng
-// @access    Public
-router.post('/refresh', async (req, res) => {
-	const refreshToken = req.header('x-auth-refresh-token')
-	const accessToken = req.header('x-auth-access-token')
-
-	if (!refreshToken && !accessToken) {
-		return res.status(401).json({ msg: 'No token, authorization denied' })
-	}
-
-	try {
-		jwt.verify(accessToken, config.get('jwtSecret'), { ignoreExpiration: true }, async function (err, payload) {
-			const userId = payload.user.id
-
-			const isExist = await RefreshToken.countDocuments({ user_id: userId, refresh_token: refreshToken })
-
-			if (!isExist) {
-				return res.status(400).send('Invalid refresh token.')
-			}
-
-			const accessToken = jwt.sign({ user: { id: userId } }, config.get('jwtSecret'), {
-				expiresIn: 30,
-			})
-
-			return res.status(200).json({
-				'access-token': accessToken
-			})
 		})
 	} catch (error) {
 		return res.status(500).send('Server error')
