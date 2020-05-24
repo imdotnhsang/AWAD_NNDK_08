@@ -1,23 +1,27 @@
 const jwt = require('jsonwebtoken')
 const config = require('config')
 
-module.exports = (req, res, next) => {
-	// Get token from Header
-	const token = req.header('x-auth-token')
+module.exports = async (req, res, next) => {
+	// Get accesstoken from Header
+	const accessToken = req.header('x-auth-access-token')
 
-	// Check if not token
-	if (!token) {
-		return res.status(401).json({ msg: 'No token, authorization denied' })
+	// Check if not accesstoken
+	if (!accessToken) {
+		return res.status(401).json({ msg: 'No access token, authorization denied' })
 	}
 
-	// Verify token
+	// Verify accesstoken
 	try {
-		const decoded = jwt.verify(token, config.get('jwtSecret'))
+		const decoded = await jwt.verify(accessToken, config.get('jwtSecret'))
 
 		req.user = decoded.user
 
 		return next()
 	} catch (error) {
+		if (error.name === 'TokenExpiredError') {
+			return res.status(401).json({ msg: 'Token expired error' })
+		}
+
 		return res.status(401).json({ msg: 'Token is not valid' })
 	}
 }
