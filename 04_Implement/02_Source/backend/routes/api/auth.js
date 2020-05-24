@@ -6,9 +6,10 @@ const randToken = require('rand-token')
 const jwt = require('jsonwebtoken')
 const config = require('config')
 const { check, validationResult } = require('express-validator')
-const authCustomer = require('../../middlewares/authCustomer')
+const authCustomer = require('../../middlewares/auth')
 
 const Customer = require('../../models/Customer')
+const RefreshToken = require('../../models/RefreshToken')
 
 // @route     GET /auth/customers
 // @desc      Lấy thông tin customer sau khi đăng nhập thành công
@@ -84,16 +85,23 @@ async (req, res) => {
 		})
 
 		const RFSZ = 80
-		const refreshToken = randToken.generate(RFSZ)
+		const refreshToken = {
+			user_id: payload.user.id,
+			entry_time: Date.now(),
+			refresh_token: randToken.generate(RFSZ)
+		}
+
+		RefreshToken.findOne({ user_id: refreshToken.user_id }, async (err, user) =>
+			user ? await RefreshToken.findOneAndUpdate({ user_id: refreshToken.user_id }, refreshToken) : await new RefreshToken(refreshToken).save()
+		)
 
 		return res.status(200).json({
 			'access-token': accessToken,
-			'refresh-token': refreshToken
+			'refresh-token': refreshToken.refresh_token
 		})
 	} catch (error) {
 		return res.status(500).send('Server error')
 	}
-}
-)
+})
 
 module.exports = router
