@@ -4,6 +4,7 @@ const connectDB = require('./config/db')
 
 const app = express()
 
+
 // Connect Datavase
 connectDB()
 
@@ -16,7 +17,9 @@ app.get('/', (req, res) => {
 
 // Defined Routes
 app.use('/customers', require('./routes/api/customers'))
-app.use('/profile', require('./routes/api/profile'))
+app.use('/receivers', require('./routes/api/receivers'))
+app.use('/staffs', require('./routes/api/staffs'))
+app.use('/debt-collections', require('./routes/api/debtCollections'))
 app.use('/auth', require('./routes/api/auth'))
 app.use('/accounts', require('./routes/api/accounts'))
 app.use('/transactions', require('./routes/api/transactions'))

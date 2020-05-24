@@ -4,6 +4,6 @@
 #### Thành viên nhóm:
 | MSSV | Họ và tên | Email | Số điện thoại |
 |--- | --- | --- | --- |
-| 1612222 | Nguyễn Quang Huân |  |  |
+| 1612222 | Nguyễn Quang Huân | ngquhuanbl@gmail.com | 0382473419 |
 | **1612556** | **Nguyễn Hoàng Sang** | **im.nhsang@gmail.com** | **03999029922** |
 | 1612557 | Lê Hoàng Sang |  |  |
