@@ -15,7 +15,7 @@
         spec:
           containers:
             - name: application
-              image: 20191612557/wmc:v1.8.1
+              image: 20191612557/wmc:v1.8.2
               imagePullPolicy: IfNotPresent
               ports:
                 - containerPort: 5000
