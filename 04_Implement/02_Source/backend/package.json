@@ -19,6 +19,7 @@
     "nanoid": "^3.1.9",
     "node-rsa": "^1.0.8",
     "openpgp": "^4.10.4",
+    "rand-token": "^1.0.1",
     "uuid": "^8.0.0"
   },
   "devDependencies": {

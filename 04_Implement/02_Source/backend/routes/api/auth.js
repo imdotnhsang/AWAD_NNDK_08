@@ -2,6 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 const bcrypt = require('bcrypt')
+const randToken = require('rand-token')
 const jwt = require('jsonwebtoken')
 const config = require('config')
 const { check, validationResult } = require('express-validator')
@@ -78,11 +79,17 @@ async (req, res) => {
 			},
 		}
 
-		const token = jwt.sign(payload, config.get('jwtSecret'), {
+		const accessToken = jwt.sign(payload, config.get('jwtSecret'), {
 			expiresIn: 600,
 		})
 
-		return res.status(200).json({ 'access-token': token })
+		const RFSZ = 80
+		const refreshToken = randToken.generate(RFSZ)
+
+		return res.status(200).json({
+			'access-token': accessToken,
+			'refresh-token': refreshToken
+		})
 	} catch (error) {
 		return res.status(500).send('Server error')
 	}
