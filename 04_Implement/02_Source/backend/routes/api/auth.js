@@ -12,7 +12,7 @@ const Customer = require('../../models/Customer')
 // @route     GET /auth/customers
 // @desc      Lấy thông tin customer sau khi đăng nhập thành công
 // @access    Public
-router.get('/', authCustomer, async (req, res) => {
+router.get('/customers', authCustomer, async (req, res) => {
 	try {
 		const customer = await Customer.findById(req.user.id)
 		res.json(customer)
@@ -25,7 +25,7 @@ router.get('/', authCustomer, async (req, res) => {
 // @route     POST /auth/customers
 // @desc      Xác thực đăng nhập của customer và trả về access-token
 // @access    Public
-router.post('/', [
+router.post('/customers', [
 	check('email', 'Please include a valid email').isEmail(),
 	check('password', 'Password is required').exists(),
 ],
@@ -79,7 +79,7 @@ async (req, res) => {
 		}
 
 		const token = jwt.sign(payload, config.get('jwtSecret'), {
-			expiresIn: 3600,
+			expiresIn: 600,
 		})
 
 		return res.status(200).json({ 'access-token': token })
