@@ -305,7 +305,7 @@ router.get('/receiver-interbank', async (req, res) => {
 				bufferAccountId,
 				{
 					key: bankInfo.partner_public_key,
-					padding: crypto.constants.RSA_PKCS1_PADDING
+					padding: crypto.constants.RSA_PKCS1_PSS_PADDING
 				},
 				bufferSignature
 			)
@@ -403,7 +403,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		}
 
 
-		const accessedApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory, { bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted })
+		const accessedApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory, { bank_id: bankInfo.bank_id, accessed_api_type: 'GET_INFO', entry_time: entryTimeDecrypted, digital_signature: digitalSignature})
 		if (accessedApiHistoryResp.status == APIStatus.Ok) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Invalid,
@@ -414,7 +414,8 @@ router.get('/receiver-interbank', async (req, res) => {
 		const saveAccessedHistoryResponse = await DBModelInstance.Create(AccessedApiHistory, {
 			bank_id: bankInfo.bank_id,
 			accessed_api_type: 'GET_INFO',
-			entry_time: entryTimeDecrypted
+			entry_time: entryTimeDecrypted,
+			digital_signature : digitalSignature
 		})
 
 		if (saveAccessedHistoryResponse.status != APIStatus.Ok) {
@@ -612,8 +613,14 @@ router.post('/receiving-interbank', [
 			})
 		}
 
-		// Kiểm tra request này có quá hạn hay không dựa vào entryTime
-
+		// Kiểm tra request này có quá hạn hay không
+		const accessedApiHistoryResp = await DBModelInstance.Query(AccessedApiHistory, { bank_id: bankInfo.bank_id, accessed_api_type: 'TRANSFER', entry_time: dataDecryptedObject.entryTime, digital_signature: req.body.digital_sign})
+		if (accessedApiHistoryResp.status == APIStatus.Ok) {
+			return MakeResponse(req, res, {
+				status: APIStatus.Invalid,
+				message: 'Your access is solved. Please make another request'
+			})
+		}
 
 		// Kiểm tra gói tin có bị chỉnh sửa hay không
 		if (req.body.data_hashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(JSON.stringify(dataDecryptedObject)).digest('hex')) {
@@ -634,7 +641,7 @@ router.post('/receiving-interbank', [
 				bufferBodyData,
 				{
 					key: bankInfo.partner_public_key,
-					padding: crypto.constants.RSA_PKCS1_PADDING
+					padding: crypto.constants.RSA_PKCS1_PSS_PADDING
 				},
 				bufferSignature
 			)
@@ -663,7 +670,8 @@ router.post('/receiving-interbank', [
 		const saveAccessedHistoryResponse = await DBModelInstance.Create(AccessedApiHistory, {
 			bank_id: bankInfo.bank_id,
 			accessed_api_type: 'TRANSFER',
-			entry_time: dataDecryptedObject.entryTime
+			entry_time: dataDecryptedObject.entryTime,
+			digital_signature: req.body.digital_sign
 		})
 	
 		if (saveAccessedHistoryResponse.status != APIStatus.Ok) {
