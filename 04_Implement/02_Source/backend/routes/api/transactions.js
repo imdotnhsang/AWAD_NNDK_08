@@ -295,7 +295,9 @@ router.get('/receiver-interbank', async (req, res) => {
 		// Kiểm tra chữ ký có hợp lệ hay không
 		if (bankInfo.encrypt_type == 'RSA') {
 
+			// eslint-disable-next-line no-undef
 			const bufferAccountId = Buffer.from(accountIdDecrypted, 'base64')
+			// eslint-disable-next-line no-undef
 			const bufferSignature = Buffer.from(digitalSignature,'base64')
 
 			const check = crypto.verify(
@@ -395,8 +397,8 @@ router.get('/receiver-interbank', async (req, res) => {
 		// Kiểm tra entryTime có bị quá 5 phút kể từ thời điểm hiện tại hay không
 		if (currentTime - entryTimeDecrypted > 300) {
 			return MakeResponse(req,res,{
-			status: APIStatus.Invalid,
-			message: "Your entrytime is expired. Please try again"
+				status: APIStatus.Invalid,
+				message: 'Your entrytime is expired. Please try again'
 			})
 		}
 
@@ -556,16 +558,17 @@ router.post('/receiving-interbank', [
 			})
 		}
 	
-		const {
-			data,
-			data_hashed,
-			digital_sign
-		} = req.body
+		// const {
+		// 	data,
+		// 	data_hashed,
+		// 	digital_sign
+		// } = req.body
 
 		// decrypt body data
-		let dataDecryptedObject = ""
+		let dataDecryptedObject = ''
 		if (bankInfo.encrypt_type == 'RSA') {
 
+			// eslint-disable-next-line no-undef
 			const buffer = Buffer.from(req.body.data,'base64')
 			const dataDecryptedStr = crypto.privateDecrypt({ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PADDING }, buffer).toString('utf-8')
 			dataDecryptedObject = JSON.parse(dataDecryptedStr)
@@ -606,7 +609,7 @@ router.post('/receiving-interbank', [
 		if (currentTime - dataDecryptedObject.entryTime > 300) {
 			return MakeResponse(req,res,{
 				status: APIStatus.Invalid,
-				message: "Your entrytime is expired. Please try again"
+				message: 'Your entrytime is expired. Please try again'
 			})
 		}
 
@@ -623,7 +626,7 @@ router.post('/receiving-interbank', [
 		if (req.body.data_hashed != crypto.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key).update(JSON.stringify(dataDecryptedObject)).digest('hex')) {
 			return MakeResponse(req,res,{
 				status: APIStatus.Invalid,
-				message: "Your data is invalid"
+				message: 'Your data is invalid'
 			})
 		}
 
@@ -649,7 +652,7 @@ router.post('/receiving-interbank', [
 				})
 			}
 		} else if (bankInfo.encrypt_type == 'PGP') {
-			req.body.digital_sign = `-----BEGIN PGP SIGNED MESSAGE-----\n` + 'Hash: SHA512\n\n' + JSON.stringify(dataDecryptedObject) + '\n' + req.body.digital_sign
+			req.body.digital_sign = '-----BEGIN PGP SIGNED MESSAGE-----\n' + 'Hash: SHA512\n\n' + JSON.stringify(dataDecryptedObject) + '\n' + req.body.digital_sign
 			req.body.digital_sign = req.body.digital_sign.replace(/\\n/g, '\n')
 			const verified = await openpgp.verify({
 				message: await openpgp.cleartext.readArmored(req.body.digital_sign),           // parse armored message

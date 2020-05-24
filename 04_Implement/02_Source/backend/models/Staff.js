@@ -26,10 +26,6 @@ const StaffSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	default_account_id: {
-		type: String,
-		unique: true
-	},
 	position: {
 		type: String, // ADMINISTRATOR, EMPLOYEE
 		require: true
