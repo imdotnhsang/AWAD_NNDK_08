@@ -2,6 +2,6 @@
     "mongoURI": "mongodb://admin:a123456@ds337718.mlab.com:37718/eight-db-test",
     "redisURI": "redis://3Rwfoaj3wxzVVC4vjKOGMstcj7j5ha3s@redis-19614.c10.us-east-1-4.ec2.cloud.redislabs.com:19614",
     "jwtSecret": "eightsjwtsecret",
-    "jwtAccessExpiration": 30,
-    "jwtRefreshExpiration": 2592000
+    "jwtAccessExpiration": 600,
+    "jwtRefreshExpiration": 1800
 }

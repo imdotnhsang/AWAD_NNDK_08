@@ -29,12 +29,21 @@ module.exports = async (req, res, next) => {
 		if (error.name === 'TokenExpiredError') {
 			jwt.verify(accessToken, config.get('jwtSecret'), { ignoreExpiration: true }, async (err, decoded) => {
 				const userId = decoded.user.id
-	
+
 				const redisToken = JSON.parse(await redisClient.getAsync(userId))
 
 				if (!redisToken || redisToken.refresh_token !== refreshToken) {
 					return res.status(401).json({ msg: 'Refresh token is not valid' })
 				} else {
+					if (redisToken.expires_in < Date.now()) {
+						redisClient.del(userId)
+
+						res.clearCookie('access_token')
+						res.clearCookie('refresh_token')
+
+						return res.status(440).json({ msg: 'Login timeout!!!' })
+					}
+
 					const accessTokenNew = jwt.sign({ user: { id: userId } }, config.get('jwtSecret'), {
 						expiresIn: config.get('jwtAccessExpiration')
 					})
