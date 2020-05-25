@@ -28,10 +28,7 @@ router.post('/', [
 		email,
 		phoneNumber,
 		password,
-		balance,
-		createdAt,
-		isActive,
-		OTP
+		balance
 	} = req.body
 
 	const nanoid = customAlphabet('1234567890', 14)
@@ -70,12 +67,7 @@ router.post('/', [
 			phone_number: phoneNumber,
 			password,
 			default_account_id: defaultAccountId,
-			created_at: createdAt,
-			is_active: isActive,
-			OTP: {
-				code: OTP.code,
-				expired_at: OTP.expiredAt
-			}
+			created_at: Date.now()
 		})
 
 		const salt = await bcrypt.genSalt(10)

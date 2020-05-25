@@ -35,7 +35,7 @@ module.exports = async (req, res, next) => {
 				if (!redisToken || redisToken.refresh_token !== refreshToken) {
 					return res.status(401).json({ msg: 'Refresh token is not valid' })
 				} else {
-					if (redisToken.expires_in < Date.now()) {
+					if (redisToken.expired_at < Date.now()) {
 						redisClient.del(userId)
 
 						res.clearCookie('access_token')

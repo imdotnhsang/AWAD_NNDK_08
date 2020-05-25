@@ -70,16 +70,6 @@ async (req, res) => {
 			})
 		}
 
-		if (!customer.is_active) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Account is not active',
-					},
-				],
-			})
-		}
-
 		const payload = {
 			user: {
 				id: customer.id,
@@ -93,7 +83,7 @@ async (req, res) => {
 		const RFSZ = 80
 		const refreshTokenInfo = {
 			user_id: payload.user.id,
-			expires_in: Date.now() + config.get('jwtRefreshExpiration'),
+			expired_at: Date.now() + config.get('jwtRefreshExpiration'),
 			refresh_token: randToken.generate(RFSZ)
 		}
 
@@ -112,7 +102,7 @@ async (req, res) => {
 
 		redisClient.set(refreshTokenInfo.user_id, JSON.stringify({
 			refresh_token: refreshTokenInfo.refresh_token,
-			expires_in: refreshTokenInfo.expires_in
+			expired_at: refreshTokenInfo.expired_at
 		}), redis.print)
 
 		return res.status(200).json({
