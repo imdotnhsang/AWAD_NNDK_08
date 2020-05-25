@@ -1,5 +1,7 @@
 /* eslint-disable no-undef */
 const express = require('express')
+const cookieParser = require('cookie-parser')
+
 const connectDB = require('./config/mongodb')
 const redisClient = require('./config/redis')
 
@@ -19,6 +21,8 @@ redisClient.on('error', (error) => {
 
 // Init Middleware
 app.use(express.json({ extended: false }))
+
+app.use(cookieParser())
 
 app.get('/', (req, res) => {
 	res.send('API Running')

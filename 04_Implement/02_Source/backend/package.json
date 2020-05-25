@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^4.0.1",
+    "bluebird": "^3.7.2",
     "config": "^3.3.1",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-validator": "^6.4.1",
     "jsonwebtoken": "^8.5.1",

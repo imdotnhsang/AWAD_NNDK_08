@@ -10,7 +10,6 @@ const { check, validationResult } = require('express-validator')
 const authCustomer = require('../../middlewares/auth')
 
 const Customer = require('../../models/Customer')
-const RefreshToken = require('../../models/RefreshToken')
 
 const redisClient = require('../../config/redis')
 
@@ -19,9 +18,10 @@ const redisClient = require('../../config/redis')
 // @access    Public
 router.get('/customers', authCustomer, async (req, res) => {
 	try {
+		console.log(req.cookies)
 		const customer = await Customer.findById(req.user.id)
 
-		redisClient.get('access-token', redis.print)
+		// redisClient.get('5ec5b7cc48283c9b5a6ceb7b', redis.print)
 
 		res.json(customer)
 	} catch (error) {
@@ -33,7 +33,7 @@ router.get('/customers', authCustomer, async (req, res) => {
 // @route     POST /auth/customers
 // @desc      Xác thực đăng nhập của customer và trả về access-token
 // @access    Public
-router.post('/customers', [
+router.post('/customers/login', [
 	check('email', 'Please include a valid email').isEmail(),
 	check('password', 'Password is required').exists(),
 ],
@@ -87,29 +87,55 @@ async (req, res) => {
 		}
 
 		const accessToken = jwt.sign(payload, config.get('jwtSecret'), {
-			expiresIn: config.get('jwtAccessExpiration'),
+			expiresIn: config.get('jwtAccessExpiration')
 		})
 
 		const RFSZ = 80
-		const refreshToken = {
+		const refreshTokenInfo = {
 			user_id: payload.user.id,
-			entry_time: Date.now(),
+			expires_in: Date.now() + config.get('jwtRefreshExpiration'),
 			refresh_token: randToken.generate(RFSZ)
 		}
 
-		RefreshToken.findOne({ user_id: refreshToken.user_id }, async (err, user) =>
-			user ? await RefreshToken.findOneAndUpdate({ user_id: refreshToken.user_id }, refreshToken) : await new RefreshToken(refreshToken).save()
-		)
+		res.cookie('access_token', accessToken, {
+			secure: false,
+			httpOnly: true
+		})
 
-		redisClient.set('access-token', accessToken)
-		
+		res.cookie('refresh_token', refreshTokenInfo.refresh_token, {
+			secure: false,
+			httpOnly: true
+		})
+		// res.clearCookie('_access_token')
+		// res.clearCookie('access-token')
+		// res.clearCookie('refresh-token')
+
+		redisClient.set(refreshTokenInfo.user_id, JSON.stringify({
+			refresh_token: refreshTokenInfo.refresh_token,
+			expires_in: refreshTokenInfo.expires_in
+		}), redis.print)
+
 		return res.status(200).json({
 			'access-token': accessToken,
-			'refresh-token': refreshToken.refresh_token
+			'refresh-token': refreshTokenInfo.refresh_token
 		})
 	} catch (error) {
 		return res.status(500).send('Server error')
 	}
 })
 
+
+router.post('/logout', authCustomer, async (req, res) => {
+	try {
+		redisClient.del(req.user.id)
+
+		res.clearCookie('access_token')
+		res.clearCookie('refresh_token')
+		// res.redirect('/')
+
+		return res.status(200).json({ msg: 'Log out successfully!!!' })
+	} catch (error) {
+		return res.status(500).send('Server error')
+	}
+})
 module.exports = router
