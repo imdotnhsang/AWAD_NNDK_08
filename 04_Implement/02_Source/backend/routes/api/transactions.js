@@ -22,7 +22,7 @@ const DBModelInstance = new DBModel()
 // @route     POST /transactions/transfering-within-bank
 // @desc      Chuyển khoản trong ngân hàng
 // @access    Public
-router.post('/transfering-within-bank', [
+router.post('/transfering-interal-banking', [
 	authCustomer,
 	check('entryTime', 'Entry time is required').not().notEmpty(),
 	check('fromAccountId', 'Transferer account is required').not().notEmpty(),
@@ -197,7 +197,7 @@ router.post('/transfering-within-bank', [
 // @route     GET /transactions/receiver-withinbank/:accountId
 // @desc      Lấy họ và tên người nhận khi chuyển khoản cùng ngân hàng
 // @access    Public
-router.get('/receiver-withinbank/:accountId', authCustomer, async (req, res) => {
+router.get('/receiver-internal-banking/:accountId', authCustomer, async (req, res) => {
 	try {
 		const { accountId } = req.params
 

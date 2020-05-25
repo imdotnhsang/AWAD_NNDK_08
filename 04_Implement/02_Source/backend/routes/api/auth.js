@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
 const randToken = require('rand-token')
+const redis = require('redis')
 const jwt = require('jsonwebtoken')
 const config = require('config')
 const { check, validationResult } = require('express-validator')
@@ -11,12 +12,17 @@ const authCustomer = require('../../middlewares/auth')
 const Customer = require('../../models/Customer')
 const RefreshToken = require('../../models/RefreshToken')
 
+const redisClient = require('../../config/redis')
+
 // @route     GET /auth/customers
 // @desc      Lấy thông tin customer sau khi đăng nhập thành công
 // @access    Public
 router.get('/customers', authCustomer, async (req, res) => {
 	try {
 		const customer = await Customer.findById(req.user.id)
+
+		redisClient.get('access-token', redis.print)
+
 		res.json(customer)
 	} catch (error) {
 		console.log(error)
@@ -95,6 +101,8 @@ async (req, res) => {
 			user ? await RefreshToken.findOneAndUpdate({ user_id: refreshToken.user_id }, refreshToken) : await new RefreshToken(refreshToken).save()
 		)
 
+		redisClient.set('access-token', accessToken)
+		
 		return res.status(200).json({
 			'access-token': accessToken,
 			'refresh-token': refreshToken.refresh_token
