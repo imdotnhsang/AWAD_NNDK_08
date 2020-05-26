@@ -11,77 +11,113 @@ const Account = require('../../models/Account')
 // @route     POST /customers
 // @desc      Đăng kí customer mới
 // @access    Public
-router.post('/', [
-	check('fullName', 'Full name is required').not().notEmpty(),
-	check('email', 'Please include a valid email').isEmail(),
-	check('phoneNumber', 'Please include a valid phone number').isLength({ min: 10, max: 10 }),
-	check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-	check('balance', 'Please enter a balance with 50000 or more').isInt({ min: 50000 })
-], async (req, res) => {
-	const errors = validationResult(req)
-	if (!errors.isEmpty()) {
-		return res.status(400).send(errors)
-	}
-
-	const {
-		fullName,
-		email,
-		phoneNumber,
-		password,
-		balance
-	} = req.body
-
-	const nanoid = customAlphabet('1234567890', 14)
-	const accountId = nanoid()
-
-	try {
-		const isExist = await Customer.countDocuments({ $or: [{ email }, { phone_number: phoneNumber }] })
-
-		if (isExist) {
-			res.status(400).json({
-				errors: [{
-					msg: 'Email or phone number already exists'
-				}]
-			})
+router.post(
+	'/',
+	[
+		check('fullName', 'Full name is required').not().notEmpty(),
+		check('email', 'Please include a valid email').isEmail(),
+		check('phoneNumber', 'Please include a valid phone number').isLength({
+			min: 10,
+			max: 10,
+		}),
+		check('balance', 'Please enter a balance with 50000 or more').isInt({
+			min: 50000,
+		}),
+	],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
 		}
 
-		let account = await Account.findOne({ account_id: accountId })
+		const { fullName, email, phoneNumber, balance } = req.body
 
-		if (account) {
-			res.status(400).json({
-				errors: [{
-					msg: 'Account already exists'
-				}]
-			})
+		const nanoidAccountId = customAlphabet('1234567890', 14)
+		const accountId = nanoidAccountId()
+
+		const checkErrorsMongoose = {
+			createAccountDefault: false,
 		}
 
-		account = new Account({ account_id: accountId, account_type: 'DEFAULT', balance })
+		try {
+			const isExist = await Customer.countDocuments({
+				$or: [{ email }, { phone_number: phoneNumber }],
+			})
 
-		const responseAccountPost = await account.save()
+			if (isExist) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Email or phone number already exists',
+						},
+					],
+				})
+			}
 
-		const defaultAccountId = responseAccountPost.account_id
+			let account = await Account.findOne({ account_id: accountId })
 
-		const customer = new Customer({
-			full_name: fullName,
-			email,
-			phone_number: phoneNumber,
-			password,
-			default_account_id: defaultAccountId,
-			created_at: Date.now()
-		})
+			if (account) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Account already exists',
+						},
+					],
+				})
+			}
 
-		const salt = await bcrypt.genSalt(10)
+			account = new Account({
+				account_id: accountId,
+				account_type: 'DEFAULT',
+				balance,
+			})
 
-		customer.password = await bcrypt.hash(password, salt)
+			const responseAccountPost = await account.save()
 
-		const response = await customer.save()
+			checkErrorsMongoose.createAccountDefault = {
+				account_id: responseAccountPost.account_id,
+			}
 
-		return res.status(200).json(response)
-	} catch (error) {
-		console.log(error)
-		return res.status(500).send('Server error')
+			const defaultAccountId = responseAccountPost.account_id
+
+			const nanoidPassword = customAlphabet(
+				'1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM',
+				8
+			)
+			const password = nanoidPassword()
+
+			const customer = new Customer({
+				full_name: fullName,
+				email: email.toLowerCase(),
+				phone_number: phoneNumber,
+				password,
+				default_account_id: defaultAccountId,
+				created_at: Date.now(),
+			})
+
+			const salt = await bcrypt.genSalt(10)
+			customer.password = await bcrypt.hash(password, salt)
+
+			const response = await customer.save()
+
+			return res.status(200).json({
+				response,
+				customer: {
+					email,
+					password,
+				},
+			})
+		} catch (error) {
+			if (checkErrorsMongoose.createAccountDefault !== false) {
+				await Account.findOneAndRemove({
+					account_id: checkErrorsMongoose.createAccountDefault.account_id,
+				})
+			}
+
+			return res.status(500).send('Server error')
+		}
 	}
-})
+)
 
 // @route     GET /customers
 // @desc      Lấy thông tin của customer
