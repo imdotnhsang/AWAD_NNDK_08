@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# react-cosmos files
+src/.babelrc
+src/.cosmos.config.json
+src/components/__fixtures__
