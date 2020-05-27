@@ -7,7 +7,6 @@ const redisClient = require('./config/redis')
 
 const app = express()
 
-
 // Connect Database
 connectDB()
 
@@ -31,6 +30,8 @@ app.get('/', (req, res) => {
 // Defined Routes
 app.use('/customers', require('./routes/api/customers'))
 app.use('/receivers', require('./routes/api/receivers'))
+app.use('/employees', require('./routes/api/employees'))
+app.use('/administrators', require('./routes/api/administrators'))
 app.use('/staffs', require('./routes/api/staffs'))
 app.use('/debt-collections', require('./routes/api/debtCollections'))
 app.use('/auth', require('./routes/api/auth'))

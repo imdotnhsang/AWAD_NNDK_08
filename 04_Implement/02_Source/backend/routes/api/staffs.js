@@ -4,6 +4,7 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
+const auth = require('../../middlewares/auth')
 
 const Staff = require('../../models/Staff')
 
@@ -11,7 +12,7 @@ const Staff = require('../../models/Staff')
 // @desc      Tạo staff (employee hoặc admin) mới
 // @access    Public
 router.post(
-	'/',
+	'/register',
 	[
 		check('fullName', 'Full name is required').not().notEmpty(),
 		check('email', 'Please include a valid email').isEmail(),
@@ -28,31 +29,22 @@ router.post(
 		}
 
 		const { fullName, email, phoneNumber, position } = req.body
-
+		
 		const username = email.split('@')[0].toLowerCase()
 
 		try {
 			const isExist = await Staff.countDocuments({
 				$or: [{ email }, { phone_number: phoneNumber }],
 			})
-
 			if (isExist) {
 				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Email or phone number already exists',
-						},
-					],
+					errors: [{ msg: 'Email or phone number already exists' }],
 				})
 			}
 
 			if (position !== 'EMPLOYEE' && position !== 'ADMINISTRATOR') {
 				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Position does not exist',
-						},
-					],
+					errors: [{ msg: 'Position does not exist' }],
 				})
 			}
 
@@ -75,26 +67,26 @@ router.post(
 			const salt = await bcrypt.genSalt(10)
 			staff.password = await bcrypt.hash(password, salt)
 
-			const response = await staff.save()
+			await staff.save()
 			if (position === 'EMPLOYEE') {
 				return res.status(200).json({
-					response,
-					employee: {
+					msg: 'Employee successfully created',
+					data: {
 						username,
 						password,
 					},
 				})
 			} else if (position === 'ADMINISTRATOR') {
 				res.status(200).json({
-					response,
-					admin: {
+					msg: 'Administrator successfully created',
+					data: {
 						username,
 						password,
 					},
 				})
 			}
 		} catch (error) {
-			return res.status(500).send('Server error')
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -102,8 +94,29 @@ router.post(
 // @route     GET /staffs
 // @desc      Lấy thông tin của staff
 // @access    Public
-router.get('/', async (req, res) => {
-	return res.status(200).json({ msg: 'GET /staff' })
+router.get('/information', auth, async (req, res) => {
+	try {
+		const staff = await Staff.findById(req.user.id)
+
+		if (!staff) {
+			return res.status(400).json({
+				errors: [{ msg: 'Staff not exists' }],
+			})
+		}
+
+		return res.status(200).json({
+			msg: 'Information successfully showed',
+			data: {
+				username: staff.username,
+				full_name: staff.full_name,
+				phone_number: staff.full_name,
+				email: staff.email,
+				position: staff.position,
+			},
+		})
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error' })
+	}
 })
 
 // @route     PUT /staffs

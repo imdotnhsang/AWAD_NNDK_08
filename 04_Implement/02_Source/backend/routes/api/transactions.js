@@ -58,36 +58,26 @@ router.post(
 
 			if (!customer) {
 				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Customer not exists',
-						},
-					],
+					errors: [{ msg: 'Customer not exists' }],
 				})
 			}
 
 			const fromFullName = customer.full_name
 			const listAccountId = [
-				...customer.saving_account_id,
+				...customer.saving_accounts_id,
 				customer.default_account_id,
 			]
 
 			if (listAccountId.indexOf(fromAccountId) === -1) {
 				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Transfering account id is not account\'s customer',
-						},
-					],
+					errors: [{ msg: 'Transfering account id is not account\'s customer' }],
 				})
 			}
 
 			if (fromAccountId === toAccountId) {
 				return res.status(400).json({
 					errors: [
-						{
-							msg: 'Beneficiary account cannot coincide with debit account',
-						},
+						{ msg: 'Beneficiary account cannot coincide with debit account' },
 					],
 				})
 			}
@@ -101,20 +91,14 @@ router.post(
 			if (!accountTransferer || !accountReceiver) {
 				return res.status(400).json({
 					errors: [
-						{
-							msg: 'Account transferer or account receiver not exists',
-						},
+						{ msg: 'Account transferer or account receiver not exists' },
 					],
 				})
 			}
 
 			if (accountTransferer.balance - transactionAmount < 50000) {
 				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Insufficient funds',
-						},
-					],
+					errors: [{ msg: 'Insufficient funds' }],
 				})
 			}
 
@@ -232,7 +216,7 @@ router.post(
 				).save()
 			}
 
-			return res.status(500).send('Server error')
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -256,11 +240,9 @@ router.get('/receiver-internal-banking/:accountId', auth, async (req, res) => {
 			})
 		}
 
-		const fullName = customer.full_name
-
-		return res.status(200).json({ full_name: fullName })
+		return res.status(200).json({ full_name: customer.full_name })
 	} catch (error) {
-		return res.status(500).send('Server error')
+		return res.status(500).json({ msg: 'Server error' })
 	}
 })
 
@@ -627,7 +609,7 @@ router.post(
 				.status(200)
 				.json({ transactionTransfererResponse, accountTransfererResponse })
 		} catch (error) {
-			return res.status(500).send('Server error')
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )

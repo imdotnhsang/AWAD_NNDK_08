@@ -12,8 +12,9 @@ const Customer = require('../../models/Customer')
 // @desc      Tạo tài khoản ngân hàng với loại tiết kiệm cho một customer
 // @access    Public
 router.post(
-	'/',
+	'/register',
 	[
+		auth,
 		check('balance', 'Please enter a balance with 0 or more').isInt({ min: 0 }),
 		check('email', 'Please include a valid email').isEmail(),
 		check('phoneNumber', 'Please include a valid phone number').isLength({
@@ -23,6 +24,7 @@ router.post(
 		check('defaultAccountId', 'Default account id is required')
 			.not()
 			.notEmpty(),
+		check('service', 'Service is required').not().notEmpty(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -30,7 +32,14 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { balance, email, phoneNumber, defaultAccountId } = req.body
+		const { position } = req.user
+		if (!position) {
+			return res.status(400).json({
+				errors: [{ msg: 'You not have permission to access' }],
+			})
+		}
+
+		const { balance, email, phoneNumber, defaultAccountId, service } = req.body
 
 		const nanoid = customAlphabet('1234567890', 14)
 		const accountId = nanoid()
@@ -44,9 +53,15 @@ router.post(
 
 			if (!customer) {
 				return res.status(400).json({
+					errors: [{ msg: 'Customer not exists' }],
+				})
+			}
+
+			if (service !== 'VISA' && service !== 'MASTERCARD') {
+				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Customer not exists',
+							msg: 'Service does not exist',
 						},
 					],
 				})
@@ -56,16 +71,19 @@ router.post(
 				account_id: accountId,
 				account_type: 'SAVING',
 				balance,
+				account_service: service,
 			})
 
 			const responseAccount = await account.save()
 
-			customer.saving_account_id.push(responseAccount.account_id)
-			const updatedCustomer = await customer.save()
+			customer.saving_accounts_id.push(responseAccount.account_id)
+			await customer.save()
 
-			return res.status(200).json({ responseAccount, updatedCustomer })
+			return res
+				.status(200)
+				.json({ msg: 'Saving account successfully created' })
 		} catch (error) {
-			return res.status(500).send('Server error')
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -74,40 +92,7 @@ router.post(
 // @desc      Lấy thông tin tài khoản ngân hàng
 // @access    Public
 router.get('/', auth, async (req, res) => {
-	try {
-		const customer = await Customer.findById(req.user.id)
-
-		if (!customer) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Customer not exists',
-					},
-				],
-			})
-		}
-
-		const {
-			full_name: fullName,
-			default_account_id: defaultAccountId,
-			saving_account_id: savingAccountsId,
-		} = customer
-
-		let savingAccounts = []
-		if (savingAccountsId.length !== 0) {
-			savingAccountsId.map(async (e) =>
-				savingAccounts.push(await Account.findOne({ account_id: e }))
-			)
-		}
-
-		const defaultAccount = await Account.findOne({
-			account_id: defaultAccountId,
-		})
-
-		return res.status(200).json({ fullName, defaultAccount, savingAccounts })
-	} catch (error) {
-		return res.status(500).send('Server error')
-	}
+	return res.status(200).json({ msg: 'GET /accounts' })
 })
 
 // @route     PUT /accounts
@@ -117,7 +102,7 @@ router.put('/', async (req, res) => {
 	try {
 		res.status(200).json({ msg: 'PUT /accounts' })
 	} catch (error) {
-		res.status(500).send('Server error')
+		return res.status(500).json({ msg: 'Server error' })
 	}
 })
 

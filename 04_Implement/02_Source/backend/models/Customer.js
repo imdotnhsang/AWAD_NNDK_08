@@ -25,10 +25,10 @@ const CustomerSchema = new mongoose.Schema({
 		type: String,
 		unique: true
 	},
-	saving_account_id: {
+	saving_accounts_id: {
 		type: Array
 	},
-	list_receiver: {
+	list_receivers_id: {
 		type: Array
 	},
 	created_at: {

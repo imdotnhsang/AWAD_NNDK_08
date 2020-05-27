@@ -12,17 +12,15 @@ const Customer = require('../../models/Customer')
 const Staff = require('../../models/Staff')
 const redisClient = require('../../config/redis')
 
-// @route     GET /auth/customers
-// @desc      Lấy thông tin customer sau khi đăng nhập thành công
+// @route     GET /auth/users
+// @desc      Test truyền payload vào req
 // @access    Public
-router.get('/customers', auth, async (req, res) => {
+router.get('/users', auth, async (req, res) => {
 	try {
-		const customer = await Customer.findById(req.user.id)
-
-		res.json(customer)
+		return res.status(200).json(req.user)
 	} catch (error) {
 		console.log(error)
-		res.status(500).send('Server error')
+		return res.status(500).json({ msg: 'Server error' })
 	}
 })
 
@@ -45,7 +43,6 @@ router.post(
 
 		try {
 			const customer = await Customer.findOne({ email })
-
 			if (!customer) {
 				return res.status(400).json({
 					errors: [
@@ -57,7 +54,6 @@ router.post(
 			}
 
 			const isMatch = await bcrypt.compare(password, customer.password)
-
 			if (!isMatch) {
 				return res.status(400).json({
 					errors: [
@@ -108,11 +104,14 @@ router.post(
 			)
 
 			return res.status(200).json({
-				'access-token': accessToken,
-				'refresh-token': refreshTokenInfo.refresh_token,
+				msg: 'Signed in successfully',
+				data: {
+					'access-token': accessToken,
+					'refresh-token': refreshTokenInfo.refresh_token,
+				},
 			})
 		} catch (error) {
-			return res.status(500).send('Server error')
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -121,7 +120,7 @@ router.post(
 // @desc      Xác thực đăng nhập của staff (employee vs admin) và trả về access-token
 // @access    Public
 router.post(
-	'/staff/login',
+	'/staffs/login',
 	[
 		check('username', 'Username is required').not().notEmpty(),
 		check('password', 'Password is required').not().notEmpty(),
@@ -135,8 +134,7 @@ router.post(
 		const { username, password } = req.body
 
 		try {
-			const staff = Staff.findOne({ username })
-
+			const staff = await Staff.findOne({ username })
 			if (!staff) {
 				return res.status(400).json({
 					errors: [
@@ -148,7 +146,6 @@ router.post(
 			}
 
 			const isMatch = await bcrypt.compare(password, staff.password)
-
 			if (!isMatch) {
 				return res.status(400).json({
 					errors: [
@@ -162,6 +159,7 @@ router.post(
 			const payload = {
 				user: {
 					id: staff.id,
+					position: staff.position,
 				},
 			}
 
@@ -195,11 +193,15 @@ router.post(
 			)
 
 			return res.status(200).json({
-				'access-token': accessToken,
-				'refresh-token': refreshTokenInfo.refresh_token,
+				msg: 'Signed in successfully',
+				data: {
+					'access-token': accessToken,
+					'refresh-token': refreshTokenInfo.refresh_token,
+				},
 			})
 		} catch (error) {
-			return res.status(500).send('Server error')
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -212,9 +214,9 @@ router.post('/logout', auth, async (req, res) => {
 		res.clearCookie('refresh_token')
 		// res.redirect('/')
 
-		return res.status(200).json({ msg: 'Log out successfully!!!' })
+		return res.status(200).json({ msg: 'Logged out successfully' })
 	} catch (error) {
-		return res.status(500).send('Server error')
+		return res.status(500).json({ msg: 'Server error' })
 	}
 })
 
