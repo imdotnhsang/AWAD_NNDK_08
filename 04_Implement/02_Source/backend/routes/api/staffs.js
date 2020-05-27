@@ -29,7 +29,7 @@ router.post(
 		}
 
 		const { fullName, email, phoneNumber, position } = req.body
-		
+
 		const username = email.split('@')[0].toLowerCase()
 
 		try {
@@ -68,23 +68,26 @@ router.post(
 			staff.password = await bcrypt.hash(password, salt)
 
 			await staff.save()
+
+			let response = {}
 			if (position === 'EMPLOYEE') {
-				return res.status(200).json({
+				response = {
 					msg: 'Employee successfully created',
 					data: {
 						username,
 						password,
 					},
-				})
+				}
 			} else if (position === 'ADMINISTRATOR') {
-				res.status(200).json({
+				response = {
 					msg: 'Administrator successfully created',
 					data: {
 						username,
 						password,
 					},
-				})
+				}
 			}
+			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).json({ msg: 'Server error' })
 		}
@@ -104,7 +107,7 @@ router.get('/information', auth, async (req, res) => {
 			})
 		}
 
-		return res.status(200).json({
+		const response = {
 			msg: 'Information successfully showed',
 			data: {
 				username: staff.username,
@@ -113,7 +116,8 @@ router.get('/information', auth, async (req, res) => {
 				email: staff.email,
 				position: staff.position,
 			},
-		})
+		}
+		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(500).json({ msg: 'Server error' })
 	}

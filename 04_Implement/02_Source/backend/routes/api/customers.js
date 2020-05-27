@@ -1,4 +1,5 @@
 const express = require('express')
+const mongoose = require('mongoose')
 
 const router = express.Router()
 const { customAlphabet } = require('nanoid')
@@ -118,9 +119,9 @@ router.post(
 			const salt = await bcrypt.genSalt(10)
 			customer.password = await bcrypt.hash(password, salt)
 
-			const response = await customer.save()
+			const responseCustomer = await customer.save()
 
-			return res.status(200).json({
+			const response = {
 				msg: 'Customer successfully created',
 				data: {
 					login_info: {
@@ -128,17 +129,18 @@ router.post(
 						password,
 					},
 					card_info: {
-						default_account_id: response.default_account_id,
+						default_account_id: responseCustomer.default_account_id,
 						account_type: responseAccount.account_type,
 						account_service: responseAccount.account_service,
 						balance: responseAccount.balance,
 					},
 					personal_info: {
-						full_name: response.full_name,
-						phone_number: response.phone_number,
+						full_name: responseCustomer.full_name,
+						phone_number: responseCustomer.phone_number,
 					},
 				},
-			})
+			}
+			return res.status(200).json(response)
 		} catch (error) {
 			if (checkErrorsMongoose.createAccountDefault !== false) {
 				await Account.findOneAndRemove({
@@ -184,15 +186,19 @@ router.get('/information', auth, async (req, res) => {
 			account_id: defaultAccountId,
 		})
 
-		let listReceivers = []
-		// if (listReceiversId.length !== 0) {
-		// 	listReceiversId.map(async (e) => {
-		// 		listReceivers.push(e)
-		// 		// console.log(await Receiver.findById(e))
-		// 	})
-		// }
-
-		console.log(listReceivers)
+		let listReceivers = (
+			await Receiver.find({
+				_id: {
+					$in: listReceiversId.map((e) => mongoose.Types.ObjectId(e)),
+				},
+			})
+		).map((e) => {
+			return {
+				bank_name: e.bank_name,
+				account_id: e.account_id,
+				nickname: e.nickname,
+			}
+		})
 
 		const response = {
 			msg: 'Information successfully showed',
@@ -217,7 +223,7 @@ router.get('/information', auth, async (req, res) => {
 							account_service: e.service,
 						}
 					}),
-					list_receivers: listReceiversId,
+					list_receivers: listReceivers,
 				},
 			},
 		}

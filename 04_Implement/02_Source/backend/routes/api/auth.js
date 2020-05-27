@@ -192,13 +192,14 @@ router.post(
 				})
 			)
 
-			return res.status(200).json({
+			const response = {
 				msg: 'Signed in successfully',
 				data: {
 					'access-token': accessToken,
 					'refresh-token': refreshTokenInfo.refresh_token,
 				},
-			})
+			}
+			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ msg: 'Server error' })
@@ -214,7 +215,8 @@ router.post('/logout', auth, async (req, res) => {
 		res.clearCookie('refresh_token')
 		// res.redirect('/')
 
-		return res.status(200).json({ msg: 'Logged out successfully' })
+		const response = { msg: 'Logged out successfully' }
+		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(500).json({ msg: 'Server error' })
 	}

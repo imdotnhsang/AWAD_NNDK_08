@@ -79,9 +79,8 @@ router.post(
 			customer.saving_accounts_id.push(responseAccount.account_id)
 			await customer.save()
 
-			return res
-				.status(200)
-				.json({ msg: 'Saving account successfully created' })
+			const response = { msg: 'Saving account successfully created' }
+			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).json({ msg: 'Server error' })
 		}
