@@ -26,7 +26,6 @@ const Col = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  
 `
 const StyledCol = styled(Col)`
   margin: ${(props) => (!props.icon && '12px 0')};
@@ -42,7 +41,6 @@ const Row = styled.div`
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;
-  margin-bottom: 30px;
   opacity: ${(props) => (props.disabled && '0.5')}
 `
 const EyeButton = styled.button`

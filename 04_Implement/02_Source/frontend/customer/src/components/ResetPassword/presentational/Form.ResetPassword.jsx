@@ -115,7 +115,14 @@ class ResetPasswordForm extends Component {
     } = this.state
 
     if (done) {
-      return <Redirect to="/login" />
+      return (
+        <Redirect
+          to={{
+            pathname: '/login',
+            state: { show: true },
+          }}
+        />
+      )
     }
 
     return (

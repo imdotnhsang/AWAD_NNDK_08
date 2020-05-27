@@ -143,10 +143,12 @@ class SignInModal extends Component {
 
   render() {
     const {
-      email, password, error, errorReCaptcha, loading, referer,
+      email, password, error, errorReCaptcha, loading,
     } = this.state
 
     if (isAuthenticated()) {
+      // eslint-disable-next-line react/prop-types
+      const { referer } = this.props
       return <Redirect to={referer} />
     }
 
