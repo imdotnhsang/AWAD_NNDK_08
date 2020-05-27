@@ -1,15 +1,28 @@
 /* eslint-disable no-undef */
 const express = require('express')
-const connectDB = require('./config/db')
+const cookieParser = require('cookie-parser')
+
+const connectDB = require('./config/mongodb')
+const redisClient = require('./config/redis')
 
 const app = express()
 
 
-// Connect Datavase
+// Connect Database
 connectDB()
+
+redisClient.on('connect', () => {
+	console.log('Redis Client Connected')
+})
+
+redisClient.on('error', (error) => {
+	console.log('Redis not connected', error)
+})
 
 // Init Middleware
 app.use(express.json({ extended: false }))
+
+app.use(cookieParser())
 
 app.get('/', (req, res) => {
 	res.send('API Running')

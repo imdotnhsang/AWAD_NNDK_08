@@ -34,20 +34,6 @@ const CustomerSchema = new mongoose.Schema({
 	created_at: {
 		type: Number,
 		require: true
-	},
-	is_active: {
-		type: Boolean,
-		require: true
-	},
-	OTP: {
-		code: {
-			type: String,
-			required: true
-		},
-		expired_at: {
-			type: Number,
-			required: true
-		}
 	}
 })
 

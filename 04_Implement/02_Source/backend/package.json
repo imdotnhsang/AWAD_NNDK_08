@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^4.0.1",
+    "bluebird": "^3.7.2",
     "config": "^3.3.1",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-validator": "^6.4.1",
     "jsonwebtoken": "^8.5.1",
@@ -20,6 +22,7 @@
     "node-rsa": "^1.0.8",
     "openpgp": "^4.10.4",
     "rand-token": "^1.0.1",
+    "redis": "^3.0.2",
     "uuid": "^8.0.0"
   },
   "devDependencies": {
