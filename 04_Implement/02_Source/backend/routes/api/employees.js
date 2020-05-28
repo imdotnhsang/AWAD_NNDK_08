@@ -9,6 +9,7 @@ const auth = require('../../middlewares/auth')
 
 const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
+const Transaction = require('../../models/Transaction')
 
 // @route     POST /employees/register-customer
 // @desc      Create customer account
@@ -198,6 +199,10 @@ router.post(
 			})
 		}
 
+		const checkErrorsMongoose = {
+			createTransactionReceiver: false,
+		}
+
 		try {
 			const customer = await Customer.findOne({
 				$or: [
@@ -222,11 +227,33 @@ router.post(
 					.json({ errors: [{ msg: 'Account does not exist' }] })
 			}
 
+			const transactionReceiver = {
+				entry_time: Date.now(),
+				from_account_id: 'EIGHT_BANK',
+				from_fullname: 'Eight Bank',
+				to_account_id: rechargeAccountId,
+				to_fullname: customer.full_name,
+				from_bank_id: 'EIGHT',
+				to_bank_id: 'EIGHT',
+				transaction_type: 'RECHARGE',
+				transaction_amount: rechargeAmount,
+				transaction_balance_before: account.balance,
+				transaction_balance_after: account.balance,
+				transaction_status: 'FAILED',
+			}
+
+			checkErrorsMongoose.createTransactionReceiver = transactionReceiver
+
 			await account.updateOne({
 				$inc: {
 					balance: rechargeAmount,
 				},
 			})
+
+			transactionReceiver.transaction_balance_after =
+				Number(account.balance) + Number(rechargeAmount)
+			transactionReceiver.transaction_status = 'SUCCESS'
+			await new Transaction(transactionReceiver).save()
 
 			const response = {
 				msg: 'Account successfully recharge',
@@ -240,6 +267,12 @@ router.post(
 			}
 			return res.status(200).json(response)
 		} catch (error) {
+			if (checkErrorsMongoose.createTransactionReceiver !== false) {
+				await new Transaction(
+					checkErrorsMongoose.createTransactionReceiver
+				).save()
+			}
+
 			return res.status(500).json({ msg: 'Server Error' })
 		}
 	}

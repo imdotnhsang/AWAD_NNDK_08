@@ -41,9 +41,6 @@ router.post(
 
 		const { balance, email, phoneNumber, defaultAccountId, service } = req.body
 
-		const nanoid = customAlphabet('1234567890', 14)
-		const accountId = nanoid()
-
 		try {
 			const customer = await Customer.findOne({
 				email,
@@ -67,7 +64,21 @@ router.post(
 				})
 			}
 
-			const account = new Account({
+			const nanoid = customAlphabet('1234567890', 14)
+			const accountId = nanoid()
+
+			let account = await Account.findOne({ account_id: accountId })
+			if (account) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Account already exists',
+						},
+					],
+				})
+			}
+
+			account = new Account({
 				account_id: accountId,
 				account_type: 'SAVING',
 				balance,
