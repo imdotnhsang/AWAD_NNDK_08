@@ -53,11 +53,14 @@ const EyeButton = styled.button`
 `
 
 const EmailInput = ({
+  label,
+  placeholder,
   value,
   error,
   icon,
   disabled,
   onChange,
+  onKeyPress,
 }) => {
   const [showPassword, setShowPassword] = useState(false)
   return (
@@ -85,8 +88,15 @@ const EmailInput = ({
           <StyledCol icon={icon}>
             {error
               ? <Title error>{error}</Title>
-              : <Title>Your password</Title>}
-            <Input placeholder="Enter your password" value={value} onChange={onChange} type={showPassword ? 'text' : 'password'} disabled={disabled} />
+              : <Title>{label}</Title>}
+            <Input
+              placeholder={placeholder}
+              value={value}
+              onChange={onChange}
+              type={showPassword ? 'text' : 'password'}
+              disabled={disabled}
+              onKeyPress={onKeyPress}
+            />
           </StyledCol>
           {showPassword
             ? (
@@ -125,18 +135,24 @@ const EmailInput = ({
   )
 }
 EmailInput.defaultProps = {
+  label: 'Your password',
+  placeholder: 'Enter your password',
   value: '',
   error: '',
   icon: true,
   disabled: false,
   onChange: (f) => f,
+  onKeyPress: (f) => f,
 }
 EmailInput.propTypes = {
+  label: PropTypes.string,
+  placeholder: PropTypes.string,
   value: PropTypes.string,
   error: PropTypes.string,
   icon: PropTypes.bool,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
+  onKeyPress: PropTypes.func,
 }
 
 export default EmailInput

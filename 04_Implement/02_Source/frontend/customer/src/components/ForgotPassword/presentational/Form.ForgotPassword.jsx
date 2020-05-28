@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { Link, Redirect } from 'react-router-dom'
-import Button from '../../common/Button.Loading'
-import Input from '../../common/Input'
+import Button from '../../common/presentational/Button.Loading'
+import Input from '../../common/presentational/Input'
 import { isValidEmail, isNumber, setJwtToStorage } from '../../../utils/utils'
 import api from '../../../api/api'
 
@@ -57,6 +57,7 @@ class ForgotPasswordForm extends Component {
     }
     this.handleEmail = this.handleEmail.bind(this)
     this.handleOTP = this.handleOTP.bind(this)
+    this.handleKeyPress = this.handleKeyPress.bind(this)
     this.handleForgotPassword = this.handleForgotPassword.bind(this)
   }
 
@@ -72,6 +73,14 @@ class ForgotPasswordForm extends Component {
       otp: event.target.value,
       error: '',
     })
+  }
+
+  handleKeyPress(event) {
+    if (event.which === 13 || event.keyCode === 13) {
+      this.handleForgotPassword()
+      return false
+    }
+    return true
   }
 
   async handleForgotPassword() {
@@ -175,6 +184,7 @@ class ForgotPasswordForm extends Component {
             error={error}
             disabled={loading}
             onChange={verifyOTPStage ? this.handleOTP : this.handleEmail}
+            onKeyPress={this.handleKeyPress}
           />
         </InputWrapper>
         <StyledLink to="/login">I remembered my password</StyledLink>

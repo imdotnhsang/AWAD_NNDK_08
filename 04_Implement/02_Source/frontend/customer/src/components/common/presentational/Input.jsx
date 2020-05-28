@@ -44,6 +44,7 @@ const GeneralInput = ({
   type,
   disabled,
   onChange,
+  onKeyPress,
 }) => (
   <Wrapper disabled={disabled}>
     <Col>
@@ -58,6 +59,7 @@ const GeneralInput = ({
             value={value}
             onChange={onChange}
             disabled={disabled}
+            onKeyPress={onKeyPress}
           />
         </Col>
       </Row>
@@ -73,6 +75,7 @@ GeneralInput.defaultProps = {
   type: 'text',
   disabled: false,
   onChange: (f) => f,
+  onKeyPress: (f) => f,
 }
 GeneralInput.propTypes = {
   label: PropTypes.string,
@@ -82,5 +85,6 @@ GeneralInput.propTypes = {
   type: PropTypes.string,
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
+  onKeyPress: PropTypes.func,
 }
 export default GeneralInput

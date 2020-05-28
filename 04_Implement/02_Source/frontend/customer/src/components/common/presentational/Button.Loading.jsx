@@ -45,6 +45,7 @@ const ButtonLoading = ({
   onClick,
 }) => (
   <Wrapper
+    type="button"
     fluid={fluid}
     onClick={onClick}
     loading={loading}

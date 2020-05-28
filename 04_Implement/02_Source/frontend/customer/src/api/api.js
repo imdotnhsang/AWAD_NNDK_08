@@ -3,6 +3,8 @@ import querystring from 'querystring'
 import { getJwtFromStorage, objectToQueryString } from '../utils/utils'
 
 export const host = 'https://mock-api-eight-bank.herokuapp.com'
+
+// export const host = 'http://localhost:3002'
 export const apiHost = `${host}/api/`
 const authType = 'Bearer'
 
@@ -13,16 +15,20 @@ const instance = axios.create({
 const api = {
   get: (url, params) => {
     // eslint-disable-next-line prefer-const
-    let options = {}
+    let options = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
 
     if (params) {
       // eslint-disable-next-line no-param-reassign
       url += url + objectToQueryString(params)
     }
-    // const jwt = getJwtFromStorage();
-    // if (jwt) {
-    //   options.headers.Authorization = `${authType} ${jwt}`;
-    // }
+    const jwt = getJwtFromStorage()
+    if (jwt) {
+      options.headers.Authorization = `${authType} ${jwt}`
+    }
 
     return instance.get(`${url}`, options)
   },
@@ -37,10 +43,10 @@ const api = {
       options = { ...options, ...config }
     }
 
-    // const jwt = getJwtFromStorage();
-    // if (jwt) {
-    //   options.headers.Authorization = `${authType} ${jwt}`;
-    // }
+    const jwt = getJwtFromStorage()
+    if (jwt) {
+      options.headers.Authorization = `${authType} ${jwt}`
+    }
 
     return instance.post(`${url}`, querystring.stringify(data), options)
   },

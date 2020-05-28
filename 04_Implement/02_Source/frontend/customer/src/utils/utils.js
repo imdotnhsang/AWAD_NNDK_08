@@ -27,3 +27,20 @@ export function isNumber(value) {
 export function isAuthenticated() {
   return getJwtFromStorage()
 }
+
+export function milisecondToDatetime(time) {
+  const date = new Date(time)
+  return `${date.toLocaleTimeString('en-GB')} ${date.toLocaleDateString('en-GB')}`
+}
+
+export function spaceSeparating(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+}
+
+export function getMonthYear(time) {
+  return new Date(time).toLocaleDateString('en-GB').slice(3)
+}
+
+export function fourDigit(cardNumber) {
+  return cardNumber.slice(cardNumber.length - 4)
+}

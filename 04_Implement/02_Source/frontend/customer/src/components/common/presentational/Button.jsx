@@ -30,6 +30,7 @@ const GeneralButton = ({
   onClick,
 }) => (
   <Wrapper
+    type="button"
     secondary={secondary}
     fluid={fluid}
     onClick={onClick}
