@@ -5,36 +5,36 @@ const mongoose = require('mongoose')
 const CustomerSchema = new mongoose.Schema({
 	full_name: {
 		type: String,
-		required: true
+		required: true,
 	},
 	email: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	phone_number: {
 		type: String,
 		require: true,
-		unique: true
+		unique: true,
 	},
 	password: {
 		type: String,
-		required: true
+		required: true,
 	},
 	default_account_id: {
 		type: String,
-		unique: true
+		unique: true,
 	},
-	saving_account_id: {
-		type: Array
+	saving_accounts_id: {
+		type: Array,
 	},
-	list_receiver: {
-		type: Array
+	list_receivers_id: {
+		type: Array,
 	},
 	created_at: {
 		type: Number,
-		require: true
-	}
+		require: true,
+	},
 })
 
 module.exports = Customer = mongoose.model('customer', CustomerSchema)

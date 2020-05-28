@@ -6,43 +6,43 @@ const LinkedBankSchema = new mongoose.Schema({
 	bank_id: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	bank_name: {
 		type: String,
-		required: true
+		required: true,
 	},
 	our_public_key: {
 		type: String,
-		required: true
+		required: true,
 	},
 	partner_public_key: {
 		type: String,
-		required: true
+		required: true,
 	},
 	encrypt_type: {
 		type: String,
-		required: true
+		required: true,
 	},
 	partner_code: {
 		type: String,
-		required: true
+		required: true,
 	},
 	secret_key: {
 		type: String,
-		required: true
+		required: true,
 	},
 	our_private_key: {
 		type: String,
-		required: true
+		required: true,
 	},
 	hash_algorithm: {
 		type: String,
-		required: true
+		required: true,
 	},
 	passphrase: {
-		type: String
-	}
+		type: String,
+	},
 })
 
 module.exports = LinkedBank = mongoose.model('linked_bank', LinkedBankSchema)

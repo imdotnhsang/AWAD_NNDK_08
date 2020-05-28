@@ -3,37 +3,40 @@
 const mongoose = require('mongoose')
 
 const DebtCollectionSchema = new mongoose.Schema({
-	debtor_fullname: {
+	borrower_fullname: {
 		type: String,
-		required: true
+		required: true,
 	},
-	debtor_default_account: {
+	borrower_default_account: {
 		type: String,
-		required: true
+		required: true,
 	},
 	lender_fullname: {
 		type: String,
-		require: true
+		require: true,
 	},
 	lender_default_account: {
 		type: String,
-		required: true
+		required: true,
 	},
 	debt_status: {
 		type: String, // COLLECTING, PAID, CANCELLED
-		require: true
+		require: true,
 	},
 	debt_amount: {
 		type: Number,
-		require: true
+		require: true,
 	},
 	debt_message: {
 		type: String,
-		require: true
+		require: true,
 	},
 	debt_reason_cancel: {
-		type: String
-	}
+		type: String,
+	},
 })
 
-module.exports = DebtCollection = mongoose.model('debt_collection', DebtCollectionSchema)
+module.exports = DebtCollection = mongoose.model(
+	'debt_collection',
+	DebtCollectionSchema
+)
