@@ -3,11 +3,11 @@
 const mongoose = require('mongoose')
 
 const DebtCollectionSchema = new mongoose.Schema({
-	debtor_fullname: {
+	borrower_fullname: {
 		type: String,
 		required: true,
 	},
-	debtor_default_account: {
+	borrower_default_account: {
 		type: String,
 		required: true,
 	},
