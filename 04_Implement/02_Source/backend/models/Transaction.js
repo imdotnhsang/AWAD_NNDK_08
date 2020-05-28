@@ -32,7 +32,7 @@ const TransactionSchema = new mongoose.Schema({
 		required: true,
 	},
 	transaction_type: {
-		// TRANSFER, RECEIVE, REPAYMENT, RECHARGE
+		// TRANSFER, RECEIVE, REPAYMENT
 		type: String,
 		required: true,
 	},

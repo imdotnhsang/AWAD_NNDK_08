@@ -235,7 +235,7 @@ router.post(
 				to_fullname: customer.full_name,
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
-				transaction_type: 'RECHARGE',
+				transaction_type: 'RECEIVE',
 				transaction_amount: rechargeAmount,
 				transaction_balance_before: account.balance,
 				transaction_balance_after: account.balance,
