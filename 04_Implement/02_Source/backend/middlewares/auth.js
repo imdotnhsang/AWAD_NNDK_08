@@ -41,7 +41,7 @@ module.exports = async (req, res, next) => {
 						res.clearCookie('access_token')
 						res.clearCookie('refresh_token')
 
-						return res.status(440).json({ msg: 'Login timeout!!!' })
+						return res.status(401).json({ msg: 'Login timeout' })
 					}
 
 					const accessTokenNew = jwt.sign({ user: { id: userId } }, config.get('jwtSecret'), {

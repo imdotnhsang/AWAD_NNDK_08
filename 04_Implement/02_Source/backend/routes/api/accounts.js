@@ -34,7 +34,7 @@ router.post(
 
 		const { position } = req.user
 		if (!position) {
-			return res.status(400).json({
+			return res.status(403).json({
 				errors: [{ msg: 'You not have permission to access' }],
 			})
 		}
@@ -79,7 +79,15 @@ router.post(
 			customer.saving_accounts_id.push(responseAccount.account_id)
 			await customer.save()
 
-			const response = { msg: 'Saving account successfully created' }
+			const response = {
+				msg: 'Saving account successfully created',
+				data: {
+					account_id: responseAccount.account_id,
+					account_type: responseAccount.account_type,
+					balance: responseAccount.balance,
+					account_service: responseAccount.account_service,
+				},
+			}
 			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).json({ msg: 'Server error' })

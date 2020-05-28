@@ -29,7 +29,7 @@ router.post(
 		check('fromAccountId', 'Transferer account is required').not().notEmpty(),
 		check('toAccountId', 'Receiver account is required').not().notEmpty(),
 		check('toFullName', 'Receiver full name is required').not().notEmpty(),
-		check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({
+		check('transactionAmount', 'Transaction amount is 50000 or more').isInt({
 			min: 50000,
 		}),
 	],

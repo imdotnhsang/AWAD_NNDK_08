@@ -6,34 +6,34 @@ const StaffSchema = new mongoose.Schema({
 	username: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	full_name: {
 		type: String,
-		required: true
+		required: true,
 	},
 	email: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
 	},
 	phone_number: {
 		type: String,
 		require: true,
-		unique: true
+		unique: true,
 	},
 	password: {
 		type: String,
-		required: true
+		required: true,
 	},
 	position: {
 		type: String, // ADMINISTRATOR, EMPLOYEE
-		require: true
+		require: true,
 	},
 	created_at: {
 		type: Number,
-		require: true
-	}
+		require: true,
+	},
 })
 
 module.exports = Staff = mongoose.model('staff', StaffSchema)

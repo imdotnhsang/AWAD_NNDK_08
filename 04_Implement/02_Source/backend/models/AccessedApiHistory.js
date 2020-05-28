@@ -5,22 +5,28 @@ const mongoose = require('mongoose')
 const AccessedApiHistorySchema = new mongoose.Schema({
 	bank_id: {
 		type: String,
-		required: true
+		required: true,
 	},
 	entry_time: {
 		type: Number,
-		required: true
+		required: true,
 	},
 	accessed_api_type: {
 		type: String, // GET_INFO, TRANSFER, DEBT_COLLECTION
-		required: true
+		required: true,
 	},
 	digital_signature: {
 		type: String,
-		required: true
-	}
+		required: true,
+	},
 })
 
-AccessedApiHistorySchema.index({bank_id:1,entry_time:1,accessed_api_type:1,digital_signature:1},{unique:true})
+AccessedApiHistorySchema.index(
+	{ bank_id: 1, entry_time: 1, accessed_api_type: 1, digital_signature: 1 },
+	{ unique: true }
+)
 
-module.exports = CallHistory = mongoose.model('accessed_api_history', AccessedApiHistorySchema)
+module.exports = CallHistory = mongoose.model(
+	'accessed_api_history',
+	AccessedApiHistorySchema
+)
