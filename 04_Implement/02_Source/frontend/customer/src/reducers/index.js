@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux'
-import menu from './menu'
 import cards from './cards'
+import receivers from './receivers'
+import banks from './banks'
 
 export default combineReducers({
-  menu, cards,
+  cards, receivers, banks,
 })

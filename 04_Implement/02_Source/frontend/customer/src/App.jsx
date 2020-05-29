@@ -4,6 +4,7 @@ import SignIn from './components/SignIn'
 import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
 import Cards from './components/Cards'
+import Receivers from './components/Receivers'
 import PrivateRoute from './PrivateRoute'
 
 
@@ -20,6 +21,11 @@ function App() {
           exact
           path="/cards"
           component={Cards}
+        />
+        <PrivateRoute
+          exact
+          path="/receivers"
+          component={Receivers}
         />
         <Route
           exact

@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled, { keyframes } from 'styled-components'
-import { spaceSeparating, getMonthYear } from '../../../utils/utils'
+import { spaceSeparating, getMonthYear, resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.div`
+const styleModifiers = ['loading', 'empty', 'service']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   width: 275px;
   padding: 28px;
   border-radius: 20px;
@@ -12,7 +14,10 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   position: relative;
-  background-image: ${(props) => (!props.loading && (props.service === 'MASTERCARD' ? 'linear-gradient(134.46deg, #111111 21.13%, #EF230C 70.45%)' : 'linear-gradient(134.46deg, #111111 21.13%, #2C41FF 70.45%)'))};
+  background-image: ${(props) => {
+    if (props.empty || props.loading) return 'none'
+    return props.service === 'MASTERCARD' ? 'linear-gradient(134.46deg, #111111 21.13%, #EF230C 70.45%)' : 'linear-gradient(134.46deg, #111111 21.13%, #2C41FF 70.45%)'
+  }};
   background-color: #fff;
   box-sizing: border-box;
   z-index: 2;
@@ -32,25 +37,26 @@ const Loading = styled.svg`
   transform: translate(-50%, -50%);
   animation: ${rotate} 2s linear infinite;
 `
-const Money = styled.span`
+const Money = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-family: OpenSans-Regular;
   font-size: 20px;
   color: #fff;
   letter-spacing: 0.1em;
   margin-top: 24px;
   margin-bottom: 16px;
+  opacity: ${(props) => (props.empty && '0')}
 `
-const CardNumber = styled.span`
+const CardNumber = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-family: OpenSans-Regular;
   font-size: 15px;
   color: ${(props) => props.theme.grayMedium};
-  opacity: ${(props) => (props.loading && '0')};
+  opacity: ${(props) => ((props.loading || props.empty) && '0')};
 `
-const Date = styled.span`
+const Date = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-family: OpenSans-Regular;
   font-size: 12px;
   color: ${(props) => props.theme.grayMedium};
-  opacity: ${(props) => (props.loading && '0')};
+  opacity: ${(props) => ((props.loading || props.empty) && '0')};
 `
 const Logo = styled.svg`
   position: absolute;
@@ -84,8 +90,8 @@ const OuterWrapper = styled.div`
     z-index: 1;
   }
 `
-const BankLogo = styled.svg`
-  opacity: ${(props) => (props.loading && '0')};
+const BankLogo = styled(resolveTagFromProps(styleModifiers, 'svg'))`
+  opacity: ${(props) => ((props.loading || props.empty) && '0')};
 `
 const Card = ({
   service,
@@ -93,9 +99,10 @@ const Card = ({
   cardNumber,
   date,
   loading,
+  empty,
 }) => (
   <OuterWrapper>
-    <Wrapper service={service} loading={loading}>
+    <Wrapper service={service} loading={loading} empty={empty}>
       {loading
           && (
             <Loading width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,7 +116,7 @@ const Card = ({
               </defs>
             </Loading>
           )}
-      <BankLogo loading={loading} width="87" height="15" viewBox="0 0 87 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <BankLogo loading={loading} empty={empty} width="87" height="15" viewBox="0 0 87 15" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.46939 4.52929V6.17321H1.81421V8.91308H6.89326V10.4681H1.81421V13.2376H7.65132V14.8816H0.025177V4.52929H7.46939Z" fill="white" />
         <path d="M9.94518 4.52929H11.7342V14.8816H9.94518V4.52929Z" fill="white" />
         <path d="M22.0064 9.84612H23.7954V13.3857C22.7948 14.4619 21.3645 15 19.5048 15C17.9381 15 16.6241 14.4965 15.5628 13.4894C14.5116 12.4823 13.986 11.2086 13.986 9.6684C13.986 8.12814 14.5217 6.8446 15.5931 5.81777C16.6746 4.79094 17.9785 4.27752 19.5048 4.27752C21.031 4.27752 22.2995 4.71195 23.3102 5.58081L22.3551 6.91372C21.9407 6.56815 21.5212 6.33119 21.0967 6.20283C20.6823 6.0646 20.1971 5.99549 19.6412 5.99549C18.5698 5.99549 17.6702 6.33612 16.9425 7.01739C16.2147 7.68878 15.8509 8.57738 15.8509 9.68321C15.8509 10.7792 16.2046 11.6628 16.9122 12.3342C17.6197 12.9957 18.4738 13.3265 19.4744 13.3265C20.4852 13.3265 21.3292 13.1142 22.0064 12.6897V9.84612Z" fill="white" />
@@ -122,15 +129,15 @@ const Card = ({
         <path d="M81.3145 14.8816H79.6164V3.89246H81.3145V10.3497L84.5894 7.00258H86.7726L83.71 10.1275L87 14.8816H84.9381L82.5426 11.4308L81.3145 12.6452V14.8816Z" fill="white" />
         <path d="M0 1.62911V0H41.2388L45.1808 1.62911H0Z" fill="#EF230C" />
       </BankLogo>
-      <Money>
-        {spaceSeparating(balance)}
+      <Money empty={empty}>
+        {spaceSeparating(balance, 3)}
         {' '}
         <b>VND</b>
       </Money>
-      <CardNumber loading={loading}>{spaceSeparating(cardNumber)}</CardNumber>
-      <Date loading={loading}>{getMonthYear(date)}</Date>
+      <CardNumber loading={loading} empty={empty}>{spaceSeparating(cardNumber, 3)}</CardNumber>
+      <Date loading={loading} empty={empty}>{getMonthYear(date)}</Date>
       {
-        !loading && (
+        !(loading || empty) && (
           service === 'MASTERCARD'
             ? (
               <Logo width="30" height="19" viewBox="0 0 30 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,6 +173,7 @@ Card.defaultProps = {
   cardNumber: '000000000000000',
   date: 1590655820911,
   loading: false,
+  empty: false,
 }
 Card.propTypes = {
   service: PropTypes.string,
@@ -173,5 +181,6 @@ Card.propTypes = {
   cardNumber: PropTypes.string,
   date: PropTypes.number,
   loading: PropTypes.bool,
+  empty: PropTypes.bool,
 }
 export default Card

@@ -45,7 +45,7 @@ ReactDOM.render(
   <Provider store={store}>
     <ThemeProvider theme={theme}>
       <StyledToastContainer
-        autoClose={60000}
+        autoClose={5000}
         closeButton={false}
       />
       <App />

@@ -3,29 +3,10 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
 import Template from '../common/presentational/Template.Customer'
-import Header from '../common/presentational/Header.Page'
 import Card from './presentational/Card'
 import CardList from './presentational/List.Card'
 import { selectCard, fetchCardsData } from '../../actions/cards'
 
-const Wrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-left: 220px;
-`
-const PageContent = styled.div`
-  width: 100%;
-  padding: 0px 60px;
-  padding-bottom: 67px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-`
 const Text = styled.span`
   font-family: OpenSans-Bold;
   font-size: 15px;
@@ -55,50 +36,52 @@ const CardsPage = ({
   onFetchData,
 }) => {
   const payingCard = cards.find((card) => card.type === 'DEFAULT') || {
-    id: '', type: '', balance: 0, service: 'MASTERCARD',
+    accountID: '', type: '', balance: 0, service: 'MASTERCARD',
   }
-  const savingCard = cards.find((card) => card.id === currentCard) || {
-    id: '', type: '', balance: 0, service: 'MASTERCARD',
+  const savingCard = cards.find((card) => card.accountID === currentCard) || {
+    accountID: '', type: '', balance: 0, service: 'MASTERCARD',
   }
   const savingCardList = cards.filter((card) => card.type === 'SAVING')
   useEffect(() => {
     onFetchData()
   }, [])
   return (
-    <Template>
-      <Wrapper>
-        <Header name="Cards" />
-        <PageContent>
-          <CardWrapper style={{ marginTop: '44px' }}>
-            <Text>Paying card</Text>
+    <Template
+      currentTab={0}
+      headerName="Cards"
+    >
+      <>
+        <CardWrapper style={{ marginTop: '44px' }}>
+          <Text>Paying card</Text>
+          <Card
+            cardNumber={payingCard.accountID}
+            balance={payingCard.balance}
+            service={payingCard.service}
+            loading={loading}
+            empty={cards.length === 0}
+          />
+        </CardWrapper>
+        <SavingCardSection>
+          <CardWrapper>
+            <Text>Saving cards</Text>
             <Card
-              cardNumber={payingCard.id}
-              balance={payingCard.balance}
-              service={payingCard.service}
+              cardNumber={savingCard.accountID}
+              balance={savingCard.balance}
+              service={savingCard.service}
               loading={loading}
+              empty={cards.length === 0}
             />
           </CardWrapper>
-          <SavingCardSection>
-            <CardWrapper>
-              <Text>Saving cards</Text>
-              <Card
-                cardNumber={savingCard.id}
-                balance={savingCard.balance}
-                service={savingCard.service}
-                loading={loading}
-              />
-            </CardWrapper>
-            {!loading
-              && (
+          {!loading
+            && (
               <CardList
                 value={currentCard}
                 data={savingCardList}
                 onClick={onSelectCard}
               />
-              )}
-          </SavingCardSection>
-        </PageContent>
-      </Wrapper>
+            )}
+        </SavingCardSection>
+      </>
     </Template>
   )
 }

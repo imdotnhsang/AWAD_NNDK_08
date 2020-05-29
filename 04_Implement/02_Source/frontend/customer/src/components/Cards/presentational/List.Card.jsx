@@ -31,28 +31,28 @@ const CardList = ({
     <Wrapper>
       {
         data.map((card, index) => {
-          const { service, id, balance } = card
+          const { service, accountID, balance } = card
           if (index === data.length - 1) {
             return (
               <Item
-                key={id}
+                key={accountID}
                 service={service}
-                cardNumber={id}
+                cardNumber={accountID}
                 balance={balance}
-                active={value === id}
-                onClick={() => onClick(id)}
+                active={value === accountID}
+                onClick={() => onClick(accountID)}
               />
             )
           }
           return (
             <ItemWrapper>
               <Item
-                key={id}
+                key={accountID}
                 service={service}
-                cardNumber={id}
+                cardNumber={accountID}
                 balance={balance}
-                active={value === id}
-                onClick={() => onClick(id)}
+                active={value === accountID}
+                onClick={() => onClick(accountID)}
               />
             </ItemWrapper>
           )
@@ -69,8 +69,8 @@ CardList.defaultProps = {
 CardList.propTypes = {
   value: PropTypes.string,
   data: PropTypes.arrayOf(PropTypes.shape({
+    accountID: PropTypes.string,
     service: PropTypes.string,
-    cardNumber: PropTypes.string,
     balance: PropTypes.number,
   })),
   onClick: PropTypes.func,

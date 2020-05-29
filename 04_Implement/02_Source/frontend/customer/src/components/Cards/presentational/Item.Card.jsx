@@ -61,7 +61,7 @@ const CardItem = ({
       <CardType>{service.toLowerCase()}</CardType>
     </Card>
     <Balance>
-      {spaceSeparating(balance)}
+      {spaceSeparating(balance, 3)}
       {' '}
       <b>VND</b>
     </Balance>

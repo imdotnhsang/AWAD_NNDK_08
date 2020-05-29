@@ -97,19 +97,18 @@ class ResetPasswordForm extends Component {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     }
-    try {
-      await api.post('/reset-password', data, config)
+    const res = await api.post('/reset-password', data, config)
+    if (res.error) {
+      const { error } = res
+      this.setState({
+        error,
+        loading: false,
+      })
+    } else {
       clearStorage()
       this.setState({
         loading: false,
         done: true,
-      })
-      // TODO: Show a sucess modal
-    } catch (e) {
-      const { error } = e.response.data
-      this.setState({
-        error,
-        loading: false,
       })
     }
   }

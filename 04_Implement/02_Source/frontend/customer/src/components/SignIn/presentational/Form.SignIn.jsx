@@ -127,16 +127,9 @@ class SignInModal extends Component {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     }
-    try {
-      const res = await api.post('/login', data, config)
-      const { token } = res.data
-      setJwtToStorage(token)
-      this.setState({
-        loading: false,
-      })
-    } catch (e) {
-      const { status } = e.response
-      const { error } = e.response.data
+    const res = await api.post('/login', data, config)
+    if (res.error) {
+      const { status, error } = res
       if (status === 419) {
         this.setState({
           errorReCaptcha: error,
@@ -148,6 +141,12 @@ class SignInModal extends Component {
           loading: false,
         })
       }
+    } else {
+      const { token } = res
+      setJwtToStorage(token)
+      this.setState({
+        loading: false,
+      })
     }
   }
 

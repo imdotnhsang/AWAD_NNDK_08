@@ -1,6 +1,6 @@
 import axios from 'axios'
 import querystring from 'querystring'
-import { getJwtFromStorage, objectToQueryString } from '../utils/utils'
+import { getJwtFromStorage, objectToQueryString, generateErrorResponse } from '../utils/utils'
 
 export const host = 'https://mock-api-eight-bank.herokuapp.com'
 
@@ -13,7 +13,7 @@ const instance = axios.create({
 })
 
 const api = {
-  get: (url, params) => {
+  get: async (url, params) => {
     // eslint-disable-next-line prefer-const
     let options = {
       headers: {
@@ -30,9 +30,14 @@ const api = {
       options.headers.Authorization = `${authType} ${jwt}`
     }
 
-    return instance.get(`${url}`, options)
+    try {
+      const response = await instance.get(`${url}`, options)
+      return response.data
+    } catch (e) {
+      return generateErrorResponse(e.response)
+    }
   },
-  post: (url, data, config) => {
+  post: async (url, data, config) => {
     let options = {
       headers: {
         'Content-Type': 'application/json',
@@ -48,7 +53,35 @@ const api = {
       options.headers.Authorization = `${authType} ${jwt}`
     }
 
-    return instance.post(`${url}`, querystring.stringify(data), options)
+    try {
+      const response = await instance.post(`${url}`, querystring.stringify(data), options)
+      return response.data
+    } catch (e) {
+      return generateErrorResponse(e.response)
+    }
+  },
+  delete: async (url, data, config) => {
+    let options = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+
+    if (config) {
+      options = { ...options, ...config }
+    }
+
+    const jwt = getJwtFromStorage()
+    if (jwt) {
+      options.headers.Authorization = `${authType} ${jwt}`
+    }
+
+    try {
+      const response = await instance.delete(`${url}`, querystring.stringify(data), options)
+      return response.data
+    } catch (e) {
+      return generateErrorResponse(e.response)
+    }
   },
 }
 

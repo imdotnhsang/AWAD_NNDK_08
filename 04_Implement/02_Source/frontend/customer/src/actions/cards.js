@@ -22,14 +22,13 @@ export const failedRequestCardsData = () => ({
 
 export const fetchCardsData = () => async (dispatch) => {
   dispatch(requestCardsData())
-  try {
-    const response = await api.get('/accounts')
-    const { data } = response.data
-    dispatch(receiveCardsData(data))
-  } catch (e) {
-    const { data } = e.response || { data: { error: 'Something wrong happended ...' } }
-    const { error } = data
+  const res = await api.get('/accounts')
+  if (res.error) {
+    const { error } = res
     dispatch(failedRequestCardsData())
     showError(error)
+  } else {
+    const { data } = res
+    dispatch(receiveCardsData(data))
   }
 }

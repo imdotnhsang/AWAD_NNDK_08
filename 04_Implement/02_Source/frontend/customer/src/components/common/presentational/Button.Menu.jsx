@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
-const Wrapper = styled.button`
+const Wrapper = styled.div`
   background: ${(props) => (props.color ? props.color : props.theme.blackMedium)};
   height: 67px;
   width: 100%;
@@ -20,28 +21,35 @@ const Name = styled.span`
   margin-left: 20px;
   line-height: 16px;
 `
+const StyledLink = styled(Link)`
+  text-decoration: none;
+`
 
 const MenuButton = ({
   color,
   active,
   name,
   children,
+  url,
   onClick,
 }) => (
-  <Wrapper
-    color={color}
-    active={active}
-    onClick={onClick}
-  >
-    {children}
-    <Name>{name}</Name>
-  </Wrapper>
+  <StyledLink to={url}>
+    <Wrapper
+      color={color}
+      active={active}
+      onClick={onClick}
+    >
+      {children}
+      <Name>{name}</Name>
+    </Wrapper>
+  </StyledLink>
 )
 MenuButton.defaultProps = {
   color: '',
   active: false,
   name: '',
   children: null,
+  url: '',
   onClick: (f) => f,
 }
 MenuButton.propTypes = {
@@ -49,6 +57,7 @@ MenuButton.propTypes = {
   active: PropTypes.bool,
   name: PropTypes.string,
   children: PropTypes.element,
+  url: PropTypes.string,
   onClick: PropTypes.func,
 }
 export default MenuButton

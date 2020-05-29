@@ -105,17 +105,17 @@ class ForgotPasswordForm extends Component {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       }
-      try {
-        await api.post('/forgot-password', data, config)
+      const res = await api.post('/forgot-password', data, config)
+      if (res.error) {
+        const { error } = res
+        this.setState({
+          error,
+          loading: false,
+        })
+      } else {
         this.setState({
           verifyOTPStage: true,
           error: '',
-          loading: false,
-        })
-      } catch (e) {
-        const { error } = e.response.data
-        this.setState({
-          error,
           loading: false,
         })
       }
@@ -139,19 +139,18 @@ class ForgotPasswordForm extends Component {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       }
-      try {
-        const res = await api.post('/forgot-password', data, config)
-        const { token } = res.data
+      const res = await api.post('/forgot-password', data, config)
+      if (res.error) {
+        const { error } = res
+        this.setState({
+          error,
+          loading: false,
+        })
+      } else {
+        const { token } = res
         setJwtToStorage(token)
         this.setState({
           newPasswordStage: true,
-          loading: false,
-        })
-        // TODO Direct to Create new password
-      } catch (e) {
-        const { error } = e.response.data
-        this.setState({
-          error,
           loading: false,
         })
       }
