@@ -282,7 +282,54 @@ router.post(
 // @desc      View transaction history of any customer account
 // @access    Private (employee)
 router.post('/transaction-history', auth, (req, res) => {
+	const { historyAccountId, historyEmail } = req.body
+	if (!historyAccountId && !historyEmail) {
+		return res.status(400).json({
+			errors: [{ msg: 'Recharge account or recharge email is required' }],
+		})
+	}
+
+	if (historyAccountId && historyAccountId.length !== 14) {
+		return res.status(400).json({
+			errors: [{ msg: 'Please include a valid account it' }],
+		})
+	}
+
+	const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/gm
+	if (historyEmail && re.test(String(historyEmail)) === false) {
+		return res.status(400).json({
+			errors: [{ msg: 'Please include a valid email' }],
+		})
+	}
+
 	return res.status(200).json({ msg: 'POST /employees/transaction-history' })
 })
 
+router.get('/all-customers', auth, async (req, res) => {
+	const { position } = req.user
+
+	if (!position || position !== 'EMPLOYEE') {
+		return res.status(403).json({
+			errors: [{ msg: 'You not have permission to access' }],
+		})
+	}
+
+	try {
+		const allCustomers = (await Customer.find()).map((e) => {
+			return {
+				full_name: e.full_name,
+				phone_number: e.phone_number,
+				email: e.email,
+				default_account_id: e.default_account_id,
+			}
+		})
+
+		console.log(allCustomers)
+		return res
+			.status(200)
+			.json({ msg: 'All customers successfully showed', data: allCustomers })
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server Error' })
+	}
+})
 module.exports = router
