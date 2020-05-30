@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { Redirect } from 'react-router-dom'
-import Button from '../../common/Button.Loading'
+import Button from '../../common/presentational/Button.Loading'
 import Input from '../../SignIn/presentational/Input.Password'
 import api from '../../../api/api'
 import { clearStorage } from '../../../utils/utils'
@@ -50,6 +50,7 @@ class ResetPasswordForm extends Component {
     }
     this.handlePassword = this.handlePassword.bind(this)
     this.handleConfimPassword = this.handleConfimPassword.bind(this)
+    this.handleKeyPress = this.handleKeyPress.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
@@ -65,6 +66,14 @@ class ResetPasswordForm extends Component {
       confirmPassword: event.target.value,
       error: '',
     })
+  }
+
+  handleKeyPress(event) {
+    if (event.which === 13 || event.keyCode === 13) {
+      this.handleSubmit()
+      return false
+    }
+    return true
   }
 
   async handleSubmit() {
@@ -88,19 +97,18 @@ class ResetPasswordForm extends Component {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     }
-    try {
-      await api.post('/reset-password', data, config)
+    const res = await api.post('/reset-password', data, config)
+    if (res.error) {
+      const { error } = res
+      this.setState({
+        error,
+        loading: false,
+      })
+    } else {
       clearStorage()
       this.setState({
         loading: false,
         done: true,
-      })
-      // TODO: Show a sucess modal
-    } catch (e) {
-      const { error } = e.response.data
-      this.setState({
-        error,
-        loading: false,
       })
     }
   }
@@ -147,6 +155,7 @@ class ResetPasswordForm extends Component {
             icon={false}
             disabled={loading}
             onChange={this.handleConfimPassword}
+            onKeyPress={this.handleKeyPress}
           />
         </InputWrapper>
         <ButtonWrapper>

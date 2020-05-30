@@ -4,7 +4,7 @@ import { Link, Redirect } from 'react-router-dom'
 import ReCAPTCHA from 'react-google-recaptcha'
 import EmailInput from './Input.Email'
 import PasswordInput from './Input.Password'
-import SubmitButton from '../../common/Button.Loading'
+import SubmitButton from '../../common/presentational/Button.Loading'
 import { isValidEmail, setJwtToStorage, isAuthenticated } from '../../../utils/utils'
 import api from '../../../api/api'
 
@@ -29,6 +29,7 @@ const ForgotPassword = styled(Link)`
   font-family: OpenSans-Regular;
   font-size: 12px;
   align-self: flex-end;
+  margin-top: 24px;
   margin-bottom: 36px;
   color: #fff;
   text-decoration: none;
@@ -63,6 +64,7 @@ class SignInModal extends Component {
     this.handleEmail = this.handleEmail.bind(this)
     this.handlePassword = this.handlePassword.bind(this)
     this.handleCaptchaChange = this.handleCaptchaChange.bind(this)
+    this.handleKeyPress = this.handleKeyPress.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
@@ -86,6 +88,14 @@ class SignInModal extends Component {
         errorReCaptcha: '',
       })
     }
+  }
+
+  handleKeyPress(event) {
+    if (event.which === 13 || event.keyCode === 13) {
+      this.handleSubmit()
+      return false
+    }
+    return true
   }
 
   async handleSubmit() {
@@ -117,16 +127,9 @@ class SignInModal extends Component {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     }
-    try {
-      const res = await api.post('/login', data, config)
-      const { token } = res.data
-      setJwtToStorage(token)
-      this.setState({
-        loading: false,
-      })
-    } catch (e) {
-      const { status } = e.response
-      const { error } = e.response.data
+    const res = await api.post('/login', data, config)
+    if (res.error) {
+      const { status, error } = res
       if (status === 419) {
         this.setState({
           errorReCaptcha: error,
@@ -138,6 +141,12 @@ class SignInModal extends Component {
           loading: false,
         })
       }
+    } else {
+      const { token } = res
+      setJwtToStorage(token)
+      this.setState({
+        loading: false,
+      })
     }
   }
 
@@ -166,6 +175,7 @@ class SignInModal extends Component {
           error={error}
           disabled={loading}
           onChange={this.handlePassword}
+          onKeyPress={this.handleKeyPress}
         />
         <ForgotPassword to="/forgot-password">Forgot password?</ForgotPassword>
         <ReCaptchaWrapper>

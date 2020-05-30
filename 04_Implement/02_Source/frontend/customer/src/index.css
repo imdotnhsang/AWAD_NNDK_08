@@ -49,3 +49,6 @@ input {
 input:focus {
   outline: none !important;
 }
+.Toastify__toast-container {
+  width: max-content !important;
+}

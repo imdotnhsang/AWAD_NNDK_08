@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import SignInForm from './presentational/Form.SignIn'
-import Template from '../common/Template.SignIn'
-import Modal from '../common/Modal.Success'
+import Template from '../common/presentational/Template.SignIn'
+import Modal from '../common/presentational/Modal.Success'
 
 const Description = styled.span`
   font-family: OpenSans-Regular;
