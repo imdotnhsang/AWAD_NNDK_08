@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import ScrollArea from 'react-scrollbar'
-import Header from './Table.Header'
-import Item from './Table.Item'
-import Loading from '../../common/presentational/Loading.Table'
+import Header from './Table.Header.Min'
+import Item from './Table.Item.Min'
+import Loading from '../../common/presentational/Loading.Table.Min'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -12,18 +12,17 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  background-color: ${(props) => props.theme.blackDark};
 `
 const Content = styled.div`
   width: 100%;
-  height: 590px;
+  height: 218px;
   position: relative;
 `
 
 const Table = ({
   data,
   loading,
-  onEdit,
-  onRemove,
 }) => (
   <Wrapper>
     <Header />
@@ -32,8 +31,9 @@ const Table = ({
         loading ? <Loading />
           : (
             <ScrollArea
+              speed={0.5}
               horizontal={false}
-              style={{ maxHeight: '590px' }}
+              style={{ maxHeight: '218px' }}
               verticalScrollbarStyle={{ width: '5px', backgroundColor: '#7C7F87', borderRadius: '10px' }}
               verticalContainerStyle={{
                 width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',
@@ -43,13 +43,10 @@ const Table = ({
                 data.map((item, index) => (
                   <Item
                     key={item.id}
-                    index={index + 1}
                     nickname={item.nickname}
                     cardNumber={item.accountID}
                     bankName={item.bankName}
                     lastItem={index === data.length - 1}
-                    onEdit={() => onEdit(item)}
-                    onRemove={() => onRemove(item)}
                   />
                 ))
               }
@@ -62,8 +59,6 @@ const Table = ({
 Table.defaultProps = {
   data: [],
   loading: false,
-  onEdit: (f) => f,
-  onRemove: (f) => f,
 }
 Table.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({
@@ -73,7 +68,5 @@ Table.propTypes = {
     bankName: PropTypes.string,
   })),
   loading: PropTypes.bool,
-  onEdit: PropTypes.func,
-  onRemove: PropTypes.func,
 }
 export default Table

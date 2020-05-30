@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { fourDigit, spaceSeparating } from '../../../utils/utils'
 
 const Card = styled.div`
-  width: 126px;
+  width: ${(props) => (props.fluid ? '100%' : '126px')};
   height: 80px;
   padding-right: 16px;
   display: flex;
@@ -21,23 +21,27 @@ const CardType = styled.span`
   font-size: 12px;
   color: #fff;
   text-transform: capitalize;
+  opacity: ${(props) => (props.empty && '0')};
 `
 const CardNumber = styled(CardType)`
   font-size: 15px;
   margin-bottom: 12px;
+  opacity: ${(props) => (props.empty && '0')};
 `
 const Circle = styled.div`
   border-radius: 50%;
   background-color: ${(props) => props.theme.orange};
   width: 15px;
   height: 15px;
-  background-color: ${(props) => (props.active ? props.theme.orange : props.theme.blackDark)};
+  background-color: ${(props) => (props.active ? props.theme.orange : 'transparent')};
+  opacity: ${(props) => (props.empty && '0')};
   margin: 0px 24px;
 `
 const Balance = styled.span`
   font-family: OpenSans-Regular;
   font-size: 20px;
   color: #fff;
+  opacity: ${(props) => (props.empty && '0')};
 `
 const Wrapper = styled.button`
   width: 480px;
@@ -45,6 +49,7 @@ const Wrapper = styled.button`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  cursor: pointer;
 `
 
 const CardItem = ({
@@ -52,15 +57,17 @@ const CardItem = ({
   cardNumber,
   balance,
   active,
+  fluid,
+  empty,
   onClick,
 }) => (
-  <Wrapper onClick={onClick}>
-    <Circle active={active} />
+  <Wrapper onClick={onClick} fluid={fluid} type="button" disabled={empty}>
+    <Circle active={active} empty={empty} />
     <Card>
-      <CardNumber>{fourDigit(cardNumber)}</CardNumber>
-      <CardType>{service.toLowerCase()}</CardType>
+      <CardNumber empty={empty}>{fourDigit(cardNumber)}</CardNumber>
+      <CardType empty={empty}>{service.toLowerCase()}</CardType>
     </Card>
-    <Balance>
+    <Balance empty={empty}>
       {spaceSeparating(balance, 3)}
       {' '}
       <b>VND</b>
@@ -73,6 +80,8 @@ CardItem.defaultProps = {
   cardNumber: '0000000000000000',
   balance: 1000000000000,
   active: false,
+  fluid: false,
+  empty: false,
   onClick: (f) => f,
 }
 CardItem.propTypes = {
@@ -80,6 +89,8 @@ CardItem.propTypes = {
   cardNumber: PropTypes.string,
   balance: PropTypes.number,
   active: PropTypes.bool,
+  fluid: PropTypes.bool,
+  empty: PropTypes.bool,
   onClick: PropTypes.func,
 }
 export default CardItem

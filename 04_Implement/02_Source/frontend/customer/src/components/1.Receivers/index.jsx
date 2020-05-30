@@ -1,13 +1,24 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 import { connect } from 'react-redux'
 import Template from '../common/presentational/Template.Customer'
 import Table from './presentational/Table'
-import { fetchReceiversData } from '../../actions/receivers'
+import { fetchReceiversDataIfNeeded } from '../../actions/receivers'
 import { fetchBanksDataIfNeeded } from '../../actions/banks'
 import AddModel from './presentational/Modal.AddReceiver'
 import EditModel from './presentational/Modal.EditReceiver'
 import RemoveModel from './presentational/Modal.RemoveReceiver'
+
+const Wrapper = styled.div`
+  width: 100%;
+  padding: 0px 60px;
+  padding-bottom: 67px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+`
 
 class ReceiversPage extends Component {
   constructor(props) {
@@ -120,29 +131,31 @@ class ReceiversPage extends Component {
         headerButtonName="New receiver"
         onHeaderButtonClick={this.handleOpenAddModal}
       >
-        <Table
-          data={data}
-          loading={loading}
-          onEdit={this.handleOpenEditModal}
-          onRemove={this.handleOpenRemoveModal}
-        />
-        <AddModel
-          show={showAddModal}
-          onClose={this.handleCloseAddModal}
-        />
-        <EditModel
-          id={selectedItem.id}
-          bankID={selectedItem.bankID}
-          accountID={selectedItem.accountID}
-          nickname={selectedItem.nickname}
-          show={showEditModal}
-          onClose={this.handleCloseEditModal}
-        />
-        <RemoveModel
-          id={selectedItem.id}
-          show={showRemoveModal}
-          onClose={this.handleCloseRemoveModal}
-        />
+        <Wrapper>
+          <Table
+            data={data}
+            loading={loading}
+            onEdit={this.handleOpenEditModal}
+            onRemove={this.handleOpenRemoveModal}
+          />
+          <AddModel
+            show={showAddModal}
+            onClose={this.handleCloseAddModal}
+          />
+          <EditModel
+            id={selectedItem.id}
+            bankID={selectedItem.bankID}
+            accountID={selectedItem.accountID}
+            nickname={selectedItem.nickname}
+            show={showEditModal}
+            onClose={this.handleCloseEditModal}
+          />
+          <RemoveModel
+            id={selectedItem.id}
+            show={showRemoveModal}
+            onClose={this.handleCloseRemoveModal}
+          />
+        </Wrapper>
       </Template>
     )
   }
@@ -171,7 +184,7 @@ const mapStateToProps = (state) => ({
   loading: state.receivers.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
-  onFetchData: () => dispatch(fetchReceiversData()),
+  onFetchData: () => dispatch(fetchReceiversDataIfNeeded()),
   onFetchModalData: () => dispatch(fetchBanksDataIfNeeded()),
 })
 export default connect(

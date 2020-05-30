@@ -31,6 +31,7 @@ const Wrapper = styled.button`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;
   opacity: ${(props) => (props.disabled && '0.5')};
+  cursor: pointer;
 `
 const Logo = styled.svg`
   transform: ${(props) => (props.show ? 'rotate(180deg)' : 'rotate(0deg)')};
@@ -60,6 +61,7 @@ const Item = styled.button`
   }
   text-align: left;
   vertical-align: middle;
+  cursor: pointer;
 `
 const ItemText = styled.span`
   font-family: OpenSans-Regular;
@@ -103,7 +105,7 @@ const Select = ({
 
   return (
     <div style={{ position: 'relative' }}>
-      <Wrapper onClick={() => setShow(!show)} disabled={disabled || loading}>
+      <Wrapper onClick={() => setShow(!show)} disabled={disabled || loading} type="button">
         <Row>
           <Col style={{ margin: '12px 0', paddingLeft: '16px', paddingRight: '16px' }}>
             {error

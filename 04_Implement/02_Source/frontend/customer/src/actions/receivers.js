@@ -16,7 +16,11 @@ export const failedRequestReceiversData = () => ({
   type: Receivers.FAILED_REQUEST_RECEIVERS_DATA,
 })
 
-export const fetchReceiversData = () => async (dispatch) => {
+export const invalidateReceiversData = () => ({
+  type: Receivers.INVALIDATE_RECEIVERS_DATA,
+})
+
+const fetchReceiversData = () => async (dispatch) => {
   dispatch(requestReceiversData())
   const res = await api.get('/receivers')
   if (res.error) {
@@ -27,4 +31,16 @@ export const fetchReceiversData = () => async (dispatch) => {
     const { data } = res
     dispatch(receiveReceiversData(data))
   }
+}
+
+const shouldFetchReceiversData = (state) => {
+  const { receivers, didInvalidate } = state
+  if (!receivers.length) return true
+  if (didInvalidate) return true
+  return false
+}
+
+export const fetchReceiversDataIfNeeded = () => (dispatch, getState) => {
+  if (shouldFetchReceiversData(getState().receivers)) return dispatch(fetchReceiversData())
+  return Promise.resolve()
 }

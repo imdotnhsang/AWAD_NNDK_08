@@ -20,7 +20,7 @@ export const failedRequestCardsData = () => ({
   type: Cards.FAILED_REQUEST_CARDS_DATA,
 })
 
-export const fetchCardsData = () => async (dispatch) => {
+const fetchCardsData = () => async (dispatch) => {
   dispatch(requestCardsData())
   const res = await api.get('/accounts')
   if (res.error) {
@@ -31,4 +31,15 @@ export const fetchCardsData = () => async (dispatch) => {
     const { data } = res
     dispatch(receiveCardsData(data))
   }
+}
+
+const shouldFetchCardsData = (state) => {
+  const data = state.cards
+  if (!data.length) return true
+  return false
+}
+
+export const fetchCardsDataIfNeeded = () => (dispatch, getState) => {
+  if (shouldFetchCardsData(getState().cards)) return dispatch(fetchCardsData())
+  return Promise.resolve()
 }

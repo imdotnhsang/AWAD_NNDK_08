@@ -6,7 +6,7 @@ import Template from '../../common/presentational/Template.Modal'
 import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
-import { fetchReceiversData } from '../../../actions/receivers'
+import { fetchReceiversDataIfNeeded, invalidateReceiversData } from '../../../actions/receivers'
 import api from '../../../api/api'
 
 const InputWrapper = styled.div`
@@ -121,6 +121,7 @@ class AddReceiverModal extends Component {
     } = this.state
     const {
       onClose,
+      onInvalidateReceiversData,
       onRefreshReceiversData,
     } = this.props
     if (!bankID || !accountID || !nickname) {
@@ -162,6 +163,7 @@ class AddReceiverModal extends Component {
         loading: false,
       })
       onClose()
+      onInvalidateReceiversData()
       onRefreshReceiversData()
     }
   }
@@ -236,6 +238,7 @@ AddReceiverModal.defaultProps = {
   onClose: (f) => f,
   //
   bankLoading: false,
+  onInvalidateReceiversData: (f) => f,
   onRefreshReceiversData: (f) => f,
 }
 AddReceiverModal.propTypes = {
@@ -243,13 +246,15 @@ AddReceiverModal.propTypes = {
   onClose: PropTypes.func,
   //
   bankLoading: PropTypes.bool,
+  onInvalidateReceiversData: PropTypes.func,
   onRefreshReceiversData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   bankLoading: state.banks.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
-  onRefreshReceiversData: () => dispatch(fetchReceiversData()),
+  onInvalidateReceiversData: () => dispatch(invalidateReceiversData()),
+  onRefreshReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
 })
 export default connect(
   mapStateToProps,

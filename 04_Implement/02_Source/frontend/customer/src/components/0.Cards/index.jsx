@@ -5,8 +5,17 @@ import { connect } from 'react-redux'
 import Template from '../common/presentational/Template.Customer'
 import Card from './presentational/Card'
 import CardList from './presentational/List.Card'
-import { selectCard, fetchCardsData } from '../../actions/cards'
+import { selectCard, fetchCardsDataIfNeeded } from '../../actions/cards'
 
+const Wrapper = styled.div`
+  width: 100%;
+  padding: 0px 60px;
+  padding-bottom: 67px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+`
 const Text = styled.span`
   font-family: OpenSans-Bold;
   font-size: 15px;
@@ -50,7 +59,7 @@ const CardsPage = ({
       currentTab={0}
       headerName="Cards"
     >
-      <>
+      <Wrapper>
         <CardWrapper style={{ marginTop: '44px' }}>
           <Text>Paying card</Text>
           <Card
@@ -81,7 +90,7 @@ const CardsPage = ({
               />
             )}
         </SavingCardSection>
-      </>
+      </Wrapper>
     </Template>
   )
 }
@@ -111,7 +120,7 @@ const mapStateToProps = (state) => ({
 })
 const mapDispatchToProps = (dispatch) => ({
   onSelectCard: (value) => dispatch(selectCard(value)),
-  onFetchData: () => dispatch(fetchCardsData()),
+  onFetchData: () => dispatch(fetchCardsDataIfNeeded()),
 })
 export default connect(
   mapStateToProps,

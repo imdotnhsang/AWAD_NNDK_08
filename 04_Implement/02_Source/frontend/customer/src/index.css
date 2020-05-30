@@ -52,3 +52,7 @@ input:focus {
 .Toastify__toast-container {
   width: max-content !important;
 }
+span {
+  font-family: OpenSans-Regular;
+  font-size: 12px;
+}
