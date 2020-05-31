@@ -18,10 +18,12 @@ const Modal = ({
     show={show}
     onClose={onClose}
   >
-    {children}
-    <ButtonWrapper>
-      <Button name="OK" fluid onClick={onClose} />
-    </ButtonWrapper>
+    <>
+      {children}
+      <ButtonWrapper>
+        <Button name="OK" fluid onClick={onClose} />
+      </ButtonWrapper>
+    </>
   </Template>
 )
 

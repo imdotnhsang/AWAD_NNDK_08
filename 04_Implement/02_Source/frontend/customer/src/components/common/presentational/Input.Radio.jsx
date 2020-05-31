@@ -1,6 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
+
+const styleModifiers = ['selected', 'fluid']
 
 const Wrapper = styled.button`
   display: flex;
@@ -21,7 +24,7 @@ const OuterCircle = styled.div`
   align-items: center;
   margin-right: 16px;
 `
-const InnerCircle = styled.div`
+const InnerCircle = styled(resolveTagFromProps(styleModifiers, 'div'))`
   background-color: ${(props) => (props.selected && props.theme.orange)};
   border-radius: 50%;
   height: 12px;

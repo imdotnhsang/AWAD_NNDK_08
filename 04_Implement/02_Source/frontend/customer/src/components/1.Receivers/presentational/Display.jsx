@@ -3,8 +3,11 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
 import Loading from '../../common/presentational/Loading.Table.Min'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.div`
+const styleModifiers = ['loading']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;
   padding: 36px 16px;

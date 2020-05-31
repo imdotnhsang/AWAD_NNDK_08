@@ -40,7 +40,7 @@ const CardList = ({
   loading,
   onClick,
 }) => (
-  <div style={{ position: 'relative', width: '100%' }}>
+  <div style={{ position: 'relative', height: '410px' }}>
     <ScrollArea
       speed={0.5}
       horizontal={false}
@@ -49,6 +49,7 @@ const CardList = ({
       verticalContainerStyle={{
         width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',
       }}
+      smoothScrolling
     >
       <Wrapper>
         {

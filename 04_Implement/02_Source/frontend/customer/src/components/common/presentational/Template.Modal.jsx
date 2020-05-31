@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Backdrop = styled.div`
+const styleModifiers = ['show', 'width']
+
+const Backdrop = styled(resolveTagFromProps(styleModifiers, 'div'))`
   position: fixed;
   top: 0;
   left: 0;
@@ -11,7 +14,7 @@ const Backdrop = styled.div`
   background-color: rgba(0,0,0,0.75);
   display: ${(props) => (props.show ? 'block' : 'none')}
 `
-const Wrapper = styled.div`
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   position: fixed;
   top: 50%;
   left: 50%;

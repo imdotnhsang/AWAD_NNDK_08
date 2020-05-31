@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled, { keyframes } from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.button`
+const styleModifiers = ['loading', 'fluid', 'secondary']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
   padding: 16px;
   background-color: ${(props) => (props.secondary ? props.theme.blackMedium : props.theme.orange)};
   width: ${(props) => (props.fluid ? '100%' : 'max-content')};
@@ -18,7 +21,7 @@ const Wrapper = styled.button`
   transition: transform 0.2s linear;
   cursor: pointer;
 `
-const Text = styled.span`
+const Text = styled(resolveTagFromProps(styleModifiers, 'span'))`
   color: ${(props) => props.theme.white}; 
   font-family: OpenSans-Regular;
   font-size: 15px;

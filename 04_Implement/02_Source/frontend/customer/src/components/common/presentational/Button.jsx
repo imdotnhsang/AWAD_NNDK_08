@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.button`
+const styleModifiers = ['secondary', 'fluid']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
   padding: 16px;
   background-color: ${(props) => (props.secondary ? props.theme.blackMedium : props.theme.orange)};
   width: ${(props) => (props.fluid ? '100%' : 'max-content')};

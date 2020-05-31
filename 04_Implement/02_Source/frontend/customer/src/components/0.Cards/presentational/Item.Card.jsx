@@ -1,9 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { fourDigit, spaceSeparating } from '../../../utils/utils'
+import { fourDigit, spaceSeparating, resolveTagFromProps } from '../../../utils/utils'
 
-const Card = styled.div`
+const styleModifiers = ['fluid', 'empty', 'active']
+
+const Card = styled(resolveTagFromProps(styleModifiers, 'div'))`
   width: ${(props) => (props.fluid ? '100%' : '126px')};
   height: 80px;
   padding-right: 16px;
@@ -16,19 +18,22 @@ const Card = styled.div`
   border-radius: 15px;
   box-sizing: border-box;
 `
-const CardType = styled.span`
+const CardType = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-family: OpenSans-Regular;
   font-size: 12px;
   color: #fff;
   text-transform: capitalize;
   opacity: ${(props) => (props.empty && '0')};
 `
-const CardNumber = styled(CardType)`
+const CardNumber = styled(resolveTagFromProps(styleModifiers, 'span'))`
+  font-family: OpenSans-Regular;  
   font-size: 15px;
   margin-bottom: 12px;
+  color: #fff;
+  text-transform: capitalize;
   opacity: ${(props) => (props.empty && '0')};
 `
-const Circle = styled.div`
+const Circle = styled(resolveTagFromProps(styleModifiers, 'div'))`
   border-radius: 50%;
   background-color: ${(props) => props.theme.orange};
   width: 15px;
@@ -37,7 +42,7 @@ const Circle = styled.div`
   opacity: ${(props) => (props.empty && '0')};
   margin: 0px 24px;
 `
-const Balance = styled.span`
+const Balance = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-family: OpenSans-Regular;
   font-size: 20px;
   color: #fff;

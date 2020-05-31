@@ -15,6 +15,24 @@ export function getJwtFromStorage() {
   return data
 }
 
+export function setNameToStorage(name) {
+  sessionStorage.setItem('name', name)
+}
+
+export function getNameFromStorage() {
+  const data = sessionStorage.getItem('name')
+  return data
+}
+
+export function setEmailToStorage(email) {
+  sessionStorage.setItem('email', email)
+}
+
+export function getEmailFromStorage() {
+  const data = sessionStorage.getItem('email')
+  return data
+}
+
 export function clearStorage() {
   sessionStorage.clear()
 }

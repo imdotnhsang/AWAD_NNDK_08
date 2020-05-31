@@ -2,9 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
-import { spaceSeparating } from '../../../utils/utils'
+import { spaceSeparating, resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.button`
+const styleModifiers = ['lastItem', 'active']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
   width: 100%;
   background-color: ${(props) => (props.active ? 'rgba(196, 196, 196, 0.3)' : props.theme.blackDark)};
   margin-bottom: ${(props) => !props.lastItem && '12px'};

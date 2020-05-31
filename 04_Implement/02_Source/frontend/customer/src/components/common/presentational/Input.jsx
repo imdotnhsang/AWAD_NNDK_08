@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled, { keyframes } from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Title = styled.span`
+const styleModifiers = ['error', 'disabled']
+
+const Title = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-size: 10px;
   margin-bottom: 8px;
   font-family: OpenSans-Regular;
@@ -11,7 +14,7 @@ const Title = styled.span`
 const Input = styled.input`
   width: 100%;
 `
-const Line = styled.div`
+const Line = styled(resolveTagFromProps(styleModifiers, 'div'))`
   width: 100%;
   height: 2px;
   background-color: ${(props) => (props.error ? props.theme.yellow : props.theme.grayMedium)};
@@ -31,7 +34,7 @@ const Row = styled.div`
   align-items: center;
   width: 100%;
 `
-const Wrapper = styled.div`
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;
   opacity: ${(props) => (props.disabled && '0.5')}
@@ -60,6 +63,7 @@ const GeneralInput = ({
   type,
   disabled,
   loading,
+  pattern,
   onChange,
   onKeyPress,
   onBlur,
@@ -76,6 +80,7 @@ const GeneralInput = ({
               type={type}
               placeholder={placeholder}
               value={value}
+              pattern={pattern}
               onChange={onChange}
               disabled={disabled}
               onKeyPress={onKeyPress}
@@ -111,6 +116,7 @@ GeneralInput.defaultProps = {
   type: 'text',
   disabled: false,
   loading: false,
+  pattern: '',
   onChange: (f) => f,
   onKeyPress: (f) => f,
   onBlur: (f) => f,
@@ -118,9 +124,13 @@ GeneralInput.defaultProps = {
 GeneralInput.propTypes = {
   label: PropTypes.string,
   placeholder: PropTypes.string,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
   error: PropTypes.string,
   type: PropTypes.string,
+  pattern: PropTypes.string,
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
   onChange: PropTypes.func,

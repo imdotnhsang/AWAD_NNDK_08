@@ -38,6 +38,7 @@ const Table = ({
               verticalContainerStyle={{
                 width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',
               }}
+              smoothScrolling
             >
               {
                 data.map((item, index) => (

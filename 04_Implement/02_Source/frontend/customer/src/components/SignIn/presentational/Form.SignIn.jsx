@@ -5,7 +5,13 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import EmailInput from './Input.Email'
 import PasswordInput from './Input.Password'
 import SubmitButton from '../../common/presentational/Button.Loading'
-import { isValidEmail, setJwtToStorage, isAuthenticated } from '../../../utils/utils'
+import {
+  isValidEmail,
+  setJwtToStorage,
+  isAuthenticated,
+  setNameToStorage,
+  setEmailToStorage,
+} from '../../../utils/utils'
 import api from '../../../api/api'
 
 const Wrapper = styled.div`
@@ -142,8 +148,10 @@ class SignInModal extends Component {
         })
       }
     } else {
-      const { token } = res
+      const { token, name } = res
       setJwtToStorage(token)
+      setNameToStorage(name)
+      setEmailToStorage(email)
       this.setState({
         loading: false,
       })

@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
+
+const styleModifiers = ['error', 'disabled', 'icon']
 
 const Logo = styled.svg`
   margin: 24px 16px;
 `
-const Title = styled.span`
+const Title = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-size: 10px;
   margin-bottom: 8px;
   font-family: OpenSans-Regular;
@@ -14,7 +17,7 @@ const Title = styled.span`
 const Input = styled.input`
   width: 100%;
 `
-const Line = styled.div`
+const Line = styled(resolveTagFromProps(styleModifiers, 'div'))`
   width: 100%;
   height: 2px;
   background-color: ${(props) => (props.error ? props.theme.yellow : props.theme.grayMedium)};
@@ -27,7 +30,9 @@ const Col = styled.div`
   align-items: flex-start;
   width: 100%;
 `
-const StyledCol = styled(Col)`
+
+// eslint-disable-next-line react/jsx-props-no-spreading
+const StyledCol = styled(({ icon, ...rest}) => <Col {...rest} />)`
   margin: ${(props) => (!props.icon && '12px 0')};
   padding-left: ${(props) => (!props.icon && '16px')};
 `
@@ -38,7 +43,7 @@ const Row = styled.div`
   align-items: center;
   width: 100%;
 `
-const Wrapper = styled.div`
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;
   opacity: ${(props) => (props.disabled && '0.5')}

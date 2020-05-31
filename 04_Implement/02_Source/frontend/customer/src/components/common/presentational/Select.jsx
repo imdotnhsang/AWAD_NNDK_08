@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled, { keyframes } from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Title = styled.span`
+const styleModifiers = ['error', 'show', 'lastItem']
+
+const Title = styled(resolveTagFromProps(styleModifiers, 'span'))`
   font-size: 10px;
   margin-bottom: 8px;
   font-family: OpenSans-Regular;
@@ -33,13 +36,13 @@ const Wrapper = styled.button`
   opacity: ${(props) => (props.disabled && '0.5')};
   cursor: pointer;
 `
-const Logo = styled.svg`
+const Logo = styled(resolveTagFromProps(styleModifiers, 'svg'))`
   transform: ${(props) => (props.show ? 'rotate(180deg)' : 'rotate(0deg)')};
   margin-right: 16px;
   transition: transform 0.5s ease-out;
   margin-left: auto;
 `
-const List = styled.div`
+const List = styled(resolveTagFromProps(styleModifiers, 'div'))`
   width: 100%;
   background-color: ${(props) => props.theme.blackDark};
   display: flex;
@@ -51,8 +54,9 @@ const List = styled.div`
   display: ${(props) => (props.show ? 'default' : 'none')};
   min-width: max-content;
   z-index: 1;
+  box-shadow: -4px 4px 6px #EF230C;
 `
-const Item = styled.button`
+const Item = styled(resolveTagFromProps(styleModifiers, 'button'))`
   padding: 8px 16px;
   width: 100%;
   margin-bottom: ${(props) => (!props.lastItem && '4px')};

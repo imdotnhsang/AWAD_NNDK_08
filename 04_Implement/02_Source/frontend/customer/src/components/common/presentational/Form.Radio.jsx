@@ -2,8 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import Item from './Input.Radio'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.div`
+const styleModifiers = ['vertical']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   display: flex;
   flex-direction: ${(props) => (props.vertical ? 'column' : 'row')};
   justify-content: flex-start;
@@ -51,7 +54,7 @@ RadioForm.propTypes = {
     }),
   ),
   vertical: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
   onChange: PropTypes.func,
 }
 
