@@ -31,6 +31,10 @@ const CustomerSchema = new mongoose.Schema({
 	list_receivers_id: {
 		type: Array,
 	},
+	is_active: {
+		type: Boolean,
+		require: true,
+	},
 	created_at: {
 		type: Number,
 		require: true,
