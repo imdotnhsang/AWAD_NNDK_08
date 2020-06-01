@@ -18,11 +18,11 @@ const DBModel = require('../../utils/DBModel')
 
 const DBModelInstance = new DBModel()
 
-// @route     POST /transactions/transfering-within-bank
+// @route     POST /transactions/transferring-within-bank
 // @desc      Chuyển khoản trong ngân hàng
 // @access    Public
 router.post(
-	'/transfering-interal-banking',
+	'/transferring-internal-banking',
 	[
 		auth,
 		check('entryTime', 'Entry time is required').not().notEmpty(),
@@ -70,7 +70,7 @@ router.post(
 
 			if (listAccountId.indexOf(fromAccountId) === -1) {
 				return res.status(400).json({
-					errors: [{ msg: 'Transfering account id is not account\'s customer' }],
+					errors: [{ msg: 'Transferring account id is not account\'s customer' }],
 				})
 			}
 
@@ -366,7 +366,7 @@ router.get('/receiver-interbank', async (req, res) => {
 			const { valid } = verified.signatures[0]
 			if (!valid) {
 				return MakeResponse(req, res, {
-					stauts: APIStatus.Invalid,
+					status: APIStatus.Invalid,
 					message: 'Signature is invalid',
 				})
 			}
@@ -379,7 +379,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		if (!entryTimeHashed || !entryTimeEncrypted) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Invalid,
-				message: 'Require entrytime',
+				message: 'Require entry time',
 			})
 		}
 

@@ -30,6 +30,10 @@ const StaffSchema = new mongoose.Schema({
 		type: String, // ADMINISTRATOR, EMPLOYEE
 		require: true,
 	},
+	is_active: {
+		type: Boolean,
+		require: true,
+	},
 	created_at: {
 		type: Number,
 		require: true,

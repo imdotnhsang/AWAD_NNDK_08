@@ -64,6 +64,16 @@ router.post(
 				})
 			}
 
+			if (customer.is_active !== true) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Customer is deactivated',
+						},
+					],
+				})
+			}
+
 			const payload = {
 				user: {
 					id: customer.id,
@@ -151,6 +161,16 @@ router.post(
 					errors: [
 						{
 							msg: 'Password is incorrect',
+						},
+					],
+				})
+			}
+
+			if (staff.is_active !== true) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Staff is deactivated',
 						},
 					],
 				})

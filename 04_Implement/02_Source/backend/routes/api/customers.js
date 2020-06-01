@@ -65,7 +65,7 @@ router.get('/information', auth, async (req, res) => {
 		})
 
 		const response = {
-			msg: 'Information successfully showed',
+			msg: 'Information successfully got',
 			data: {
 				personal_info: {
 					full_name: customer.full_name,
@@ -97,6 +97,36 @@ router.get('/information', auth, async (req, res) => {
 // @access    Public
 router.put('/', async (req, res) => {
 	return res.status(200).json({ msg: 'PUT /customers' })
+})
+
+// @route     PUT /customers/all-customers
+// @desc      Lấy tất cả các customer
+// @access    Public
+router.get('/all-customers', auth, async (req, res) => {
+	const { position } = req.user
+
+	if (!position || position !== 'EMPLOYEE') {
+		return res.status(403).json({
+			errors: [{ msg: 'You not have permission to access' }],
+		})
+	}
+
+	try {
+		const allCustomers = (await Customer.find()).map((e) => {
+			return {
+				full_name: e.full_name,
+				default_account_id: e.default_account_id,
+				email: e.email,
+				phone_number: e.phone_number,
+			}
+		})
+
+		return res
+			.status(200)
+			.json({ msg: 'All customers successfully got', data: allCustomers })
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server Error' })
+	}
 })
 
 module.exports = router
