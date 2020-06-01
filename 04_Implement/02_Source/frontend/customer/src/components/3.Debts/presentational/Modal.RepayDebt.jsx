@@ -2,33 +2,21 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
-import Step1 from '../container/Content.Step1'
-import Step2 from '../container/Content.Step2.Internal'
-import Step3 from '../container/Content.Step3'
-import Step4 from './Content.Step4'
-import Step5 from './Content.Step5'
+import Step1 from '../container/Content.Step1.RepayDebt'
+import Step2 from '../container/Content.Step2.RepayDebt'
+import Step3 from './Content.Step3.RepayDebt'
 
-
-class InternalModal extends Component {
+class RepayDebtModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      senderAccountID: '',
-      receiver: {
-        accountName: '',
-        accountID: '',
-        bankID: '',
-        bankName: '',
-      },
-      amount: 50000,
-      detail: '',
-      chargedBySender: true,
+      accountID: '',
       step: 1,
     }
     this.handleOnChange = this.handleOnChange.bind(this)
     this.handleNext = this.handleNext.bind(this)
     this.handleBack = this.handleBack.bind(this)
-    this.handleTransfer = this.handleTransfer.bind(this)
+    this.handleRepay = this.handleRepay.bind(this)
   }
 
   handleOnChange(value) {
@@ -49,7 +37,7 @@ class InternalModal extends Component {
     }))
   }
 
-  async handleTransfer() {
+  async handleRepay() {
     const {
       onSuccess,
       onFailure,
@@ -57,20 +45,16 @@ class InternalModal extends Component {
       onProcessing,
     } = this.props
     onClose()
+
+    // eslint-disable-next-line react/destructuring-assignment
+    const { id } = this.props.data
     const {
-      senderAccountID,
-      receiver,
-      amount,
-      detail,
-      chargedBySender,
+      accountID,
     } = this.state
+
     const data = {
-      senderAccountID,
-      receiverAccountID: receiver.accountID,
-      receiverBankID: receiver.bankID,
-      amount,
-      detail,
-      chargedBySender,
+      accountID,
+      debtID: id,
     }
     const config = {
       headers: {
@@ -78,34 +62,30 @@ class InternalModal extends Component {
       },
     }
     onProcessing()
-    const res = await api.post('/transfer', data, config)
+    const res = await api.post('/debts/repay', data, config)
     if (res.error) {
       const { error } = res
       onFailure(error)
     } else {
       onSuccess()
     }
-    // TODO recommend customer to save this receiver for future transfers
   }
 
   render() {
     const {
       step,
-      senderAccountID,
-      receiver,
-      amount,
-      detail,
-      chargedBySender,
+      accountID,
     } = this.state
     const {
       show,
+      data,
       onClose,
     } = this.props
 
     return (
       <Template
         width={604}
-        name="Internal transfer"
+        name="Repay debt"
         show={show}
         onClose={onClose}
       >
@@ -113,40 +93,18 @@ class InternalModal extends Component {
           [
             null,
             <Step1
-              value={senderAccountID}
+              value={accountID}
               onChange={this.handleOnChange}
               onClose={onClose}
               onNext={this.handleNext}
             />,
             <Step2
-              value={receiver}
-              onChange={this.handleOnChange}
+              data={data}
               onBack={this.handleBack}
               onNext={this.handleNext}
             />,
             <Step3
-              value={{
-                amount,
-                detail,
-                chargedBySender,
-                senderAccountID,
-              }}
-              onChange={this.handleOnChange}
-              onBack={this.handleBack}
-              onNext={this.handleNext}
-            />,
-            <Step4
-              value={{
-                senderAccountID,
-                receiver,
-                amount,
-                chargedBySender,
-              }}
-              onBack={this.handleBack}
-              onNext={this.handleNext}
-            />,
-            <Step5
-              onTransfer={this.handleTransfer}
+              onRepay={this.handleRepay}
             />,
           ][step] || null
         }
@@ -154,18 +112,36 @@ class InternalModal extends Component {
     )
   }
 }
-InternalModal.defaultProps = {
+RepayDebtModal.defaultProps = {
   show: true,
+  data: {
+    id: '',
+    lenderName: '',
+    lenderID: '',
+    borrowerName: '',
+    borrowerID: '',
+    amount: 0,
+    message: '',
+  },
   onClose: (f) => f,
   onSuccess: (f) => f,
   onFailure: (f) => f,
   onProcessing: (f) => f,
 }
-InternalModal.propTypes = {
+RepayDebtModal.propTypes = {
   show: PropTypes.bool,
+  data: PropTypes.shape({
+    id: PropTypes.string,
+    lenderName: PropTypes.string,
+    lenderID: PropTypes.string,
+    borrowerName: PropTypes.string,
+    borrowerID: PropTypes.string,
+    amount: PropTypes.number,
+    message: PropTypes.string,
+  }),
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
   onProcessing: PropTypes.func,
 }
-export default InternalModal
+export default RepayDebtModal

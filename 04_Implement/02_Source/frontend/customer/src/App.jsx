@@ -6,6 +6,7 @@ import ResetPassword from './components/ResetPassword'
 import Cards from './components/0.Cards'
 import Receivers from './components/1.Receivers'
 import Transfer from './components/2.Transfer'
+import Debts from './components/3.Debts'
 import PrivateRoute from './PrivateRoute'
 
 
@@ -32,6 +33,11 @@ function App() {
           exact
           path="/transfer"
           component={Transfer}
+        />
+        <PrivateRoute
+          exact
+          path="/debts"
+          component={Debts}
         />
         <Route
           exact

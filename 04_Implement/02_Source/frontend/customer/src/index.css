@@ -6,6 +6,10 @@
   font-family: OpenSans-Bold;
   src: URL("/fonts/OpenSans-Bold.ttf");
 }
+@font-face {
+  font-family: OpenSans-SemiBold;
+  src: URL("/fonts/OpenSans-SemiBold.ttf");
+}
 html {
   height: 100%;
 }

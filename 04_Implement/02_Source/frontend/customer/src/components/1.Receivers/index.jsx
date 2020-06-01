@@ -6,9 +6,9 @@ import Template from '../common/presentational/Template.Customer'
 import Table from './presentational/Table'
 import { fetchReceiversDataIfNeeded } from '../../actions/receivers'
 import { fetchBanksDataIfNeeded } from '../../actions/banks'
-import AddModel from './presentational/Modal.AddReceiver'
-import EditModel from './presentational/Modal.EditReceiver'
-import RemoveModel from './presentational/Modal.RemoveReceiver'
+import AddModal from './presentational/Modal.AddReceiver'
+import EditModal from './presentational/Modal.EditReceiver'
+import RemoveModal from './presentational/Modal.RemoveReceiver'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -138,11 +138,11 @@ class ReceiversPage extends Component {
             onEdit={this.handleOpenEditModal}
             onRemove={this.handleOpenRemoveModal}
           />
-          <AddModel
+          <AddModal
             show={showAddModal}
             onClose={this.handleCloseAddModal}
           />
-          <EditModel
+          <EditModal
             id={selectedItem.id}
             bankID={selectedItem.bankID}
             accountID={selectedItem.accountID}
@@ -150,7 +150,7 @@ class ReceiversPage extends Component {
             show={showEditModal}
             onClose={this.handleCloseEditModal}
           />
-          <RemoveModel
+          <RemoveModal
             id={selectedItem.id}
             show={showRemoveModal}
             onClose={this.handleCloseRemoveModal}
