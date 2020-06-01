@@ -6,7 +6,7 @@ import Template from '../../common/presentational/Template.Modal'
 import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
-import { fetchReceiversData } from '../../../actions/receivers'
+import { fetchReceiversDataIfNeeded, invalidateReceiversData } from '../../../actions/receivers'
 import api from '../../../api/api'
 
 const InputWrapper = styled.div`
@@ -48,6 +48,7 @@ class EditReceiverModal extends Component {
     } = this.state
     const {
       onClose,
+      onInvalidateReceiversData,
       onRefreshReceiversData,
     } = this.props
 
@@ -83,6 +84,7 @@ class EditReceiverModal extends Component {
         loading: false,
       })
       onClose()
+      onInvalidateReceiversData()
       onRefreshReceiversData()
     }
   }
@@ -149,6 +151,7 @@ EditReceiverModal.defaultProps = {
   show: true,
   onClose: (f) => f,
   //
+  onInvalidateReceiversData: (f) => f,
   onRefreshReceiversData: (f) => f,
 }
 EditReceiverModal.propTypes = {
@@ -159,10 +162,12 @@ EditReceiverModal.propTypes = {
   show: PropTypes.bool,
   onClose: PropTypes.func,
   //
+  onInvalidateReceiversData: PropTypes.func,
   onRefreshReceiversData: PropTypes.func,
 }
 const mapDispatchToProps = (dispatch) => ({
-  onRefreshReceiversData: () => dispatch(fetchReceiversData()),
+  onInvalidateReceiversData: () => dispatch(invalidateReceiversData()),
+  onRefreshReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
 })
 export default connect(
   null,

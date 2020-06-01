@@ -39,16 +39,26 @@ button:focus {
   outline: 0 !important;
 }
 
-input {
+input, textarea {
   border: none !important;
   font-family: OpenSans-Regular;
   font-size: 12px;
   background-color: #111;
   color: #fff;
 }
+
 input:focus {
   outline: none !important;
 }
+
+textarea:focus {
+  outline: none !important;
+}
+
 .Toastify__toast-container {
   width: max-content !important;
+}
+span {
+  font-family: OpenSans-Regular;
+  font-size: 12px;
 }

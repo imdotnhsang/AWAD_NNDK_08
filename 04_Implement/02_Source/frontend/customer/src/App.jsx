@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import SignIn from './components/SignIn'
 import ForgotPassword from './components/ForgotPassword'
 import ResetPassword from './components/ResetPassword'
-import Cards from './components/Cards'
-import Receivers from './components/Receivers'
+import Cards from './components/0.Cards'
+import Receivers from './components/1.Receivers'
+import Transfer from './components/2.Transfer'
 import PrivateRoute from './PrivateRoute'
 
 
@@ -26,6 +27,11 @@ function App() {
           exact
           path="/receivers"
           component={Receivers}
+        />
+        <PrivateRoute
+          exact
+          path="/transfer"
+          component={Transfer}
         />
         <Route
           exact

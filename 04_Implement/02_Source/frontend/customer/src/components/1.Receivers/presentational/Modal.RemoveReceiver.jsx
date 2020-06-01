@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import DeleteButton from '../../common/presentational/Button.Loading'
 import CancelButton from '../../common/presentational/Button'
 import Template from '../../common/presentational/Template.Modal'
-import { fetchReceiversData } from '../../../actions/receivers'
+import { fetchReceiversDataIfNeeded, invalidateReceiversData } from '../../../actions/receivers'
 import api from '../../../api/api'
 
 const Text = styled.span`
@@ -41,6 +41,7 @@ const RemoveReceiverModal = ({
   show,
   onClose,
   //
+  onInvalidateReceiversData,
   onRefreshReceiversData,
 }) => {
   const [loading, setLoading] = useState(false)
@@ -64,6 +65,7 @@ const RemoveReceiverModal = ({
     } else {
       setLoading(false)
       onClose()
+      onInvalidateReceiversData()
       onRefreshReceiversData()
     }
   }
@@ -107,16 +109,19 @@ RemoveReceiverModal.defaultProps = {
   id: '',
   show: true,
   onClose: (f) => f,
+  onInvalidateReceiversData: (f) => f,
   onRefreshReceiversData: (f) => f,
 }
 RemoveReceiverModal.propTypes = {
   id: PropTypes.string,
   show: PropTypes.bool,
   onClose: PropTypes.func,
+  onInvalidateReceiversData: PropTypes.func,
   onRefreshReceiversData: PropTypes.func,
 }
 const mapDispatchToProps = (dispatch) => ({
-  onRefreshReceiversData: () => dispatch(fetchReceiversData()),
+  onInvalidateReceiversData: () => dispatch(invalidateReceiversData()),
+  onRefreshReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
 })
 export default connect(
   null,

@@ -14,8 +14,7 @@ const instance = axios.create({
 
 const api = {
   get: async (url, params) => {
-    // eslint-disable-next-line prefer-const
-    let options = {
+    const options = {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -23,7 +22,7 @@ const api = {
 
     if (params) {
       // eslint-disable-next-line no-param-reassign
-      url += url + objectToQueryString(params)
+      url += `?${objectToQueryString(params)}`
     }
     const jwt = getJwtFromStorage()
     if (jwt) {
@@ -60,15 +59,16 @@ const api = {
       return generateErrorResponse(e.response)
     }
   },
-  delete: async (url, data, config) => {
-    let options = {
+  delete: async (url, params) => {
+    const options = {
       headers: {
         'Content-Type': 'application/json',
       },
     }
 
-    if (config) {
-      options = { ...options, ...config }
+    if (params) {
+      // eslint-disable-next-line no-param-reassign
+      url += `?${objectToQueryString(params)}`
     }
 
     const jwt = getJwtFromStorage()
@@ -77,7 +77,7 @@ const api = {
     }
 
     try {
-      const response = await instance.delete(`${url}`, querystring.stringify(data), options)
+      const response = await instance.delete(`${url}`, options)
       return response.data
     } catch (e) {
       return generateErrorResponse(e.response)

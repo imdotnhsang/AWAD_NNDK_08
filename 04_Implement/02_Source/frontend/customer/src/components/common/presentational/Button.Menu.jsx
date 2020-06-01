@@ -2,8 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Wrapper = styled.div`
+const styleModifiers = ['color', 'active']
+
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   background: ${(props) => (props.color ? props.color : props.theme.blackMedium)};
   height: 67px;
   width: 100%;

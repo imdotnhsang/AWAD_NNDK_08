@@ -1,8 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { resolveTagFromProps } from '../../../utils/utils'
 
-const Backdrop = styled.div`
+const styleModifiers = ['show', 'width']
+
+const Backdrop = styled(resolveTagFromProps(styleModifiers, 'div'))`
   position: fixed;
   top: 0;
   left: 0;
@@ -11,7 +14,7 @@ const Backdrop = styled.div`
   background-color: rgba(0,0,0,0.75);
   display: ${(props) => (props.show ? 'block' : 'none')}
 `
-const Wrapper = styled.div`
+const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   position: fixed;
   top: 50%;
   left: 50%;
@@ -44,6 +47,7 @@ const CancelButton = styled.button`
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
+  cursor: pointer;
 `
 const CancelButtonText = styled.span`
   font-family: OpenSans-Bold;
@@ -63,7 +67,7 @@ const ModalTemplate = ({
     <Wrapper width={width}>
       <Header>
         <Name>{name}</Name>
-        <CancelButton onClick={onClose}>
+        <CancelButton onClick={onClose} type="button">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="13.5356" y="5.05005" width="2" height="12" transform="rotate(45 13.5356 5.05005)" fill="#7C7F87" />
             <rect x="5.05029" y="6.4646" width="2" height="12" transform="rotate(-45 5.05029 6.4646)" fill="#7C7F87" />

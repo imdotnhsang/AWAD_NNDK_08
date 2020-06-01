@@ -26,6 +26,7 @@ const Button = styled.button`
     border: ${(props) => `2px solid ${props.theme.orange}`};
   }
   border-radius: 10px;
+  cursor: pointer;
 `
 const ButtonName = styled.span`
   font-family: OpenSans-Regular;
@@ -45,7 +46,7 @@ const PageHeader = ({
     {
       button
       && (
-        <Button onClick={onClick}>
+        <Button onClick={onClick} type="button">
           <ButtonName>{buttonName}</ButtonName>
           <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="6.75" y="3.5" width="1.5" height="9" fill="#EF230C" />

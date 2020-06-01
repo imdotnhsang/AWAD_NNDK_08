@@ -37,6 +37,7 @@ BankSelect.defaultProps = {
   disabled: false,
   data: [],
   error: '',
+  associated: false,
   fetchingError: '',
   onChange: (f) => f,
   onFetchData: (f) => f,
@@ -50,13 +51,16 @@ BankSelect.propTypes = {
     value: PropTypes.string,
   })),
   error: PropTypes.string,
+  // eslint-disable-next-line react/no-unused-prop-types
+  associated: PropTypes.bool,
   fetchingError: PropTypes.string,
   onChange: PropTypes.func,
   onFetchData: PropTypes.func,
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   const { loading, banks, error } = state.banks
-  const data = banks.map((bank) => ({ text: bank.name, value: bank.id }))
+  let data = banks.map((bank) => ({ text: bank.name, value: bank.id }))
+  if (ownProps.associated) data = data.filter((e) => e.text !== 'EIGHT.Bank')
   return ({
     loading,
     data,

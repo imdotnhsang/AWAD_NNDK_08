@@ -22,12 +22,7 @@ const Wrapper = styled.div`
 `
 const PageContent = styled.div`
   width: 100%;
-  padding: 0px 60px;
-  padding-bottom: 67px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  height: 100%;
 `
 
 const CustomerTemplate = ({
