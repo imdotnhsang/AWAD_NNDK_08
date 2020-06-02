@@ -5,5 +5,6 @@ module.exports = async (req, res, next) => {
 			errors: [{ msg: 'You not have permission to access' }],
 		})
 	}
+
 	return next()
 }

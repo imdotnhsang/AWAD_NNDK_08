@@ -5,21 +5,15 @@ const bcrypt = require('bcrypt')
 const { check, validationResult } = require('express-validator')
 
 const auth = require('../../middlewares/auth')
+const staff = require('../../middlewares/staff')
 
 const Staff = require('../../models/Staff')
 
 // @route     GET /staffs
-// @desc      Lấy thông tin của một staff đang đăng nhập
+// @desc      Get information staff
 // @access    Private (administrator & employee)
-router.get('/information', auth, async (req, res) => {
+router.get('/information', [auth, staff], async (req, res) => {
 	try {
-		const { position } = req.user
-		if (!position) {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
-		}
-
 		const staff = await Staff.findById(req.user.id)
 		if (!staff) {
 			return res.status(400).json({
@@ -44,12 +38,13 @@ router.get('/information', auth, async (req, res) => {
 })
 
 // @route     PUT /staffs
-// @desc      Cập nhật thông tin staff
+// @desc      Update information staff
 // @access    Private (administrator & employee)
 router.put(
 	'/change-password',
 	[
 		auth,
+		staff,
 		check('oldPassword', 'Please include a valid password').isLength({
 			min: 8,
 		}),
@@ -61,13 +56,6 @@ router.put(
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 			return res.status(400).send(errors)
-		}
-
-		const { position } = req.user
-		if (!position) {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
 		}
 
 		const { oldPassword, newPassword } = req.body
