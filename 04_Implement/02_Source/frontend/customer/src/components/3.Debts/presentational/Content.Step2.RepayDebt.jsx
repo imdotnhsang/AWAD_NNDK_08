@@ -134,7 +134,8 @@ class Step2RepayDebt extends Component {
     return (
       <>
         <Banner
-          index={2}
+          // index={2}
+          index={1}
           name="Confirm"
           description="Re-check the debt details"
         />
@@ -160,6 +161,7 @@ class Step2RepayDebt extends Component {
         {error && <Error>{error}</Error>}
         <ButtonWrapper>
           <CancelButton
+            // name="Back"
             name="Cancel"
             secondary
             fluid

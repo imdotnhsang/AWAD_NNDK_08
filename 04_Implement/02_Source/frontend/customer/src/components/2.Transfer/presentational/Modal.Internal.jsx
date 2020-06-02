@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
-import Step1 from '../container/Content.Step1'
+// import Step1 from '../container/Content.Step1'
 import Step2 from '../container/Content.Step2.Internal'
 import Step3 from '../container/Content.Step3'
 import Step4 from './Content.Step4'
@@ -13,7 +13,7 @@ class InternalModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      senderAccountID: '',
+      // senderAccountID: '',
       receiver: {
         accountName: '',
         accountID: '',
@@ -58,14 +58,14 @@ class InternalModal extends Component {
     } = this.props
     onClose()
     const {
-      senderAccountID,
+      // senderAccountID,
       receiver,
       amount,
       detail,
       chargedBySender,
     } = this.state
     const data = {
-      senderAccountID,
+      // senderAccountID,
       receiverAccountID: receiver.accountID,
       receiverBankID: receiver.bankID,
       amount,
@@ -85,13 +85,12 @@ class InternalModal extends Component {
     } else {
       onSuccess()
     }
-    // TODO recommend customer to save this receiver for future transfers
   }
 
   render() {
     const {
       step,
-      senderAccountID,
+      // senderAccountID,
       receiver,
       amount,
       detail,
@@ -113,16 +112,17 @@ class InternalModal extends Component {
         {
           [
             null,
-            <Step1
-              value={senderAccountID}
-              onChange={this.handleOnChange}
-              onClose={onClose}
-              onNext={this.handleNext}
-            />,
+            // <Step1
+            //   value={senderAccountID}
+            //   onChange={this.handleOnChange}
+            //   onClose={onClose}
+            //   onNext={this.handleNext}
+            // />,
             <Step2
               value={receiver}
               onChange={this.handleOnChange}
-              onBack={this.handleBack}
+              // onBack={this.handleBack}
+              onBack={onClose}
               onNext={this.handleNext}
               onNewReceiver={onNewReceiver}
             />,
@@ -131,7 +131,7 @@ class InternalModal extends Component {
                 amount,
                 detail,
                 chargedBySender,
-                senderAccountID,
+                // senderAccountID,
               }}
               onChange={this.handleOnChange}
               onBack={this.handleBack}
@@ -139,7 +139,7 @@ class InternalModal extends Component {
             />,
             <Step4
               value={{
-                senderAccountID,
+                // senderAccountID,
                 receiver,
                 amount,
                 chargedBySender,

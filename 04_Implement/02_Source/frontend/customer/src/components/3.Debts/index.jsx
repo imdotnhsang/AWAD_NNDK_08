@@ -12,9 +12,9 @@ import {
   invalidateDebtsDataReceivedFromOthers,
   invalidateDebtsDataCreatedByYou,
 } from '../../actions/debts'
-import {
-  fetchCardsDataIfNeeded,
-} from '../../actions/cards'
+// import {
+//   fetchCardsDataIfNeeded,
+// } from '../../actions/cards'
 import { DebtStatus } from '../../constants/constants'
 import RepayModal from './presentational/Modal.RepayDebt'
 import AddModal from './container/Modal.AddDebt'
@@ -88,11 +88,11 @@ class ReceiversPage extends Component {
     const {
       onFetchCreatedByYouData,
       onFetchReceivedFromOthersData,
-      onFetchAccountsData,
+      // onFetchAccountsData,
     } = this.props
     onFetchCreatedByYouData()
     onFetchReceivedFromOthersData()
-    onFetchAccountsData()
+    // onFetchAccountsData()
   }
 
   handleTab(value) {
@@ -384,7 +384,7 @@ ReceiversPage.defaultProps = {
   accountsDataLoading: false,
   onFetchCreatedByYouData: (f) => f,
   onFetchReceivedFromOthersData: (f) => f,
-  onFetchAccountsData: (f) => f,
+  // onFetchAccountsData: (f) => f,
   invalidateReceivedFromOthersData: (f) => f,
   invalidateCreatedByYouData: (f) => f,
 }
@@ -429,7 +429,7 @@ ReceiversPage.propTypes = {
   accountsDataLoading: PropTypes.bool,
   onFetchCreatedByYouData: PropTypes.func,
   onFetchReceivedFromOthersData: PropTypes.func,
-  onFetchAccountsData: PropTypes.func,
+  // onFetchAccountsData: PropTypes.func,
   invalidateReceivedFromOthersData: PropTypes.func,
   invalidateCreatedByYouData: PropTypes.func,
 }
@@ -447,7 +447,7 @@ const mapDispatchToProps = (dispatch) => ({
   onFetchCreatedByYouData: () => dispatch(fecthDebtsDataCreatedByYouIfNeeded()),
   invalidateReceivedFromOthersData: () => dispatch(invalidateDebtsDataReceivedFromOthers()),
   onFetchReceivedFromOthersData: () => dispatch(fecthDebtsDataReceivedFromOthersIfNeeded()),
-  onFetchAccountsData: () => dispatch(fetchCardsDataIfNeeded()),
+  // onFetchAccountsData: () => dispatch(fetchCardsDataIfNeeded()),
 })
 export default connect(
   mapStateToProps,

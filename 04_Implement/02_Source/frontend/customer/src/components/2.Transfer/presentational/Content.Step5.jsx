@@ -97,7 +97,8 @@ class Step5Content extends Component {
     return (
       <>
         <Banner
-          index={5}
+          // index={5}
+          index={4}
           name="Finish"
           description="Finish your payment by verifying your payment using OTP code"
         />

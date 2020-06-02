@@ -97,7 +97,8 @@ class Step3RepayContent extends Component {
     return (
       <>
         <Banner
-          index={3}
+          // index={3}
+          index={2}
           name="Finish"
           description="Finish your payment by verifying your payment using OTP code"
         />

@@ -11,6 +11,7 @@ import SearchButton from '../../common/presentational/Button.Search'
 import Display from '../../1.Receivers/presentational/Display'
 import Select from '../../common/container/Select.Bank'
 import api from '../../../api/api'
+import { getBankIDFromStorage } from '../../../utils/utils'
 
 const FormWrapper = styled.div`
   width: 100%;
@@ -271,7 +272,8 @@ class Step2Content extends Component {
     return (
       <>
         <Banner
-          index={2}
+          // index={2}
+          index={1}
           name="Receiver"
           description="Provide the information of the receiver"
         />
@@ -379,7 +381,9 @@ Step2Content.propTypes = {
 }
 
 const mapStateToProps = (state) => ({
-  receiversData: state.receivers.receivers.filter((receiver) => receiver.bankName !== 'EIGHT.Bank').map((receiver) => ({
+  receiversData: state.receivers.receivers.filter(
+    (receiver) => receiver.bankID !== getBankIDFromStorage(),
+  ).map((receiver) => ({
     accountName: receiver.nickname,
     accountID: receiver.accountID,
     bankID: receiver.bankID,

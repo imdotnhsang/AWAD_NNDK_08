@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
-import Step1 from '../container/Content.Step1.RepayDebt'
+// import Step1 from '../container/Content.Step1.RepayDebt'
 import Step2 from './Content.Step2.RepayDebt'
 import Step3 from './Content.Step3.RepayDebt'
+import { invalidateCardsData } from '../../../actions/cards'
+
 
 class RepayDebtModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      accountID: '',
+      // accountID: '',
       step: 1,
     }
     this.handleOnChange = this.handleOnChange.bind(this)
@@ -43,17 +46,19 @@ class RepayDebtModal extends Component {
       onFailure,
       onClose,
       onProcessing,
+      //
+      onInvalidateData,
     } = this.props
     onClose()
 
     // eslint-disable-next-line react/destructuring-assignment
     const { id } = this.props.data
-    const {
-      accountID,
-    } = this.state
+    // const {
+    //   accountID,
+    // } = this.state
 
     const data = {
-      accountID,
+      // accountID,
       debtID: id,
     }
     const config = {
@@ -68,13 +73,14 @@ class RepayDebtModal extends Component {
       onFailure(error)
     } else {
       onSuccess('You have successfully repay this debt', false)
+      onInvalidateData()
     }
   }
 
   render() {
     const {
       step,
-      accountID,
+      // accountID,
     } = this.state
     const {
       show,
@@ -92,15 +98,16 @@ class RepayDebtModal extends Component {
         {
           [
             null,
-            <Step1
-              value={accountID}
-              onChange={this.handleOnChange}
-              onClose={onClose}
-              onNext={this.handleNext}
-            />,
+            // <Step1
+            //   value={accountID}
+            //   onChange={this.handleOnChange}
+            //   onClose={onClose}
+            //   onNext={this.handleNext}
+            // />,
             <Step2
               data={data}
-              onBack={this.handleBack}
+              // onBack={this.handleBack}
+              onBack={onClose}
               onNext={this.handleNext}
             />,
             <Step3
@@ -127,6 +134,8 @@ RepayDebtModal.defaultProps = {
   onSuccess: (f) => f,
   onFailure: (f) => f,
   onProcessing: (f) => f,
+  //
+  onInvalidateData: (f) => f,
 }
 RepayDebtModal.propTypes = {
   show: PropTypes.bool,
@@ -143,5 +152,13 @@ RepayDebtModal.propTypes = {
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
   onProcessing: PropTypes.func,
+  //
+  onInvalidateData: PropTypes.func,
 }
-export default RepayDebtModal
+const mapDispatchToProps = (dispatch) => ({
+  onInvalidateData: () => dispatch(invalidateCardsData()),
+})
+export default connect(
+  null,
+  mapDispatchToProps,
+)(RepayDebtModal)

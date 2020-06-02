@@ -4,6 +4,7 @@ const initialState = {
   currentCard: '',
   cards: [],
   loading: false,
+  didInvalidate: false,
 }
 
 const cards = (state = initialState, action) => {
@@ -17,6 +18,7 @@ const cards = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        didInvalidate: false,
       }
     case Cards.RECEIVE_CARDS_DATA: {
       const { accountID } = action.data.find((card) => card.type === 'SAVING') || { accountID: '' }
@@ -24,12 +26,20 @@ const cards = (state = initialState, action) => {
         currentCard: accountID,
         cards: action.data,
         loading: false,
+        didInvalidate: false,
+      }
+    }
+    case Cards.INVALIDATE_CARDS_DATA: {
+      return {
+        ...state,
+        didInvalidate: true,
       }
     }
     case Cards.FAILED_REQUEST_CARDS_DATA:
       return {
         ...state,
         loading: false,
+        didInvalidate: false,
       }
     default:
       return state

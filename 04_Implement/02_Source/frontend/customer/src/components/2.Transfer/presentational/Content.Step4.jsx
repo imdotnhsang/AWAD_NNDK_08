@@ -6,6 +6,7 @@ import BackButton from '../../common/presentational/Button'
 import ConfirmButton from '../../common/presentational/Button.Loading'
 import Banner from '../../common/presentational/Banner.Step'
 import {
+  getAccountIDFromStorage,
   getNameFromStorage,
   spaceSeparating,
   getEmailFromStorage,
@@ -92,17 +93,18 @@ class Step4Content extends Component {
       onBack,
     } = this.props
     const {
-      senderAccountID,
+      // senderAccountID,
       receiver,
       amount,
       chargedBySender,
     } = value
-    const from = `${spaceSeparating(senderAccountID, 4)} / ${getNameFromStorage()} / EIGHT.Bank`
+    const from = `${spaceSeparating(getAccountIDFromStorage(), 4)} / ${getNameFromStorage()} / EIGHT.Bank`
     const to = `${spaceSeparating(receiver.accountID, 4)} / ${receiver.accountName} / ${receiver.bankName}`
     return (
       <>
         <Banner
-          index={4}
+          // index={4}
+          index={3}
           name="Confirm"
           description="Re-check the payment details"
         />
@@ -139,7 +141,7 @@ class Step4Content extends Component {
 
 Step4Content.defaultProps = {
   value: {
-    senderAccountID: '',
+    // senderAccountID: '',
     receiver: {
       accountName: '',
       accountID: '',
@@ -154,7 +156,7 @@ Step4Content.defaultProps = {
 }
 Step4Content.propTypes = {
   value: PropTypes.shape({
-    senderAccountID: PropTypes.string,
+    // senderAccountID: PropTypes.string,
     receiver: {
       accountName: PropTypes.string,
       accountID: PropTypes.string,

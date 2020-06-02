@@ -33,6 +33,25 @@ export function getEmailFromStorage() {
   return data
 }
 
+export function setBankIDToStorage(id) {
+  sessionStorage.setItem('bankID', id)
+}
+
+export function getBankIDFromStorage() {
+  const data = sessionStorage.getItem('bankID')
+  return data
+}
+
+export function setAccountIDToStorage(id) {
+  sessionStorage.setItem('accountID', id)
+}
+
+export function getAccountIDFromStorage() {
+  const data = sessionStorage.getItem('accountID')
+  return data
+}
+
+
 export function clearStorage() {
   sessionStorage.clear()
 }

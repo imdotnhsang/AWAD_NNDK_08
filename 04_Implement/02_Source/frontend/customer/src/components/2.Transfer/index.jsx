@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Row, Col } from 'react-bootstrap'
 import Template from '../common/presentational/Template.Customer'
 import Button from '../common/presentational/Button.Loading'
-import { fetchCardsDataIfNeeded } from '../../actions/cards'
+import { fetchCardsDataIfNeeded, invalidateCardsData } from '../../actions/cards'
 import { fetchReceiversDataIfNeeded } from '../../actions/receivers'
 import { fetchBanksDataIfNeeded } from '../../actions/banks'
 import InternalModal from './presentational/Modal.Internal'
@@ -70,6 +70,7 @@ class TransferPage extends Component {
       showFailure: false,
       showProcessing: false,
       showSaveReceiver: false,
+      successMessage: false,
       failureMessage: '',
     }
     this.handleNewReceiver = this.handleNewReceiver.bind(this)
@@ -132,9 +133,10 @@ class TransferPage extends Component {
     })
   }
 
-  handleOpenSuccessModal() {
+  handleOpenSuccessModal(message) {
     this.setState({
       showProcessing: false,
+      successMessage: message,
     })
     setTimeout(() => {
       this.setState({
@@ -146,8 +148,15 @@ class TransferPage extends Component {
   handleCloseSuccessModal() {
     this.setState({
       showSuccess: false,
+      successMessage: '',
     })
     const { newReceiver } = this.state
+    const {
+      onInvalidateCardsData,
+      onFetchCardsData,
+    } = this.props
+    onInvalidateCardsData()
+    onFetchCardsData()
     if (newReceiver.accountID) {
       this.handleOpenSaveReceiverModal()
     }
@@ -205,6 +214,7 @@ class TransferPage extends Component {
       showFailure,
       showProcessing,
       showSaveReceiver,
+      successMessage,
       failureMessage,
     } = this.state
 
@@ -296,7 +306,7 @@ class TransferPage extends Component {
           {showSuccess
             && (
               <SuccessModal onClose={this.handleCloseSuccessModal}>
-                <Description>Your transaction has been successfully done!</Description>
+                <Description>{(successMessage || 'Your transaction has been successfully done!')}</Description>
               </SuccessModal>
             )}
           {showFailure
@@ -322,6 +332,8 @@ class TransferPage extends Component {
               <SaveReceiverModal
                 onClose={this.handleCloseSaveReceiverModal}
                 data={newReceiver}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
               />
             )}
         </>
@@ -333,6 +345,7 @@ TransferPage.defaultProps = {
   loadingCards: false,
   loadingReceivers: false,
   loadingBanks: false,
+  onInvalidateCardsData: (f) => f,
   onFetchCardsData: (f) => f,
   onFetchReceiversData: (f) => f,
   onFetchBanksData: (f) => f,
@@ -341,6 +354,7 @@ TransferPage.propTypes = {
   loadingCards: PropTypes.bool,
   loadingReceivers: PropTypes.bool,
   loadingBanks: PropTypes.bool,
+  onInvalidateCardsData: PropTypes.func,
   onFetchCardsData: PropTypes.func,
   onFetchReceiversData: PropTypes.func,
   onFetchBanksData: PropTypes.func,
@@ -352,6 +366,7 @@ const mapStateToProps = (state) => ({
   loadingBanks: state.banks.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
+  onInvalidateCardsData: () => dispatch(invalidateCardsData()),
   onFetchCardsData: () => dispatch(fetchCardsDataIfNeeded()),
   onFetchReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
   onFetchBanksData: () => dispatch(fetchBanksDataIfNeeded()),
