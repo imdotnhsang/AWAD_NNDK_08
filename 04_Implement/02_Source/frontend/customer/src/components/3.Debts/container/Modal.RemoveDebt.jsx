@@ -143,17 +143,17 @@ class RemoveDebtModal extends Component {
           </TextAreaWrapper>
           {error && <Error>{error}</Error>}
           <ButtonWrapper>
-            <SubmitButton
-              name="Delete"
-              fluid
-              loading={loading}
-              onClick={this.handleDelete}
-            />
             <CancelButton
               fluid
               secondary
               name="Cancel"
               onClick={onClose}
+            />
+            <SubmitButton
+              name="Delete"
+              fluid
+              loading={loading}
+              onClick={this.handleDelete}
             />
           </ButtonWrapper>
         </>

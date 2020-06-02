@@ -100,6 +100,7 @@ class InternalModal extends Component {
     const {
       show,
       onClose,
+      onNewReceiver,
     } = this.props
 
     return (
@@ -123,6 +124,7 @@ class InternalModal extends Component {
               onChange={this.handleOnChange}
               onBack={this.handleBack}
               onNext={this.handleNext}
+              onNewReceiver={onNewReceiver}
             />,
             <Step3
               value={{
@@ -160,6 +162,7 @@ InternalModal.defaultProps = {
   onSuccess: (f) => f,
   onFailure: (f) => f,
   onProcessing: (f) => f,
+  onNewReceiver: (f) => f,
 }
 InternalModal.propTypes = {
   show: PropTypes.bool,
@@ -167,5 +170,6 @@ InternalModal.propTypes = {
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
   onProcessing: PropTypes.func,
+  onNewReceiver: PropTypes.func,
 }
 export default InternalModal

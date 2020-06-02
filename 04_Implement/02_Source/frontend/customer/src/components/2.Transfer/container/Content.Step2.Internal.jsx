@@ -102,10 +102,22 @@ class Step2Content extends Component {
   }
 
   handleOnChange(value) {
-    const { onChange } = this.props
+    const { onChange, onNewReceiver } = this.props
+    const { tab } = this.state
     onChange({
       receiver: value,
     })
+    if (tab === 2) {
+      onNewReceiver(value)
+    } else {
+      onNewReceiver({
+        id: '',
+        accountName: '',
+        accountID: '',
+        bankID: '',
+        bankName: '',
+      })
+    }
   }
 
   handleTableChange(value) {
@@ -309,6 +321,7 @@ Step2Content.defaultProps = {
   onChange: (f) => f,
   onBack: (f) => f,
   onNext: (f) => f,
+  onNewReceiver: (f) => f,
   //
   receiversData: [],
   banksData: [],
@@ -323,6 +336,7 @@ Step2Content.propTypes = {
   onChange: PropTypes.func,
   onBack: PropTypes.func,
   onNext: PropTypes.func,
+  onNewReceiver: PropTypes.func,
   //
   receiversData: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
