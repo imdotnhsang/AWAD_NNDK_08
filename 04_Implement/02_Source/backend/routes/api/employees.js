@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const { check, validationResult } = require('express-validator')
 
 const auth = require('../../middlewares/auth')
+const employee = require('../../middlewares/employee')
 
 const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
@@ -18,6 +19,7 @@ router.post(
 	'/register-customer',
 	[
 		auth,
+		employee,
 		check('fullName', 'Full name is required').not().notEmpty(),
 		check('email', 'Please include a valid email').isEmail(),
 		check('phoneNumber', 'Please include a valid phone number').isLength({
@@ -33,13 +35,6 @@ router.post(
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 			return res.status(400).send(errors)
-		}
-
-		const { position } = req.user
-		if (!position || position !== 'EMPLOYEE') {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
 		}
 
 		const { fullName, email, phoneNumber, balance, service } = req.body
@@ -154,13 +149,14 @@ router.post(
 	}
 )
 
-// @route     POST /employees/register-customer
+// @route     POST /employees/recharge-account
 // @desc      Recharge any customer account
 // @access    Private (employee)
 router.post(
 	'/recharge-account',
 	[
 		auth,
+		employee,
 		check('rechargeAmount', 'Recharge amount is 50000 or more').isInt({
 			min: 50000,
 		}),
@@ -169,13 +165,6 @@ router.post(
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 			return res.status(400).send(errors)
-		}
-
-		const { position } = req.user
-		if (!position || position !== 'EMPLOYEE') {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
 		}
 
 		const { rechargeAccountId, rechargeEmail, rechargeAmount } = req.body
@@ -221,7 +210,7 @@ router.post(
 				account_id: customer.default_account_id,
 			})
 
-			if (!account) {
+			if (!account || account.account_type !== 'DEFAULT') {
 				return res
 					.status(400)
 					.json({ errors: [{ msg: 'Account does not exist' }] })
@@ -256,12 +245,13 @@ router.post(
 			await new Transaction(transactionReceiver).save()
 
 			const response = {
-				msg: 'Account successfully recharge',
+				msg: 'Account successfully recharged',
 				data: {
 					full_name: customer.full_name,
 					account_id: account.account_id,
 					account_type: account.account_type,
-					balance: Number(account.balance) + Number(rechargeAmount),
+					balance_before: Number(account.balance),
+					balance_after: Number(account.balance) + Number(rechargeAmount),
 					account_service: account.account_service,
 				},
 			}
@@ -278,18 +268,10 @@ router.post(
 	}
 )
 
-// @route     PUT /employees/all-customers
-// @desc      Lấy tất cả các customer
-// @access    Public
-router.get('/all-customers', auth, async (req, res) => {
-	const { position } = req.user
-
-	if (!position || position !== 'EMPLOYEE') {
-		return res.status(403).json({
-			errors: [{ msg: 'You not have permission to access' }],
-		})
-	}
-
+// @route     GET /employees/all-customers
+// @desc      Get all customers
+// @access    Private (employee)
+router.get('/all-customers', [auth, employee], async (req, res) => {
 	try {
 		const allCustomers = (await Customer.find()).map((e) => {
 			return {
@@ -300,9 +282,11 @@ router.get('/all-customers', auth, async (req, res) => {
 			}
 		})
 
-		return res
-			.status(200)
-			.json({ msg: 'All customers successfully got', data: allCustomers })
+		const response = {
+			msg: 'All customers successfully got',
+			data: allCustomers,
+		}
+		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(500).json({ msg: 'Server Error' })
 	}
@@ -313,15 +297,12 @@ router.get('/all-customers', auth, async (req, res) => {
 // @access    Private (employee)
 router.get(
 	'/transaction-history',
-	[auth, check('historyEmail', 'Please include a valid email').isEmail()],
+	[
+		auth,
+		employee,
+		check('historyEmail', 'Please include a valid email').isEmail(),
+	],
 	async (req, res) => {
-		const { position } = req.user
-		if (!position || position !== 'EMPLOYEE') {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
-		}
-
 		const { historyEmail } = req.body
 
 		try {
@@ -405,7 +386,6 @@ router.get(
 						}),
 				},
 			}
-
 			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
