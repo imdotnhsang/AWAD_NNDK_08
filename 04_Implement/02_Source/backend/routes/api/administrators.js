@@ -328,7 +328,7 @@ router.get(
 				msg: 'All transactions successfully got',
 				data: allInterbankTransactions,
 			}
-			return res.status(200).json()
+			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).json({
 				msg: 'Server error',
