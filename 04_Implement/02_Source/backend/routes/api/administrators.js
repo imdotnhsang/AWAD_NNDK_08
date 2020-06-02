@@ -4,18 +4,21 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
+
 const auth = require('../../middlewares/auth')
+const administrator = require('../../middlewares/administrator')
 
 const Transaction = require('../../models/Transaction')
 const Staff = require('../../models/Staff')
 
 // @route     POST /administrator/register-staff
-// @desc      Tạo staff (employee hoặc admin) mới
+// @desc      Create new staff (employee or administrator)
 // @access    Private (administrator)
 router.post(
 	'/register-staff',
 	[
 		auth,
+		administrator,
 		check('fullName', 'Full name is required').not().notEmpty(),
 		check('email', 'Please include a valid email').isEmail(),
 		check('phoneNumber', 'Please include a valid phone number').isLength({
@@ -28,13 +31,6 @@ router.post(
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 			return res.status(400).send(errors)
-		}
-
-		const { position } = req.user
-		if (!position || position !== 'ADMINISTRATOR') {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
 		}
 
 		const { fullName, email, phoneNumber, positionRegister } = req.body
@@ -74,6 +70,7 @@ router.post(
 				full_name: fullName,
 				position: positionRegister,
 				created_at: Date.now(),
+				is_active: true,
 			})
 
 			const salt = await bcrypt.genSalt(10)
@@ -107,17 +104,9 @@ router.post(
 )
 
 // @route     GET /administrators/all-staffs
-// @desc      Lấy danh sách tất cả các tài khoản staff
+// @desc      Get all staffs (administrators and employees)
 // @access    Private (administrator)
-router.get('/all-staffs', auth, async (req, res) => {
-	const { position } = req.user
-
-	if (!position || position !== 'ADMINISTRATOR') {
-		return res.status(403).json({
-			errors: [{ msg: 'You not have permission to access' }],
-		})
-	}
-
+router.get('/all-staffs', [auth, administrator], async (req, res) => {
 	try {
 		const allStaffs = (await Staff.find()).map((e) => {
 			return {
@@ -131,49 +120,93 @@ router.get('/all-staffs', auth, async (req, res) => {
 			}
 		})
 
-		return res
-			.status(200)
-			.json({ msg: 'All staffs successfully got', data: allStaffs })
+		const response = { msg: 'All staffs successfully got', data: allStaffs }
+		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(500).json({ msg: 'Server Error' })
 	}
 })
 
-// @route     PUT /administrator
-// @desc      Cập nhật thông tin staff một staff bất kì
-// @access    Private (administrator)
-router.put('/update-staff', auth, async (req, res) => {
-	const { position } = req.user
-	if (!position || position !== 'ADMINISTRATOR') {
-		return res.status(403).json({
-			errors: [{ msg: 'You not have permission to access' }],
-		})
-	}
-
-	try {
-		return res.status(200).json({ msg: 'PUT /administrators/update-staff' })
-	} catch (error) {
-		return res.status(400).json({ msg: 'Server error' })
-	}
-})
-
-// @route     PUT /administrators/deactivate-staff
-// @desc      Xoá một staff bất kì
+// @route     PUT /administrators/update-staff
+// @desc      Update information staff (full name, email => username)
 // @access    Private (administrator)
 router.put(
-	'/deactivate-staff',
-	[auth, check('username', 'Username is required').not().notEmpty()],
+	'/update-staff',
+	[
+		auth,
+		administrator,
+		check('username', 'User is required').not().notEmpty(),
+		check('fullName', 'Full name is required').not().notEmpty(),
+		check('email', 'Please include a valid email').isEmail(),
+	],
 	async (req, res) => {
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 			return res.status(400).send(errors)
 		}
 
-		const { position } = req.user
-		if (!position || position !== 'ADMINISTRATOR') {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
+		const { username, fullName, email } = req.body
+
+		try {
+			const staff = await Staff.findOne({ username })
+			if (!staff) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Staff not exists',
+						},
+					],
+				})
+			}
+
+			if (email === staff.email && fullName === staff.full_name) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'New information cannot coincide with old information',
+						},
+					],
+				})
+			}
+
+			const isExist = await Staff.countDocuments({ email })
+			if (isExist && email !== staff.email) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'New email already exists',
+						},
+					],
+				})
+			}
+
+			staff.full_name = fullName
+			staff.email = email
+			staff.username = email.split('@')[0].toLowerCase()
+			await staff.save()
+
+			const response = { msg: 'Staff successfully updated' }
+			return res.status(200).json(response)
+		} catch (error) {
+			return res.status(500).json({ msg: 'Server error' })
+		}
+	}
+)
+
+// @route     PUT /administrators/deactivate-staff
+// @desc      Deactivate any staff
+// @access    Private (administrator)
+router.put(
+	'/deactivate-staff',
+	[
+		auth,
+		administrator,
+		check('username', 'Username is required').not().notEmpty(),
+	],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
 		}
 
 		const { username } = req.body
@@ -203,30 +236,28 @@ router.put(
 			staff.is_active = false
 			await staff.save()
 
-			return res.status(200).json({ msg: 'Staff successfully deactivate' })
+			const response = { msg: 'Staff successfully deactivate' }
+			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(400).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
 
 // @route     PUT /administrators/activate-staff
-// @desc      Xoá một staff bất kì
+// @desc      Active any staff which was deactivated
 // @access    Private (administrator)
 router.put(
 	'/activate-staff',
-	[auth, check('username', 'Username is required').not().notEmpty()],
+	[
+		auth,
+		administrator,
+		check('username', 'Username is required').not().notEmpty(),
+	],
 	async (req, res) => {
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
 			return res.status(400).send(errors)
-		}
-
-		const { position } = req.user
-		if (!position || position !== 'ADMINISTRATOR') {
-			return res.status(403).json({
-				errors: [{ msg: 'You not have permission to access' }],
-			})
 		}
 
 		const { username } = req.body
@@ -256,55 +287,54 @@ router.put(
 			staff.is_active = true
 			await staff.save()
 
-			return res.status(200).json({ msg: 'Staff successfully activate' })
+			const response = { msg: 'Staff successfully activated' }
+			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(400).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
 
 // @route     GET /administrators/all-interbank-transactions
-// @desc      Lấy toàn bộ danh sách giao dịch
+// @desc      Get all interbank transactions
 // @access    Private (administrator)
-router.get('/all-interbank-transactions', auth, async (req, res) => {
-	const { position } = req.user
-	if (!position || position !== 'ADMINISTRATOR') {
-		return res.status(403).json({
-			errors: [{ msg: 'You not have permission to access' }],
-		})
-	}
+router.get(
+	'/all-interbank-transactions',
+	[auth, administrator],
+	async (req, res) => {
+		try {
+			const allInterbankTransactions = (await Transaction.find())
+				.filter(
+					(e) =>
+						(e.transaction_type === 'RECEIVE' && e.from_bank_id !== 'EIGHT') ||
+						(e.transaction_type === 'TRANSFER' && e.to_bank_id !== 'EIGHT')
+				)
+				.map((e) => {
+					return {
+						entry_time: e.entry_time,
+						from_bank_id: e.from_bank_id,
+						to_bank_id: e.to_bank_id,
+						from_account_id: e.from_account_id,
+						from_fullname: e.from_fullname,
+						to_account_id: e.to_account_id,
+						to_fullname: e.to_fullname,
+						transaction_type: e.transaction_type,
+						transaction_amount: e.transaction_amount,
+						transaction_status: e.transaction_status,
+					}
+				})
 
-	try {
-		const allInterbankTransactions = (await Transaction.find())
-			.filter(
-				(e) =>
-					(e.transaction_type === 'RECEIVE' && e.from_bank_id !== 'EIGHT') ||
-					(e.transaction_type === 'TRANSFER' && e.to_bank_id !== 'EIGHT')
-			)
-			.map((e) => {
-				return {
-					entry_time: e.entry_time,
-					from_bank_id: e.from_bank_id,
-					to_bank_id: e.to_bank_id,
-					from_account_id: e.from_account_id,
-					from_fullname: e.from_fullname,
-					to_account_id: e.to_account_id,
-					to_fullname: e.to_fullname,
-					transaction_type: e.transaction_type,
-					transaction_amount: e.transaction_amount,
-					transaction_status: e.transaction_status,
-				}
+			const response = {
+				msg: 'All transactions successfully got',
+				data: allInterbankTransactions,
+			}
+			return res.status(200).json(response)
+		} catch (error) {
+			return res.status(500).json({
+				msg: 'Server error',
 			})
-
-		return res.status(200).json({
-			msg: 'All transactions successfully got',
-			data: allInterbankTransactions,
-		})
-	} catch (error) {
-		return res.status(400).json({
-			msg: 'Server error',
-		})
+		}
 	}
-})
+)
 
 module.exports = router
