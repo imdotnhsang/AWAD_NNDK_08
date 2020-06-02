@@ -142,20 +142,73 @@ router.get('/all-staffs', auth, async (req, res) => {
 // @route     PUT /administrator
 // @desc      Cập nhật thông tin staff một staff bất kì
 // @access    Private (administrator)
-router.put('/update-staff', auth, async (req, res) => {
-	const { position } = req.user
-	if (!position || position !== 'ADMINISTRATOR') {
-		return res.status(403).json({
-			errors: [{ msg: 'You not have permission to access' }],
-		})
-	}
+router.put(
+	'/update-staff',
+	[
+		auth,
+		check('username', 'User is required').not().notEmpty(),
+		check('fullName', 'Full name is required').not().notEmpty(),
+		check('email', 'Please include a valid email').isEmail(),
+	],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
+		}
 
-	try {
-		return res.status(200).json({ msg: 'PUT /administrators/update-staff' })
-	} catch (error) {
-		return res.status(400).json({ msg: 'Server error' })
+		const { position } = req.user
+		if (!position || position !== 'ADMINISTRATOR') {
+			return res.status(403).json({
+				errors: [{ msg: 'You not have permission to access' }],
+			})
+		}
+
+		const { username, fullName, email } = req.body
+
+		try {
+			const staff = await Staff.findOne({ username })
+			if (!staff) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Staff not exists',
+						},
+					],
+				})
+			}
+
+			if (email === staff.email && fullName === staff.full_name) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'New information cannot coincide with old information',
+						},
+					],
+				})
+			}
+
+			const isExist = await Staff.countDocuments({ email })
+			if (isExist && email !== staff.email) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Email already exists',
+						},
+					],
+				})
+			}
+
+			staff.full_name = fullName
+			staff.email = email
+			staff.username = email.split('@')[0].toLowerCase()
+			await staff.save()
+
+			return res.status(200).json({ msg: 'Staff successfully updated' })
+		} catch (error) {
+			return res.status(500).json({ msg: 'Server error' })
+		}
 	}
-})
+)
 
 // @route     PUT /administrators/deactivate-staff
 // @desc      Xoá một staff bất kì
@@ -205,7 +258,7 @@ router.put(
 
 			return res.status(200).json({ msg: 'Staff successfully deactivate' })
 		} catch (error) {
-			return res.status(400).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -256,9 +309,9 @@ router.put(
 			staff.is_active = true
 			await staff.save()
 
-			return res.status(200).json({ msg: 'Staff successfully activate' })
+			return res.status(200).json({ msg: 'Staff successfully activated' })
 		} catch (error) {
-			return res.status(400).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
@@ -301,7 +354,7 @@ router.get('/all-interbank-transactions', auth, async (req, res) => {
 			data: allInterbankTransactions,
 		})
 	} catch (error) {
-		return res.status(400).json({
+		return res.status(500).json({
 			msg: 'Server error',
 		})
 	}

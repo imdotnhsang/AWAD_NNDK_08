@@ -172,7 +172,6 @@ router.post(
 		}
 
 		const { position } = req.user
-
 		if (!position || position !== 'EMPLOYEE') {
 			return res.status(403).json({
 				errors: [{ msg: 'You not have permission to access' }],
@@ -279,31 +278,140 @@ router.post(
 	}
 )
 
-// @route     POST /employees/register-customer
+// @route     PUT /employees/all-customers
+// @desc      Lấy tất cả các customer
+// @access    Public
+router.get('/all-customers', auth, async (req, res) => {
+	const { position } = req.user
+
+	if (!position || position !== 'EMPLOYEE') {
+		return res.status(403).json({
+			errors: [{ msg: 'You not have permission to access' }],
+		})
+	}
+
+	try {
+		const allCustomers = (await Customer.find()).map((e) => {
+			return {
+				full_name: e.full_name,
+				default_account_id: e.default_account_id,
+				email: e.email,
+				phone_number: e.phone_number,
+			}
+		})
+
+		return res
+			.status(200)
+			.json({ msg: 'All customers successfully got', data: allCustomers })
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server Error' })
+	}
+})
+
+// @route     GET /employees/transaction-history
 // @desc      View transaction history of any customer account
 // @access    Private (employee)
-router.post('/transaction-history', auth, (req, res) => {
-	const { historyAccountId, historyEmail } = req.body
-	if (!historyAccountId && !historyEmail) {
-		return res.status(400).json({
-			errors: [{ msg: 'Recharge account or recharge email is required' }],
-		})
-	}
+router.get(
+	'/transaction-history',
+	[auth, check('historyEmail', 'Please include a valid email').isEmail()],
+	async (req, res) => {
+		const { position } = req.user
+		if (!position || position !== 'EMPLOYEE') {
+			return res.status(403).json({
+				errors: [{ msg: 'You not have permission to access' }],
+			})
+		}
 
-	if (historyAccountId && historyAccountId.length !== 14) {
-		return res.status(400).json({
-			errors: [{ msg: 'Please include a valid account it' }],
-		})
-	}
+		const { historyEmail } = req.body
 
-	const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/gm
-	if (historyEmail && re.test(String(historyEmail)) === false) {
-		return res.status(400).json({
-			errors: [{ msg: 'Please include a valid email' }],
-		})
-	}
+		try {
+			const customer = await Customer.findOne({ email: historyEmail })
+			if (!customer) {
+				return res
+					.status(400)
+					.json({ errors: [{ msg: 'Customer does not exist' }] })
+			}
 
-	return res.status(200).json({ msg: 'POST /employees/transaction-history' })
-})
+			const listAccount = [
+				customer.default_account_id,
+				...customer.saving_accounts_id,
+			]
+
+			const transactionHistory = await Transaction.find({
+				$or: [
+					{
+						from_account_id: {
+							$in: listAccount,
+						},
+					},
+					{ to_account_id: { $in: listAccount } },
+				],
+			})
+
+			const response = {
+				msg: 'Transaction history successfully got',
+				data: {
+					receive: transactionHistory
+						.filter(
+							(e) =>
+								e.transaction_type === 'RECEIVE' ||
+								e.transaction_type === 'RECHARGE'
+						)
+						.map((e) => {
+							return {
+								entry_time: e.entry_time,
+								from_bank_id: e.from_bank_id,
+								to_bank_id: e.to_bank_id,
+								from_account_id: e.from_account_id,
+								from_fullname: e.from_fullname,
+								to_account_id: e.to_account_id,
+								to_fullname: e.to_fullname,
+								transaction_type: e.transaction_type,
+								transaction_amount: e.transaction_amount,
+								transaction_status: e.transaction_status,
+							}
+						}),
+					transfer: transactionHistory
+						.filter((e) => e.transaction_type === 'TRANSFER')
+						.map((e) => {
+							return {
+								entry_time: e.entry_time,
+								from_bank_id: e.from_bank_id,
+								to_bank_id: e.to_bank_id,
+								from_account_id: e.from_account_id,
+								from_fullname: e.from_fullname,
+								to_account_id: e.to_account_id,
+								to_fullname: e.to_fullname,
+								transaction_type: e.transaction_type,
+								transaction_amount: e.transaction_amount,
+								transaction_status: e.transaction_status,
+							}
+						}),
+					debt: transactionHistory
+						.filter((e) => e.transaction_type === 'REPAYMENT')
+						.map((e) => {
+							return {
+								entry_time: e.entry_time,
+								from_bank_id: e.from_bank_id,
+								to_bank_id: e.to_bank_id,
+								from_account_id: e.from_account_id,
+								from_fullname: e.from_fullname,
+								to_account_id: e.to_account_id,
+								to_fullname: e.to_fullname,
+								transaction_type: e.transaction_type,
+								transaction_amount: e.transaction_amount,
+								transaction_status: e.transaction_status,
+							}
+						}),
+				},
+			}
+
+			return res.status(200).json(response)
+		} catch (error) {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error' })
+		}
+	}
+)
 
 module.exports = router
