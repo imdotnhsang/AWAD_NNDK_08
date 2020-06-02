@@ -2,9 +2,9 @@ import axios from 'axios'
 import querystring from 'querystring'
 import { getJwtFromStorage, objectToQueryString, generateErrorResponse } from '../utils/utils'
 
-export const host = 'https://mock-api-eight-bank.herokuapp.com'
+// export const host = 'https://mock-api-eight-bank.herokuapp.com'
 
-// export const host = 'http://localhost:3002'
+export const host = 'http://localhost:3002'
 export const apiHost = `${host}/api/`
 const authType = 'Bearer'
 

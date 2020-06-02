@@ -13,6 +13,7 @@ import InterbankModal from './presentational/Modal.Interbank'
 import SuccessModal from '../common/presentational/Modal.Success'
 import FailureModal from '../common/presentational/Modal.Failure'
 import ProcessingModal from '../common/presentational/Modal.Processing'
+import SaveReceiverModal from './presentational/Modal.SaveReceiver'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -57,13 +58,21 @@ class TransferPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      newReceiver: {
+        accountName: '',
+        accountID: '',
+        bankID: '',
+        bankName: '',
+      },
       showInternal: false,
       showInterbank: false,
       showSuccess: false,
       showFailure: false,
       showProcessing: false,
+      showSaveReceiver: false,
       failureMessage: '',
     }
+    this.handleNewReceiver = this.handleNewReceiver.bind(this)
     this.handleOpenInternal = this.handleOpenInternal.bind(this)
     this.handleCloseInternal = this.handleCloseInternal.bind(this)
     this.handleOpenInterbank = this.handleOpenInterbank.bind(this)
@@ -73,6 +82,8 @@ class TransferPage extends Component {
     this.handleOpenFailureModal = this.handleOpenFailureModal.bind(this)
     this.handleCloseFailureModal = this.handleCloseFailureModal.bind(this)
     this.handleShowProcessing = this.handleShowProcessing.bind(this)
+    this.handleOpenSaveReceiverModal = this.handleOpenSaveReceiverModal.bind(this)
+    this.handleCloseSaveReceiverModal = this.handleCloseSaveReceiverModal.bind(this)
   }
 
   componentDidMount() {
@@ -84,6 +95,12 @@ class TransferPage extends Component {
     onFetchCardsData()
     onFetchReceiversData()
     onFetchBanksData()
+  }
+
+  handleNewReceiver(value) {
+    this.setState({
+      newReceiver: value,
+    })
   }
 
   handleOpenInternal() {
@@ -127,6 +144,10 @@ class TransferPage extends Component {
     this.setState({
       showSuccess: false,
     })
+    const { newReceiver } = this.state
+    if (newReceiver.accountID) {
+      this.handleOpenSaveReceiverModal()
+    }
   }
 
   handleOpenFailureModal(message) {
@@ -153,13 +174,33 @@ class TransferPage extends Component {
     })
   }
 
+  handleOpenSaveReceiverModal() {
+    this.setState({
+      showSaveReceiver: true,
+    })
+  }
+
+  handleCloseSaveReceiverModal() {
+    this.setState({
+      newReceiver: {
+        accountName: '',
+        accountID: '',
+        bankID: '',
+        bankName: '',
+      },
+      showSaveReceiver: false,
+    })
+  }
+
   render() {
     const {
+      newReceiver,
       showInternal,
       showInterbank,
       showSuccess,
       showFailure,
       showProcessing,
+      showSaveReceiver,
       failureMessage,
     } = this.state
 
@@ -227,6 +268,7 @@ class TransferPage extends Component {
               (showInternal && !loading) && (
                 <InternalModal
                   show={showInternal && !loading}
+                  onNewReceiver={this.handleNewReceiver}
                   onClose={this.handleCloseInternal}
                   onSuccess={this.handleOpenSuccessModal}
                   onFailure={this.handleOpenFailureModal}
@@ -238,6 +280,7 @@ class TransferPage extends Component {
               (showInterbank && !loading) && (
                 <InterbankModal
                   show={showInterbank && !loading}
+                  onNewReceiver={this.handleNewReceiver}
                   onClose={this.handleCloseInterbank}
                   onSuccess={this.handleOpenSuccessModal}
                   onFailure={this.handleOpenFailureModal}
@@ -266,6 +309,11 @@ class TransferPage extends Component {
           </FailureModal>
           <ProcessingModal
             show={showProcessing}
+          />
+          <SaveReceiverModal
+            show={showSaveReceiver}
+            onClose={this.handleCloseSaveReceiverModal}
+            data={newReceiver}
           />
         </>
       </Template>

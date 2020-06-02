@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
 import Step1 from '../container/Content.Step1'
-import Step2 from '../container/Content.Step2.Internal'
+import Step2 from '../container/Content.Step2.Interbank'
 import Step3 from '../container/Content.Step3'
 import Step4 from './Content.Step4'
 import Step5 from './Content.Step5'
@@ -85,7 +85,6 @@ class InternalModal extends Component {
     } else {
       onSuccess()
     }
-    // TODO recommend customer to save this receiver for future transfers
   }
 
   render() {
@@ -106,7 +105,7 @@ class InternalModal extends Component {
     return (
       <Template
         width={604}
-        name="Internal transfer"
+        name="Interbank transfer"
         show={show}
         onClose={onClose}
       >

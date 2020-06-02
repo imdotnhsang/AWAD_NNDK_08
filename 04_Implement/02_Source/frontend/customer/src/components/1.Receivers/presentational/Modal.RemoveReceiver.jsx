@@ -85,14 +85,6 @@ const RemoveReceiverModal = ({
         error && <Error>{error}</Error>
       }
       <ButtonWrapper>
-        <DeleteWrapper>
-          <DeleteButton
-            name="Delete"
-            fluid
-            onClick={handleDelete}
-            loading={loading}
-          />
-        </DeleteWrapper>
         <CancelWrapper>
           <CancelButton
             name="Cancel"
@@ -101,6 +93,14 @@ const RemoveReceiverModal = ({
             onClick={onClose}
           />
         </CancelWrapper>
+        <DeleteWrapper>
+          <DeleteButton
+            name="Delete"
+            fluid
+            onClick={handleDelete}
+            loading={loading}
+          />
+        </DeleteWrapper>
       </ButtonWrapper>
     </Template>
   )
