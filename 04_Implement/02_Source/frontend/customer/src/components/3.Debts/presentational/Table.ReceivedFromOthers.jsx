@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import ScrollArea from 'react-scrollbar'
@@ -27,11 +27,15 @@ const Table = ({
   onInfo,
   onRemove,
 }) => {
+  const ref = useRef(null)
   const [filter, setFilter] = useState('')
   let filteredData = data
   if (filter) {
     filteredData = filteredData.filter((o) => o.status === filter)
   }
+  useEffect(() => {
+    if (!loading) ref.current.scrollArea.scrollTop()
+  })
   return (
     <Wrapper>
       <Header
@@ -50,6 +54,7 @@ const Table = ({
                   width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',
                 }}
                 smoothScrolling
+                ref={ref}
               >
                 {
                   filteredData.map((item, index) => (

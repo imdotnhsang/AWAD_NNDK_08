@@ -10,15 +10,16 @@ import {
   fecthDebtsDataCreatedByYouIfNeeded,
   fecthDebtsDataReceivedFromOthersIfNeeded,
   invalidateDebtsDataReceivedFromOthers,
+  invalidateDebtsDataCreatedByYou,
 } from '../../actions/debts'
 import {
   fetchCardsDataIfNeeded,
 } from '../../actions/cards'
 import { DebtStatus } from '../../constants/constants'
 import RepayModal from './presentational/Modal.RepayDebt'
-import AddModal from './presentational/Modal.AddDebt'
+import AddModal from './container/Modal.AddDebt'
 import InfoModal from './presentational/Modal.InfoDebt'
-import RemoveModal from './container/Modal.RemoveDebt'
+import RemoveModal from './presentational/Modal.RemoveDebt'
 import SuccessModal from '../common/presentational/Modal.Success'
 import FailureModal from '../common/presentational/Modal.Failure'
 import ProcessingModal from '../common/presentational/Modal.Processing'
@@ -59,10 +60,11 @@ class ReceiversPage extends Component {
       showPayModal: false,
       showInfoModal: false,
       showRemoveModal: false,
-      createdByYouRemove: true,
+      createdByYouAction: true,
       showSuccess: false,
       showFailure: false,
       showProcessing: false,
+      successMessage: '',
       failureMessage: '',
     }
     this.handleTab = this.handleTab.bind(this)
@@ -181,27 +183,40 @@ class ReceiversPage extends Component {
     })
   }
 
-  handleOpenSuccessModal() {
+  handleOpenSuccessModal(message, createdByYouAction) {
     this.setState({
       showProcessing: false,
     })
     setTimeout(() => {
       this.setState({
         showSuccess: true,
+        successMessage: message,
+        createdByYouAction,
       })
     }, 1000)
   }
 
   handleCloseSuccessModal() {
     const {
+      invalidateCreatedByYouData,
+      onFetchCreatedByYouData,
       invalidateReceivedFromOthersData,
       onFetchReceivedFromOthersData,
     } = this.props
+    const {
+      createdByYouAction,
+    } = this.state
     this.setState({
       showSuccess: false,
+      successMessage: '',
     })
-    invalidateReceivedFromOthersData()
-    onFetchReceivedFromOthersData()
+    if (createdByYouAction) {
+      invalidateCreatedByYouData()
+      onFetchCreatedByYouData()
+    } else {
+      invalidateReceivedFromOthersData()
+      onFetchReceivedFromOthersData()
+    }
   }
 
   handleOpenFailureModal(message) {
@@ -219,6 +234,7 @@ class ReceiversPage extends Component {
   handleCloseFailureModal() {
     this.setState({
       showFailure: false,
+      failureMessage: '',
     })
   }
 
@@ -240,6 +256,7 @@ class ReceiversPage extends Component {
       showSuccess,
       showFailure,
       showProcessing,
+      successMessage,
       failureMessage,
     } = this.state
 
@@ -289,50 +306,35 @@ class ReceiversPage extends Component {
                 />,
               ][tab] || null
             }
-
-            {/* <Table
-              data={data}
-              loading={loading}
-              onInfo={this.handleOpenInfoModal}
-              onRemove={this.handleOpenRemoveModal}
-            /> */}
-            {/* <AddModel
-              show={showAddModal}
-              onClose={this.handleCloseAddModal}
-            />
-            <InfoModel
-              id={selectedItem.id}
-              bankID={selectedItem.bankID}
-              accountID={selectedItem.accountID}
-              nickname={selectedItem.nickname}
-              show={showInfoModal}
-              onClose={this.handleCloseInfoModal}
-            />
-            <RemoveModel
-              id={selectedItem.id}
-              show={showRemoveModal}
-              onClose={this.handleCloseRemoveModal}
-            /> */}
           </Wrapper>
-          <AddModal
-            show={showAddModal}
-            onClose={this.handleCloseAddModal}
-          />
-          <InfoModal
-            show={showInfoModal}
-            data={selectedItem}
-            onClose={this.handleCloseInfoModal}
-          />
-          <RemoveModal
-            show={showRemoveModal}
-            data={selectedItem}
-            onClose={this.handleCloseRemoveModal}
-            createdByYouRemove={createdByYouRemove}
-          />
+          {showAddModal
+            && (
+              <AddModal
+                onClose={this.handleCloseAddModal}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
+          {showInfoModal
+            && (
+              <InfoModal
+                data={selectedItem}
+                onClose={this.handleCloseInfoModal}
+              />
+            )}
+          {showRemoveModal
+            && (
+              <RemoveModal
+                data={selectedItem}
+                onClose={this.handleCloseRemoveModal}
+                createdByYouRemove={createdByYouRemove}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
           {showPayModal
             && (
             <RepayModal
-              show={showPayModal}
               data={selectedItem}
               onClose={this.handleClosePayModal}
               onSuccess={this.handleOpenSuccessModal}
@@ -340,27 +342,32 @@ class ReceiversPage extends Component {
               onProcessing={this.handleShowProcessing}
             />
             )}
-          <SuccessModal
-            show={showSuccess}
-            onClose={this.handleCloseSuccessModal}
-          >
-            <Description>Your transaction has been successfully done!</Description>
-          </SuccessModal>
-          <FailureModal
-            show={showFailure}
-            onClose={this.handleCloseFailureModal}
-          >
-            <Description>
-              Something wrong has happened that your transaction was canceled
-              <br />
-              Error message:
-              {' '}
-              {failureMessage}
-            </Description>
-          </FailureModal>
-          <ProcessingModal
-            show={showProcessing}
-          />
+          {showSuccess
+            && (
+            <SuccessModal
+              onClose={this.handleCloseSuccessModal}
+            >
+              <Description>{successMessage}</Description>
+            </SuccessModal>
+            )}
+          {showFailure
+            && (
+              <FailureModal
+                onClose={this.handleCloseFailureModal}
+              >
+                <Description>
+                  Something wrong has happened that your transaction was canceled
+                  <br />
+                  Error message:
+                  {' '}
+                  {failureMessage}
+                </Description>
+              </FailureModal>
+            )}
+          {showProcessing
+            && (
+              <ProcessingModal />
+            )}
         </>
       </Template>
     )
@@ -379,6 +386,7 @@ ReceiversPage.defaultProps = {
   onFetchReceivedFromOthersData: (f) => f,
   onFetchAccountsData: (f) => f,
   invalidateReceivedFromOthersData: (f) => f,
+  invalidateCreatedByYouData: (f) => f,
 }
 ReceiversPage.propTypes = {
   createdByYouData: PropTypes.arrayOf(
@@ -423,6 +431,7 @@ ReceiversPage.propTypes = {
   onFetchReceivedFromOthersData: PropTypes.func,
   onFetchAccountsData: PropTypes.func,
   invalidateReceivedFromOthersData: PropTypes.func,
+  invalidateCreatedByYouData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   createdByYouData: state.debts.createdByYou.data,
@@ -434,6 +443,7 @@ const mapStateToProps = (state) => ({
   accountsDataLoading: state.cards.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
+  invalidateCreatedByYouData: () => dispatch(invalidateDebtsDataCreatedByYou()),
   onFetchCreatedByYouData: () => dispatch(fecthDebtsDataCreatedByYouIfNeeded()),
   invalidateReceivedFromOthersData: () => dispatch(invalidateDebtsDataReceivedFromOthers()),
   onFetchReceivedFromOthersData: () => dispatch(fecthDebtsDataReceivedFromOthersIfNeeded()),

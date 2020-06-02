@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
 import Step1 from '../container/Content.Step1.RepayDebt'
-import Step2 from '../container/Content.Step2.RepayDebt'
+import Step2 from './Content.Step2.RepayDebt'
 import Step3 from './Content.Step3.RepayDebt'
 
 class RepayDebtModal extends Component {
@@ -67,7 +67,7 @@ class RepayDebtModal extends Component {
       const { error } = res
       onFailure(error)
     } else {
-      onSuccess()
+      onSuccess('You have successfully repay this debt', false)
     }
   }
 

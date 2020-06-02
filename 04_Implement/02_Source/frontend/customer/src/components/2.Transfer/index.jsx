@@ -13,7 +13,7 @@ import InterbankModal from './presentational/Modal.Interbank'
 import SuccessModal from '../common/presentational/Modal.Success'
 import FailureModal from '../common/presentational/Modal.Failure'
 import ProcessingModal from '../common/presentational/Modal.Processing'
-import SaveReceiverModal from './presentational/Modal.SaveReceiver'
+import SaveReceiverModal from './container/Modal.SaveReceiver'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -86,7 +86,13 @@ class TransferPage extends Component {
     this.handleCloseSaveReceiverModal = this.handleCloseSaveReceiverModal.bind(this)
   }
 
-  componentDidMount() {
+  handleNewReceiver(value) {
+    this.setState({
+      newReceiver: value,
+    })
+  }
+
+  handleOpenInternal() {
     const {
       onFetchCardsData,
       onFetchReceiversData,
@@ -95,18 +101,8 @@ class TransferPage extends Component {
     onFetchCardsData()
     onFetchReceiversData()
     onFetchBanksData()
-  }
-
-  handleNewReceiver(value) {
-    this.setState({
-      newReceiver: value,
-    })
-  }
-
-  handleOpenInternal() {
     this.setState({
       showInternal: true,
-      showInterbank: false,
     })
   }
 
@@ -117,9 +113,16 @@ class TransferPage extends Component {
   }
 
   handleOpenInterbank() {
+    const {
+      onFetchCardsData,
+      onFetchReceiversData,
+      onFetchBanksData,
+    } = this.props
+    onFetchCardsData()
+    onFetchReceiversData()
+    onFetchBanksData()
     this.setState({
       showInterbank: true,
-      showInternal: false,
     })
   }
 
@@ -165,6 +168,7 @@ class TransferPage extends Component {
   handleCloseFailureModal() {
     this.setState({
       showFailure: false,
+      failureMessage: '',
     })
   }
 
@@ -235,7 +239,6 @@ class TransferPage extends Component {
                         fluid
                         name="EIGHT.Bank internal transfer"
                         onClick={this.handleOpenInternal}
-                        loading={showInternal && loading}
                       />
                     </InnerButtonWrapper>
                   </ButtonWrapper>
@@ -257,7 +260,6 @@ class TransferPage extends Component {
                         secondary
                         name="Interbank transfer"
                         onClick={this.handleOpenInterbank}
-                        loading={showInterbank && loading}
                       />
                     </InnerButtonWrapper>
                   </ButtonWrapper>
@@ -265,56 +267,63 @@ class TransferPage extends Component {
               </Row>
             </SectionWrapper>
             {
-              (showInternal && !loading) && (
-                <InternalModal
-                  show={showInternal && !loading}
-                  onNewReceiver={this.handleNewReceiver}
-                  onClose={this.handleCloseInternal}
-                  onSuccess={this.handleOpenSuccessModal}
-                  onFailure={this.handleOpenFailureModal}
-                  onProcessing={this.handleShowProcessing}
-                />
-              )
+              showInternal
+                && (
+                  <InternalModal
+                    loading={loading}
+                    onNewReceiver={this.handleNewReceiver}
+                    onClose={this.handleCloseInternal}
+                    onSuccess={this.handleOpenSuccessModal}
+                    onFailure={this.handleOpenFailureModal}
+                    onProcessing={this.handleShowProcessing}
+                  />
+                )
             }
             {
-              (showInterbank && !loading) && (
-                <InterbankModal
-                  show={showInterbank && !loading}
-                  onNewReceiver={this.handleNewReceiver}
-                  onClose={this.handleCloseInterbank}
-                  onSuccess={this.handleOpenSuccessModal}
-                  onFailure={this.handleOpenFailureModal}
-                  onProcessing={this.handleShowProcessing}
-                />
-              )
+              showInterbank
+                && (
+                  <InterbankModal
+                    loading={loading}
+                    onNewReceiver={this.handleNewReceiver}
+                    onClose={this.handleCloseInterbank}
+                    onSuccess={this.handleOpenSuccessModal}
+                    onFailure={this.handleOpenFailureModal}
+                    onProcessing={this.handleShowProcessing}
+                  />
+                )
             }
           </Wrapper>
-          <SuccessModal
-            show={showSuccess}
-            onClose={this.handleCloseSuccessModal}
-          >
-            <Description>Your transaction has been successfully done!</Description>
-          </SuccessModal>
-          <FailureModal
-            show={showFailure}
-            onClose={this.handleCloseFailureModal}
-          >
-            <Description>
-              Something wrong has happened that your transaction was canceled
-              <br />
-              Error message:
-              {' '}
-              {failureMessage}
-            </Description>
-          </FailureModal>
-          <ProcessingModal
-            show={showProcessing}
-          />
-          <SaveReceiverModal
-            show={showSaveReceiver}
-            onClose={this.handleCloseSaveReceiverModal}
-            data={newReceiver}
-          />
+          {showSuccess
+            && (
+              <SuccessModal onClose={this.handleCloseSuccessModal}>
+                <Description>Your transaction has been successfully done!</Description>
+              </SuccessModal>
+            )}
+          {showFailure
+            && (
+              <FailureModal
+                onClose={this.handleCloseFailureModal}
+              >
+                <Description>
+                  Something wrong has happened that your transaction was cancelled
+                  <br />
+                  Error message:
+                  {' '}
+                  {failureMessage}
+                </Description>
+              </FailureModal>
+            )}
+          {showProcessing
+            && (
+              <ProcessingModal />
+            )}
+          {showSaveReceiver
+            && (
+              <SaveReceiverModal
+                onClose={this.handleCloseSaveReceiverModal}
+                data={newReceiver}
+              />
+            )}
         </>
       </Template>
     )

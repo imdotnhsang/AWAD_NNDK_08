@@ -1,18 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
 import TextArea from '../../common/presentational/TextArea'
 import SubmitButton from '../../common/presentational/Button.Loading'
 import CancelButton from '../../common/presentational/Button'
 import api from '../../../api/api'
-import {
-  invalidateDebtsDataCreatedByYou,
-  invalidateDebtsDataReceivedFromOthers,
-  fecthDebtsDataCreatedByYouIfNeeded,
-  fecthDebtsDataReceivedFromOthersIfNeeded,
-} from '../../../actions/debts'
 
 const Instruction = styled.span`
   font-family: OpenSans-Regular;
@@ -38,12 +31,6 @@ const ButtonWrapper = styled.div`
     margin-left: 10px;
   }
 `
-const Error = styled.span`
-  font-family: OpenSans-Regular;
-  font-size: 12px;
-  color: ${(props) => props.theme.yellow};
-  margin-top: 30px;
-`
 
 class RemoveDebtModal extends Component {
   constructor(props) {
@@ -51,7 +38,6 @@ class RemoveDebtModal extends Component {
     this.state = {
       reasonOfCancel: '',
       loading: false,
-      error: '',
     }
     this.handleReason = this.handleReason.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
@@ -67,17 +53,14 @@ class RemoveDebtModal extends Component {
     const { reasonOfCancel } = this.state
     this.setState({
       loading: true,
-      error: '',
     })
     // eslint-disable-next-line react/destructuring-assignment
     const { id } = this.props.data
     const {
       createdByYouRemove,
       onClose,
-      invalidateCreatedByYou,
-      invalidateReceivedFromOthers,
-      refreshCreatedByYou,
-      refreshReceivedFromOthers,
+      onSuccess,
+      onFailure,
     } = this.props
 
     const data = {
@@ -93,20 +76,15 @@ class RemoveDebtModal extends Component {
     if (res.error) {
       this.setState({
         loading: false,
-        error: res.error,
       })
+      onClose()
+      onFailure(res.error)
     } else {
       this.setState({
         loading: false,
       })
       onClose()
-      if (createdByYouRemove) {
-        invalidateCreatedByYou()
-        refreshCreatedByYou()
-      } else {
-        invalidateReceivedFromOthers()
-        refreshReceivedFromOthers()
-      }
+      onSuccess('You have successfully removed this debt reminder', createdByYouRemove)
     }
   }
 
@@ -118,7 +96,6 @@ class RemoveDebtModal extends Component {
     const {
       reasonOfCancel,
       loading,
-      error,
     } = this.state
 
     return (
@@ -141,7 +118,6 @@ class RemoveDebtModal extends Component {
               onChange={this.handleReason}
             />
           </TextAreaWrapper>
-          {error && <Error>{error}</Error>}
           <ButtonWrapper>
             <CancelButton
               fluid
@@ -168,11 +144,8 @@ RemoveDebtModal.defaultProps = {
   show: false,
   createdByYouRemove: true,
   onClose: (f) => f,
-  //
-  invalidateCreatedByYou: (f) => f,
-  invalidateReceivedFromOthers: (f) => f,
-  refreshCreatedByYou: (f) => f,
-  refreshReceivedFromOthers: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
 }
 RemoveDebtModal.propTypes = {
   data: PropTypes.shape({
@@ -182,18 +155,7 @@ RemoveDebtModal.propTypes = {
   createdByYouRemove: PropTypes.bool,
   onClose: PropTypes.func,
   //
-  invalidateCreatedByYou: PropTypes.func,
-  invalidateReceivedFromOthers: PropTypes.func,
-  refreshCreatedByYou: PropTypes.func,
-  refreshReceivedFromOthers: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
 }
-const mapDispatchToProps = (dispatch) => ({
-  invalidateCreatedByYou: () => dispatch(invalidateDebtsDataCreatedByYou()),
-  invalidateReceivedFromOthers: () => dispatch(invalidateDebtsDataReceivedFromOthers()),
-  refreshCreatedByYou: () => dispatch(fecthDebtsDataCreatedByYouIfNeeded()),
-  refreshReceivedFromOthers: () => dispatch(fecthDebtsDataReceivedFromOthersIfNeeded()),
-})
-export default connect(
-  null,
-  mapDispatchToProps,
-)(RemoveDebtModal)
+export default RemoveDebtModal

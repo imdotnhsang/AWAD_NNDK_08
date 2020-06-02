@@ -98,7 +98,7 @@ class InternalModal extends Component {
       chargedBySender,
     } = this.state
     const {
-      show,
+      loading,
       onClose,
       onNewReceiver,
     } = this.props
@@ -107,7 +107,7 @@ class InternalModal extends Component {
       <Template
         width={604}
         name="Internal transfer"
-        show={show}
+        loading={loading}
         onClose={onClose}
       >
         {
@@ -157,7 +157,7 @@ class InternalModal extends Component {
   }
 }
 InternalModal.defaultProps = {
-  show: true,
+  loading: false,
   onClose: (f) => f,
   onSuccess: (f) => f,
   onFailure: (f) => f,
@@ -165,7 +165,7 @@ InternalModal.defaultProps = {
   onNewReceiver: (f) => f,
 }
 InternalModal.propTypes = {
-  show: PropTypes.bool,
+  loading: PropTypes.bool,
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,

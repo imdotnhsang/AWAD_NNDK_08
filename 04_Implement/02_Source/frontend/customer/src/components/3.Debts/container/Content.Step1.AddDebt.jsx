@@ -238,7 +238,7 @@ class Step2AddDebtContent extends Component {
     return (
       <>
         <Banner
-          index={2}
+          index={1}
           name="Borrower"
           description="Provide the information of the borrower"
         />

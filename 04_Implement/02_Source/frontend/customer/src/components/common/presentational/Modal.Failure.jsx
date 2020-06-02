@@ -9,13 +9,11 @@ const ButtonWrapper = styled.div`
   margin-top: 36px;
 `
 const Modal = ({
-  show,
   onClose,
   children,
 }) => (
   <Template
     name="FAILED!"
-    show={show}
     onClose={onClose}
   >
     <>
@@ -28,12 +26,10 @@ const Modal = ({
 )
 
 Modal.defaultProps = {
-  show: false,
   onClose: (f) => f,
   children: null,
 }
 Modal.propTypes = {
-  show: PropTypes.bool,
   onClose: PropTypes.func,
   children: PropTypes.element,
 }

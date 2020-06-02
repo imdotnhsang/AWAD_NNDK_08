@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
-import Step1 from '../container/Content.Step1.AddDebt'
-import Step2 from '../container/Content.Step2.AddDebt'
+import Step1 from './Content.Step1.AddDebt'
+import Step2 from '../presentational/Content.Step2.AddDebt'
+import { fetchBanksDataIfNeeded } from '../../../actions/banks'
 
 class AddDebtModal extends Component {
   constructor(props) {
@@ -21,6 +23,11 @@ class AddDebtModal extends Component {
     this.handleOnChange = this.handleOnChange.bind(this)
     this.handleNext = this.handleNext.bind(this)
     this.handleBack = this.handleBack.bind(this)
+  }
+
+  componentDidMount() {
+    const { onFetchBanksData } = this.props
+    onFetchBanksData()
   }
 
   handleOnChange(value) {
@@ -50,16 +57,19 @@ class AddDebtModal extends Component {
     } = this.state
 
     const {
-      show,
       onClose,
+      onSuccess,
+      onFailure,
+      //
+      banksLoading,
     } = this.props
 
     return (
       <Template
-        show={show}
         onClose={onClose}
         name="Add debt"
         width={604}
+        loading={banksLoading}
       >
         {
           [
@@ -78,6 +88,8 @@ class AddDebtModal extends Component {
               onChange={this.handleOnChange}
               onBack={this.handleBack}
               onClose={onClose}
+              onSuccess={onSuccess}
+              onFailure={onFailure}
             />,
           ][step] || null
         }
@@ -86,11 +98,28 @@ class AddDebtModal extends Component {
   }
 }
 AddDebtModal.defaultProps = {
-  show: false,
   onClose: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
+  //
+  banksLoading: false,
+  onFetchBanksData: (f) => f,
 }
 AddDebtModal.propTypes = {
-  show: PropTypes.bool,
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
+  //
+  banksLoading: PropTypes.bool,
+  onFetchBanksData: PropTypes.func,
 }
-export default AddDebtModal
+const mapStateToProps = (state) => ({
+  banksLoading: state.banks.loading,
+})
+const mapDispatchToProps = (dispatch) => ({
+  onFetchBanksData: () => dispatch(fetchBanksDataIfNeeded()),
+})
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AddDebtModal)
