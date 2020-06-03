@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { DebtStatus } from '../../../constants/constants'
-import Status from './Status'
+import Status from './Status.Debt'
 
 const Wrapper = styled.button`
   width: max-content;

@@ -1,5 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 import React from 'react'
+import { DebtType } from '../constants/constants'
 
 export function isValidEmail(email) {
   // eslint-disable-next-line no-control-regex
@@ -97,3 +98,13 @@ export const resolveTagFromProps = (styleModifiers, tag) => (({ children, ...pro
   styleModifiers.map((propName) => !!props.hasOwnProperty(propName) && delete props[propName])
   return React.createElement(tag, props, children)
 })
+
+export function getUrlFromCategory(category) {
+  return category.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)
+}
+
+export function getDebtType(lenderID) {
+  const yourID = getAccountIDFromStorage()
+  if (lenderID === yourID) return DebtType.LOAN
+  return DebtType.DEBT
+}

@@ -7,10 +7,8 @@ import MenuTab from '../common/presentational/Menu.Tab'
 import TableCreatedByYou from './presentational/Table.CreatedByYou'
 import TableReceivedFromOthers from './presentational/Table.ReceivedFromOthers'
 import {
-  fecthDebtsDataCreatedByYouIfNeeded,
-  fecthDebtsDataReceivedFromOthersIfNeeded,
-  invalidateDebtsDataReceivedFromOthers,
-  invalidateDebtsDataCreatedByYou,
+  fecthDebtsDataIfNeeded,
+  invalidateDebtsData,
 } from '../../actions/debts'
 // import {
 //   fetchCardsDataIfNeeded,
@@ -82,17 +80,6 @@ class ReceiversPage extends Component {
     this.handleOpenFailureModal = this.handleOpenFailureModal.bind(this)
     this.handleCloseFailureModal = this.handleCloseFailureModal.bind(this)
     this.handleShowProcessing = this.handleShowProcessing.bind(this)
-  }
-
-  componentDidMount() {
-    const {
-      onFetchCreatedByYouData,
-      onFetchReceivedFromOthersData,
-      // onFetchAccountsData,
-    } = this.props
-    onFetchCreatedByYouData()
-    onFetchReceivedFromOthersData()
-    // onFetchAccountsData()
   }
 
   handleTab(value) {
@@ -198,10 +185,8 @@ class ReceiversPage extends Component {
 
   handleCloseSuccessModal() {
     const {
-      invalidateCreatedByYouData,
-      onFetchCreatedByYouData,
-      invalidateReceivedFromOthersData,
-      onFetchReceivedFromOthersData,
+      onInvalidateData,
+      onFetchData,
     } = this.props
     const {
       createdByYouAction,
@@ -211,11 +196,11 @@ class ReceiversPage extends Component {
       successMessage: '',
     })
     if (createdByYouAction) {
-      invalidateCreatedByYouData()
-      onFetchCreatedByYouData()
+      onInvalidateData('createdByYou')
+      onFetchData('createdByYou')
     } else {
-      invalidateReceivedFromOthersData()
-      onFetchReceivedFromOthersData()
+      onInvalidateData('receivedFromOthers')
+      onFetchData('receivedFromOthers')
     }
   }
 
@@ -260,15 +245,6 @@ class ReceiversPage extends Component {
       failureMessage,
     } = this.state
 
-    const {
-      createdByYouData,
-      createdByYouLoading,
-      //
-      receivedFromOthersData,
-      receivedFromOthersLoading,
-      //
-      accountsDataLoading,
-    } = this.props
 
     const menuTabData = [
       { name: 'Created by you', value: 0 },
@@ -292,14 +268,10 @@ class ReceiversPage extends Component {
             {
               [
                 <TableCreatedByYou
-                  data={createdByYouData}
-                  loading={createdByYouLoading}
                   onInfo={this.handleOpenInfoModal}
                   onRemove={this.handleOpenRemoveModal}
                 />,
                 <TableReceivedFromOthers
-                  data={receivedFromOthersData}
-                  loading={receivedFromOthersLoading || accountsDataLoading}
                   onPay={this.handleOpenPayModal}
                   onInfo={this.handleOpenInfoModal}
                   onRemove={this.handleOpenRemoveModal}
@@ -375,81 +347,19 @@ class ReceiversPage extends Component {
 }
 
 ReceiversPage.defaultProps = {
-  createdByYouData: [],
-  createdByYouLoading: false,
-  //
-  receivedFromOthersData: [],
-  receivedFromOthersLoading: false,
-  //
-  accountsDataLoading: false,
-  onFetchCreatedByYouData: (f) => f,
-  onFetchReceivedFromOthersData: (f) => f,
-  // onFetchAccountsData: (f) => f,
-  invalidateReceivedFromOthersData: (f) => f,
-  invalidateCreatedByYouData: (f) => f,
+  onInvalidateData: (f) => f,
+  onFetchData: (f) => f,
 }
 ReceiversPage.propTypes = {
-  createdByYouData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      lenderName: PropTypes.string,
-      lenderID: PropTypes.string,
-      borrowerName: PropTypes.string,
-      borrowerID: PropTypes.string,
-      status: PropTypes.oneOf([
-        DebtStatus.UNPAID,
-        DebtStatus.PAID,
-        DebtStatus.CANCELLED,
-      ]),
-      amount: PropTypes.number,
-      message: PropTypes.string,
-      reasonOfCancel: PropTypes.string,
-    }),
-  ),
-  createdByYouLoading: PropTypes.bool,
-  //
-  receivedFromOthersData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      lenderName: PropTypes.string,
-      lenderID: PropTypes.string,
-      borrowerName: PropTypes.string,
-      borrowerID: PropTypes.string,
-      status: PropTypes.oneOf([
-        DebtStatus.UNPAID,
-        DebtStatus.PAID,
-        DebtStatus.CANCELLED,
-      ]),
-      amount: PropTypes.number,
-      message: PropTypes.string,
-      reasonOfCancel: PropTypes.string,
-    }),
-  ),
-  receivedFromOthersLoading: PropTypes.bool,
-  accountsDataLoading: PropTypes.bool,
-  onFetchCreatedByYouData: PropTypes.func,
-  onFetchReceivedFromOthersData: PropTypes.func,
-  // onFetchAccountsData: PropTypes.func,
-  invalidateReceivedFromOthersData: PropTypes.func,
-  invalidateCreatedByYouData: PropTypes.func,
+  onInvalidateData: PropTypes.func,
+  onFetchData: PropTypes.func,
 }
-const mapStateToProps = (state) => ({
-  createdByYouData: state.debts.createdByYou.data,
-  createdByYouLoading: state.debts.createdByYou.loading,
-  //
-  receivedFromOthersData: state.debts.receivedFromOthers.data,
-  receivedFromOthersLoading: state.debts.receivedFromOthers.loading,
-  //
-  accountsDataLoading: state.cards.loading,
-})
+
 const mapDispatchToProps = (dispatch) => ({
-  invalidateCreatedByYouData: () => dispatch(invalidateDebtsDataCreatedByYou()),
-  onFetchCreatedByYouData: () => dispatch(fecthDebtsDataCreatedByYouIfNeeded()),
-  invalidateReceivedFromOthersData: () => dispatch(invalidateDebtsDataReceivedFromOthers()),
-  onFetchReceivedFromOthersData: () => dispatch(fecthDebtsDataReceivedFromOthersIfNeeded()),
-  // onFetchAccountsData: () => dispatch(fetchCardsDataIfNeeded()),
+  onInvalidateData: (category) => dispatch(invalidateDebtsData(category)),
+  onFetchData: (category) => dispatch(fecthDebtsDataIfNeeded(category)),
 })
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(ReceiversPage)

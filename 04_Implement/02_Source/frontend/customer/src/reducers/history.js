@@ -1,38 +1,43 @@
-import { Debts } from '../constants/actionTypes'
+import { History } from '../constants/actionTypes'
 
 const initialState = {
-  createdByYou: {
+  receive: {
     data: [],
-    didInvalidate: false,
     loading: false,
+    didInvalidate: false,
   },
-  receivedFromOthers: {
+  transfer: {
     data: [],
-    didInvalidate: false,
     loading: false,
+    didInvalidate: false,
+  },
+  debtRepaying: {
+    data: [],
+    loading: false,
+    didInvalidate: false,
   },
 }
 const tab = (state, action) => {
   switch (action.type) {
-    case Debts.REQUEST_DEBTS_DATA:
+    case History.REQUEST_HISTORY_DATA:
       return {
         ...state,
         loading: true,
         didInvalidate: false,
       }
-    case Debts.RECEIVE_DEBTS_DATA:
+    case History.RECEIVE_HISTORY_DATA:
       return {
         ...state,
         data: action.data,
         loading: false,
         didInvalidate: false,
       }
-    case Debts.INVALIDATE_DEBTS_DATA:
+    case History.INVALIDATE_HISTORY_DATA:
       return {
         ...state,
         didInvalidate: true,
       }
-    case Debts.FAILED_REQUEST_DEBTS_DATA:
+    case History.FAILED_REQUEST_HISTORY_DATA:
       return {
         ...state,
         loading: false,
@@ -42,12 +47,13 @@ const tab = (state, action) => {
       return state
   }
 }
-const debts = (state = initialState, action) => {
+
+const history = (state = initialState, action) => {
   switch (action.type) {
-    case Debts.REQUEST_DEBTS_DATA:
-    case Debts.RECEIVE_DEBTS_DATA:
-    case Debts.FAILED_REQUEST_DEBTS_DATA:
-    case Debts.INVALIDATE_DEBTS_DATA:
+    case History.REQUEST_HISTORY_DATA:
+    case History.RECEIVE_HISTORY_DATA:
+    case History.INVALIDATE_HISTORY_DATA:
+    case History.FAILED_REQUEST_HISTORY_DATA:
       return {
         ...state,
         [action.category]: tab(state[action.category], action),
@@ -57,4 +63,4 @@ const debts = (state = initialState, action) => {
   }
 }
 
-export default debts
+export default history
