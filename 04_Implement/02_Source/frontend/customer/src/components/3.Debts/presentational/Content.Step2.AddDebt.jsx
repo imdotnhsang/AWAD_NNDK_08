@@ -163,12 +163,14 @@ class Step2AddDebtContent extends Component {
             secondary
             name="Back"
             onClick={onBack}
+            disabled={loading}
           />
           <AddButton
             fluid
             name="Finish"
             onClick={this.handleAdd}
             loading={loading}
+            disabled={loading}
           />
         </ButtonWrapper>
       </>

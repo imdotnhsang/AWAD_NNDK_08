@@ -34,7 +34,7 @@ const Wrapper = styled.button`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;
   opacity: ${(props) => (props.disabled && '0.5')};
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const Logo = styled(resolveTagFromProps(styleModifiers, 'svg'))`
   transform: ${(props) => (props.show ? 'rotate(180deg)' : 'rotate(0deg)')};
@@ -65,7 +65,7 @@ const Item = styled(resolveTagFromProps(styleModifiers, 'button'))`
   }
   text-align: left;
   vertical-align: middle;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const ItemText = styled.span`
   font-family: OpenSans-Regular;

@@ -26,6 +26,7 @@ class EditReceiverModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      nickname: '',
       error: '',
       loading: false,
     }
@@ -50,7 +51,6 @@ class EditReceiverModal extends Component {
       onSuccess,
       onFailure,
     } = this.props
-
     if (!nickname) {
       this.setState({
         error: 'Required field',
@@ -89,13 +89,14 @@ class EditReceiverModal extends Component {
 
   render() {
     const {
+      nickname,
       error,
       loading,
     } = this.state
     const {
       bankID,
       accountID,
-      nickname,
+      nickname: oldNickname,
       onClose,
       //
       bankLoading,
@@ -105,6 +106,7 @@ class EditReceiverModal extends Component {
         name="Edit receiver"
         onClose={onClose}
         loading={bankLoading}
+        disabled={loading}
       >
         <Text>Enter the new infomation for this contact</Text>
         <InputWrapper>
@@ -123,7 +125,7 @@ class EditReceiverModal extends Component {
         </InputWrapper>
         <Input
           label="Nickname"
-          placeholder="Enter the receiver's nickname"
+          placeholder={oldNickname}
           value={nickname}
           error={error}
           onChange={this.handleNickname}
@@ -135,6 +137,7 @@ class EditReceiverModal extends Component {
             fluid
             onClick={this.handleSubmit}
             loading={loading}
+            disabled={loading}
           />
         </ButtonWrapper>
       </Template>

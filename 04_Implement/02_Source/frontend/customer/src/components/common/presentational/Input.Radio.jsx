@@ -10,8 +10,8 @@ const Wrapper = styled.button`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  cursor: pointer;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const OuterCircle = styled.div`
   background-color: ${(props) => props.theme.blackDark};

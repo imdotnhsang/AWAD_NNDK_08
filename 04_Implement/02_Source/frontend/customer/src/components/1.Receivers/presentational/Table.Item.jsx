@@ -34,7 +34,7 @@ const ActionButton = styled.button`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 
 const TableItem = ({

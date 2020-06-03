@@ -10,7 +10,7 @@ const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
   width: 100%;
   background-color: ${(props) => (props.active ? 'rgba(196, 196, 196, 0.3)' : props.theme.blackDark)};
   margin-bottom: ${(props) => !props.lastItem && '12px'};
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
   padding: 0px 12px;
 `
 const Text = styled.span`

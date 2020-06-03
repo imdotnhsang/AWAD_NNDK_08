@@ -126,12 +126,14 @@ class Step4Content extends Component {
             secondary
             name="Back"
             onClick={onBack}
+            disabled={loading}
           />
           <ConfirmButton
             fluid
             name="Confirm"
             loading={loading}
             onClick={this.handleConfirm}
+            disabled={loading}
           />
         </ButtonWrapper>
       </>

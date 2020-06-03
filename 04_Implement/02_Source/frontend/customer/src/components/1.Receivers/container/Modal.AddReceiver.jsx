@@ -105,6 +105,7 @@ class AddReceiverModal extends Component {
       } else {
         this.setState({
           accountIDValid: false,
+          accountIDError: 'Invalid card number',
           accountIDLoading: false,
         })
       }
@@ -188,44 +189,48 @@ class AddReceiverModal extends Component {
         name="Add receiver"
         onClose={onClose}
         loading={bankLoading}
+        disabled={loading}
       >
-        <Text>Enter the infomation for your new contact</Text>
-        <InputWrapper>
-          <Select
-            error={error}
-            value={bankID}
-            onChange={this.handleBankID}
-            disabled={loading}
-          />
-        </InputWrapper>
-        <InputWrapper>
+        <>
+          <Text>Enter the infomation for your new contact</Text>
+          <InputWrapper>
+            <Select
+              error={error}
+              value={bankID}
+              onChange={this.handleBankID}
+              disabled={loading || accountIDLoading}
+            />
+          </InputWrapper>
+          <InputWrapper>
+            <Input
+              label="Card number"
+              placeholder="Enter the receiver's card number"
+              value={accountID}
+              onChange={this.handleAccountID}
+              disabled={loading || bankID === ''}
+              error={error || accountIDError}
+              loading={accountIDLoading}
+              onBlur={this.handleValidateAccountID}
+            />
+          </InputWrapper>
           <Input
-            label="Card number"
-            placeholder="Enter the receiver's card number"
-            value={accountID}
-            onChange={this.handleAccountID}
-            disabled={loading || bankID === ''}
-            error={error || accountIDError}
-            loading={accountIDLoading}
-            onBlur={this.handleValidateAccountID}
+            label="Nickname"
+            placeholder="Enter the receiver's nickname"
+            value={nickname}
+            error={error}
+            onChange={this.handleNickname}
+            disabled={loading || !accountIDValid}
           />
-        </InputWrapper>
-        <Input
-          label="Nickname"
-          placeholder="Enter the receiver's nickname"
-          value={nickname}
-          error={error}
-          onChange={this.handleNickname}
-          disabled={loading || !accountIDValid}
-        />
-        <ButtonWrapper>
-          <Button
-            name="Create new receiver"
-            fluid
-            onClick={this.handleSubmit}
-            loading={loading}
-          />
-        </ButtonWrapper>
+          <ButtonWrapper>
+            <Button
+              name="Create new receiver"
+              fluid
+              onClick={this.handleSubmit}
+              loading={loading}
+              disabled={loading || accountIDLoading}
+            />
+          </ButtonWrapper>
+        </>
       </Template>
     )
   }

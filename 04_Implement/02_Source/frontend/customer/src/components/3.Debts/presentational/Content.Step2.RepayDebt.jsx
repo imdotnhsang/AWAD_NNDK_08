@@ -166,12 +166,14 @@ class Step2RepayDebt extends Component {
             secondary
             fluid
             onClick={onBack}
+            disabled={loading}
           />
           <RepayButton
             name="Confirm"
             fluid
             onClick={this.handleSendOTP}
             loading={loading}
+            disabled={loading}
           />
         </ButtonWrapper>
       </>

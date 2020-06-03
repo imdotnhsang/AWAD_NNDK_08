@@ -55,7 +55,7 @@ const EyeButton = styled.button`
   align-items: center;
   margin-right: 16px;
   margin-left: auto;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 
 const EmailInput = ({

@@ -293,11 +293,13 @@ class Step2AddDebtContent extends Component {
             secondary
             name="Cancel"
             onClick={onClose}
+            disabled={loading}
           />
           <Button
             fluid
             name="Next"
             onClick={this.handleNext}
+            disabled={loading}
           />
         </ButtonWrapper>
       </>
@@ -344,7 +346,7 @@ Step2AddDebtContent.propTypes = {
 
 const mapStateToProps = (state) => ({
   receiversData: state.receivers.receivers.filter(
-    (receiver) => receiver.bankID === getBankIDFromStorage()
+    (receiver) => receiver.bankID === getBankIDFromStorage(),
   ).map((receiver) => ({
     accountName: receiver.nickname,
     accountID: receiver.accountID,

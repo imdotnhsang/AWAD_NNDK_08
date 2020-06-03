@@ -51,7 +51,7 @@ const ActionButton = styled.button`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
   opacity: ${((props) => (props.disabled && '0.5'))};
 `
 

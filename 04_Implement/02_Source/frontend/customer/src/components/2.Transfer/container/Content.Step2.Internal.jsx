@@ -136,44 +136,46 @@ class Step2Content extends Component {
   }
 
   async handleSearch() {
-    const { tab2Input } = this.state
-    const { banksData } = this.props
-    // eslint-disable-next-line no-restricted-globals
-    if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
-      this.setState({
-        error: 'Invalid value',
-      })
-      return
-    }
-    this.setState({
-      loading: true,
-      error: '',
-    })
-    const bankID = banksData.find((bank) => bank.name === 'EIGHT.Bank').id
-    const data = {
-      accountID: tab2Input,
-      bankID,
-    }
-    const res = await api.get('/banks/account', data)
-    if (res.error) {
-      const { error } = res
-      this.setState({
-        error,
-        loading: false,
-      })
-    } else {
-      const { valid } = res
-      if (valid) {
+    const { tab2Input, loading } = this.state
+    if (!loading) {
+      const { banksData } = this.props
+      // eslint-disable-next-line no-restricted-globals
+      if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
         this.setState({
-          loading: false,
-          newReceiver: res.data,
+          error: 'Invalid value',
         })
-        this.handleOnChange(res.data)
+        return
+      }
+      this.setState({
+        loading: true,
+        error: '',
+      })
+      const bankID = banksData.find((bank) => bank.name === 'EIGHT.Bank').id
+      const data = {
+        accountID: tab2Input,
+        bankID,
+      }
+      const res = await api.get('/banks/account', data)
+      if (res.error) {
+        const { error } = res
+        this.setState({
+          error,
+          loading: false,
+        })
       } else {
-        this.setState({
-          error: 'Invalid card number',
-          loading: false,
-        })
+        const { valid } = res
+        if (valid) {
+          this.setState({
+            loading: false,
+            newReceiver: res.data,
+          })
+          this.handleOnChange(res.data)
+        } else {
+          this.setState({
+            error: 'Invalid card number',
+            loading: false,
+          })
+        }
       }
     }
   }
@@ -199,26 +201,28 @@ class Step2Content extends Component {
       tab,
       existedReceiver,
       newReceiver,
+      loading,
     } = this.state
 
     const {
       onNext,
     } = this.props
 
-
-    if (tab === 1) {
-      if (existedReceiver.accountID) onNext()
-      else {
+    if (!loading) {
+      if (tab === 1) {
+        if (existedReceiver.accountID) onNext()
+        else {
+          this.setState({
+            error: 'Please choose a receiver',
+          })
+        }
+      } else if (newReceiver.accountID) {
+        onNext()
+      } else {
         this.setState({
           error: 'Please choose a receiver',
         })
       }
-    } else if (newReceiver.accountID) {
-      onNext()
-    } else {
-      this.setState({
-        error: 'Please choose a receiver',
-      })
     }
   }
 
@@ -301,11 +305,13 @@ class Step2Content extends Component {
             secondary
             // name="Back"
             name="Cancel"
+            disabled={loading}
             onClick={onBack}
           />
           <Button
             fluid
             name="Next"
+            disabled={loading}
             onClick={this.handleNext}
           />
         </ButtonWrapper>

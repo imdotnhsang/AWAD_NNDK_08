@@ -26,7 +26,7 @@ const Button = styled.button`
     border: ${(props) => `2px solid ${props.theme.orange}`};
   }
   border-radius: 10px;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const ButtonName = styled.span`
   font-family: OpenSans-Regular;

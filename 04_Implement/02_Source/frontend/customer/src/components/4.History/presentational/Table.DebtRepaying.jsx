@@ -115,7 +115,11 @@ class Table extends Component {
                   style={{ maxHeight: '590px' }}
                   verticalScrollbarStyle={{ width: '5px', backgroundColor: '#7C7F87', borderRadius: '10px' }}
                   verticalContainerStyle={{
-                    width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',
+                    width: '5px',
+                    backgroundImage:
+                    'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
+                    borderRadius: '10px',
+                    right: '0px',
                   }}
                   smoothScrolling
                   ref={this.ref}
@@ -124,7 +128,11 @@ class Table extends Component {
                     sortedData.map((item, index) => {
                       const type = getDebtType(item.lenderID)
                       const accountID = type === DebtType.LOAN ? item.borrowerID : item.lenderID
-                      const accountName = type === DebtType.LOAN ? item.borrowerName : item.lenderName
+                      const accountName = (
+                        type === DebtType.LOAN
+                          ? item.borrowerName
+                          : item.lenderName
+                      )
                       return (
                         <Item
                           key={item.senderID}

@@ -19,7 +19,7 @@ const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
     transform: translate(-4px, -4px);
   }
   transition: transform 0.2s linear;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 
 const GeneralButton = ({
