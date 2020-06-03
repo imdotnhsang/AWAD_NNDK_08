@@ -120,6 +120,7 @@ class Step5Content extends Component {
             name="Finish"
             onClick={this.handleFinish}
             loading={loading}
+            disabled={loading}
           />
         </ButtonWrapper>
       </>

@@ -19,7 +19,7 @@ const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
     transform: translate(-4px, -4px);
   }
   transition: transform 0.2s linear;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const Text = styled.span`
   color: ${(props) => props.theme.white}; 
@@ -31,6 +31,7 @@ const GeneralButton = ({
   name,
   secondary,
   fluid,
+  disabled,
   onClick,
 }) => (
   <Wrapper
@@ -38,6 +39,7 @@ const GeneralButton = ({
     secondary={secondary}
     fluid={fluid}
     onClick={onClick}
+    disabled={disabled}
   >
     <Text>{name}</Text>
   </Wrapper>
@@ -46,12 +48,14 @@ const GeneralButton = ({
 GeneralButton.defaultProps = {
   name: '',
   secondary: false,
+  disabled: false,
   fluid: false,
   onClick: (f) => f,
 }
 GeneralButton.propTypes = {
   name: PropTypes.string,
   secondary: PropTypes.bool,
+  disabled: PropTypes.bool,
   fluid: PropTypes.bool,
   onClick: PropTypes.func,
 }

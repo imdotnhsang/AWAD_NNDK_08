@@ -19,7 +19,7 @@ const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
     transform: ${(props) => (!props.loading && 'translate(-4px, -4px)')};
   }
   transition: transform 0.2s linear;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const Text = styled(resolveTagFromProps(styleModifiers, 'span'))`
   color: ${(props) => props.theme.white}; 
@@ -46,6 +46,7 @@ const ButtonLoading = ({
   name,
   fluid,
   secondary,
+  disabled,
   loading,
   onClick,
 }) => (
@@ -55,6 +56,7 @@ const ButtonLoading = ({
     fluid={fluid}
     onClick={onClick}
     loading={loading}
+    disabled={disabled}
   >
     <Text loading={loading}>{name}</Text>
     {loading && (
@@ -77,6 +79,7 @@ ButtonLoading.defaultProps = {
   fluid: false,
   loading: false,
   secondary: false,
+  disabled: false,
   onClick: (f) => f,
 }
 ButtonLoading.propTypes = {
@@ -84,6 +87,7 @@ ButtonLoading.propTypes = {
   fluid: PropTypes.bool,
   loading: PropTypes.bool,
   secondary: PropTypes.bool,
+  disabled: PropTypes.bool,
   onClick: PropTypes.func,
 }
 

@@ -8,6 +8,7 @@ import Receivers from './components/1.Receivers'
 import Transfer from './components/2.Transfer'
 import Debts from './components/3.Debts'
 import History from './components/4.History'
+import Account from './components/5.Account'
 import PrivateRoute from './PrivateRoute'
 
 
@@ -44,6 +45,11 @@ function App() {
           exact
           path="/history"
           component={History}
+        />
+        <PrivateRoute
+          exact
+          path="/account"
+          component={Account}
         />
         <Route
           exact

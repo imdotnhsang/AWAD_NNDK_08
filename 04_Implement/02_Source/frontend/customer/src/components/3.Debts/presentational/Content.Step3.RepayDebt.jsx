@@ -120,6 +120,7 @@ class Step3RepayContent extends Component {
             name="Finish"
             onClick={this.handleFinish}
             loading={loading}
+            disabled={loading}
           />
         </ButtonWrapper>
       </>

@@ -60,6 +60,7 @@ const RemoveReceiverModal = ({
   return (
     <Template
       name="Remove receiver"
+      disabled={loading}
       onClose={onClose}
     >
       <Text>
@@ -83,6 +84,7 @@ const RemoveReceiverModal = ({
             fluid
             onClick={handleDelete}
             loading={loading}
+            disabled={loading}
           />
         </DeleteWrapper>
       </ButtonWrapper>

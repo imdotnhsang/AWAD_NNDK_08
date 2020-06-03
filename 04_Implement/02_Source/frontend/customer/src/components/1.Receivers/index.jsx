@@ -196,58 +196,58 @@ class ReceiversPage extends Component {
               onRemove={this.handleOpenRemoveModal}
             />
           </Wrapper>
+          {showAddModal
+            && (
+              <AddModal
+                onClose={this.handleCloseAddModal}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
+          {showEditModal
+            && (
+              <EditModal
+                id={selectedItem.id}
+                bankID={selectedItem.bankID}
+                accountID={selectedItem.accountID}
+                nickname={selectedItem.nickname}
+                onClose={this.handleCloseEditModal}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
+          {showRemoveModal
+            && (
+              <RemoveModal
+                id={selectedItem.id}
+                onClose={this.handleCloseRemoveModal}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
+          {showSuccessModal
+            && (
+              <SuccessModal
+                onClose={this.handleCloseSuccessModal}
+              >
+                <Description>{successMessage}</Description>
+              </SuccessModal>
+            )}
+          {showFailureModal
+            && (
+              <FailureModal
+                onClose={this.handleCloseFailureModal}
+              >
+                <Description>
+                  Something wrong has happened that your action was cancelded
+                  <br />
+                  Error message:
+                  {' '}
+                  {failureMessage}
+                </Description>
+              </FailureModal>
+            )}
         </>
-        {showAddModal
-          && (
-            <AddModal
-              onClose={this.handleCloseAddModal}
-              onSuccess={this.handleOpenSuccessModal}
-              onFailure={this.handleOpenFailureModal}
-            />
-          )}
-        {showEditModal
-          && (
-            <EditModal
-              id={selectedItem.id}
-              bankID={selectedItem.bankID}
-              accountID={selectedItem.accountID}
-              nickname={selectedItem.nickname}
-              onClose={this.handleCloseEditModal}
-              onSuccess={this.handleOpenSuccessModal}
-              onFailure={this.handleOpenFailureModal}
-            />
-          )}
-        {showRemoveModal
-          && (
-            <RemoveModal
-              id={selectedItem.id}
-              onClose={this.handleCloseRemoveModal}
-              onSuccess={this.handleOpenSuccessModal}
-              onFailure={this.handleOpenFailureModal}
-            />
-          )}
-        {showSuccessModal
-          && (
-            <SuccessModal
-              onClose={this.handleCloseSuccessModal}
-            >
-              <Description>{successMessage}</Description>
-            </SuccessModal>
-          )}
-        {showFailureModal
-          && (
-            <FailureModal
-              onClose={this.handleCloseFailureModal}
-            >
-              <Description>
-                Something wrong has happened that your action was cancelded
-                <br />
-                Error message:
-                {' '}
-                {failureMessage}
-              </Description>
-            </FailureModal>
-          )}
       </Template>
     )
   }

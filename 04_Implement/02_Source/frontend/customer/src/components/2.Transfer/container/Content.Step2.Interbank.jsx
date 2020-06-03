@@ -220,6 +220,7 @@ class Step2Content extends Component {
     }
   }
 
+
   handleNext() {
     const {
       tab,
@@ -230,7 +231,6 @@ class Step2Content extends Component {
     const {
       onNext,
     } = this.props
-
 
     if (tab === 1) {
       if (existedReceiver.accountID) onNext()
@@ -333,11 +333,13 @@ class Step2Content extends Component {
             fluid
             secondary
             name="Back"
+            disabled={loading}
             onClick={onBack}
           />
           <Button
             fluid
             name="Next"
+            disabled={loading}
             onClick={this.handleNext}
           />
         </ButtonWrapper>

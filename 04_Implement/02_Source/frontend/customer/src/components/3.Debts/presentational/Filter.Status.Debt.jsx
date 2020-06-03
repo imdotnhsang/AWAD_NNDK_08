@@ -10,7 +10,7 @@ const Wrapper = styled.button`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const Name = styled.span`
   font-family: OpenSans-SemiBold;
@@ -36,7 +36,7 @@ const Item = styled.button`
   &:hover {
     background-color: rgba(71, 75, 81, 0.23);
   }
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

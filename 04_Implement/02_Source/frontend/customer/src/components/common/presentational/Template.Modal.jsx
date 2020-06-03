@@ -46,7 +46,7 @@ const CancelButton = styled.button`
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const CancelButtonText = styled.span`
   font-family: OpenSans-Bold;
@@ -143,6 +143,7 @@ const ModalTemplate = ({
   loading,
   children,
   onClose,
+  disabled,
 }) => (
   <Backdrop>
     <Wrapper width={width} loading={loading}>
@@ -166,7 +167,7 @@ const ModalTemplate = ({
             <>
               <Header>
                 <Name>{name}</Name>
-                <CancelButton onClick={onClose} type="button">
+                <CancelButton onClick={onClose} type="button" disabled={disabled}>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="13.5356" y="5.05005" width="2" height="12" transform="rotate(45 13.5356 5.05005)" fill="#7C7F87" />
                     <rect x="5.05029" y="6.4646" width="2" height="12" transform="rotate(-45 5.05029 6.4646)" fill="#7C7F87" />
@@ -186,12 +187,14 @@ ModalTemplate.defaultProps = {
   name: 'Name',
   children: null,
   loading: false,
+  disabled: false,
   onClose: (f) => f,
 }
 ModalTemplate.propTypes = {
   width: PropTypes.number,
   name: PropTypes.string,
   loading: PropTypes.bool,
+  disabled: PropTypes.bool,
   children: PropTypes.element,
   onClose: PropTypes.func,
 }

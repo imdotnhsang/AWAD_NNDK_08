@@ -11,7 +11,7 @@ const Wrapper = styled.button`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 const Name = styled.span`
   font-family: OpenSans-Regular;
