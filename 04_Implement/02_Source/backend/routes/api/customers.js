@@ -460,7 +460,7 @@ router.get('/transaction-history', auth, async (req, res) => {
 // @route     GET /customers/cards-information
 // @desc      Get all information of customer page
 // @access    Public
-router.get('/cards-information', auth, async (req, res) => {
+router.get('/information-cards', auth, async (req, res) => {
 	try {
 		const customer = await Customer.findById(req.user.id)
 		if (!customer) {
@@ -498,7 +498,7 @@ router.get('/cards-information', auth, async (req, res) => {
 		})
 
 		const response = {
-			msg: 'Cards information successfully got',
+			msg: 'Information cards successfully got',
 			data: {
 				default_account: {
 					account_id: defaultAccount.account_id,
