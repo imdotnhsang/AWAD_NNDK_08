@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
 import Template from '../../common/presentational/Template.Modal'
 import Button from '../../common/presentational/Button'
-import Status from './Status'
+import Status from './Status.Debt'
 import { DebtStatus } from '../../../constants/constants'
 import { spaceSeparating } from '../../../utils/utils'
 

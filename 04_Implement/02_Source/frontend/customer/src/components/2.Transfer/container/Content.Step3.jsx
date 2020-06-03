@@ -8,6 +8,7 @@ import FormRadio from '../../common/presentational/Form.Radio'
 import Button from '../../common/presentational/Button'
 import Banner from '../../common/presentational/Banner.Step'
 import { MINIMUM_BALANCE } from '../../../constants/constants'
+import { getAccountIDFromStorage } from '../../../utils/utils'
 
 const Instruction = styled.span`
   font-family: OpenSans-Regular;
@@ -133,7 +134,8 @@ class Step3Content extends Component {
     return (
       <>
         <Banner
-          index={3}
+          // index={3}
+          index={2}
           name="Payment"
           description="Provide the details of the payment"
         />
@@ -201,10 +203,9 @@ Step3Content.propTypes = {
   //
   balance: PropTypes.number,
 }
-const mapStateToProps = (state, ownProps) => {
-  const { senderAccountID } = ownProps.value
+const mapStateToProps = (state) => {
   const { cards } = state.cards
-  const { balance } = cards.find((card) => card.accountID === senderAccountID)
+  const { balance } = cards.find((card) => card.accountID === getAccountIDFromStorage())
   return ({
     balance,
   })

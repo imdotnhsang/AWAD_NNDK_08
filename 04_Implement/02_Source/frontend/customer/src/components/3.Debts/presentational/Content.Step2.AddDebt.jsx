@@ -1,17 +1,12 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { connect } from 'react-redux'
 import Input from '../../common/presentational/Input'
 import TextArea from '../../common/presentational/TextArea'
 import api from '../../../api/api'
 import AddButton from '../../common/presentational/Button.Loading'
 import BackButton from '../../common/presentational/Button'
 import Banner from '../../common/presentational/Banner.Step'
-import {
-  invalidateDebtsDataCreatedByYou,
-  fecthDebtsDataCreatedByYouIfNeeded,
-} from '../../../actions/debts'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -35,12 +30,6 @@ const ButtonWrapper = styled.div`
     margin-left: 10px;
   }
 `
-const Error = styled.span`
-  font-family: OpenSans-Regular;
-  font-size: 12px;
-  color: ${(props) => props.theme.yellow};
-  margin-top: 30px;
-`
 
 class Step2AddDebtContent extends Component {
   constructor(props) {
@@ -48,7 +37,6 @@ class Step2AddDebtContent extends Component {
     this.state = {
       amount: 50000,
       error: '',
-      addError: '',
       loading: false,
     }
     this.handleAmount = this.handleAmount.bind(this)
@@ -101,13 +89,11 @@ class Step2AddDebtContent extends Component {
     const {
       value,
       onClose,
-      //
-      invalidateCreatedByYou,
-      refreshCreatedByYou,
+      onSuccess,
+      onFailure,
     } = this.props
     if (!error) {
       this.setState({
-        addError: '',
         loading: true,
       })
 
@@ -125,13 +111,13 @@ class Step2AddDebtContent extends Component {
       const res = await api.post('/debts/create', data, config)
       if (res.error) {
         this.setState({
-          addError: res.error,
           loading: false,
         })
+        onClose()
+        onFailure(res.error)
       } else {
         onClose()
-        invalidateCreatedByYou()
-        refreshCreatedByYou()
+        onSuccess('You have successfully created a new debt!', true)
       }
     }
   }
@@ -140,7 +126,6 @@ class Step2AddDebtContent extends Component {
     const {
       amount,
       error,
-      addError,
       loading,
     } = this.state
     const {
@@ -148,7 +133,6 @@ class Step2AddDebtContent extends Component {
       onBack,
     } = this.props
     const { message } = value
-
     return (
       <>
         <Banner
@@ -173,7 +157,6 @@ class Step2AddDebtContent extends Component {
             onChange={this.handleMessage}
           />
         </TextAreaWrapper>
-        {addError && <Error>{addError}</Error>}
         <ButtonWrapper>
           <BackButton
             fluid
@@ -201,9 +184,8 @@ Step2AddDebtContent.defaultProps = {
   onChange: (f) => f,
   onBack: (f) => f,
   onClose: (f) => f,
-  //
-  invalidateCreatedByYou: (f) => f,
-  refreshCreatedByYou: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
 }
 Step2AddDebtContent.propTypes = {
   value: PropTypes.shape({
@@ -214,15 +196,7 @@ Step2AddDebtContent.propTypes = {
   onChange: PropTypes.func,
   onBack: PropTypes.func,
   onClose: PropTypes.func,
-  //
-  invalidateCreatedByYou: PropTypes.func,
-  refreshCreatedByYou: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
 }
-const mapDispatchToProps = (dispatch) => ({
-  invalidateCreatedByYou: () => dispatch(invalidateDebtsDataCreatedByYou()),
-  refreshCreatedByYou: () => dispatch(fecthDebtsDataCreatedByYouIfNeeded()),
-})
-export default connect(
-  null,
-  mapDispatchToProps,
-)(Step2AddDebtContent)
+export default Step2AddDebtContent

@@ -10,6 +10,7 @@ import Table from '../../1.Receivers/presentational/Table.Min.Select'
 import SearchButton from '../../common/presentational/Button.Search'
 import Display from '../../1.Receivers/presentational/Display'
 import api from '../../../api/api'
+import { getBankIDFromStorage } from '../../../utils/utils'
 
 const FormWrapper = styled.div`
   width: 100%;
@@ -238,7 +239,7 @@ class Step2AddDebtContent extends Component {
     return (
       <>
         <Banner
-          index={2}
+          index={1}
           name="Borrower"
           description="Provide the information of the borrower"
         />
@@ -342,7 +343,9 @@ Step2AddDebtContent.propTypes = {
 }
 
 const mapStateToProps = (state) => ({
-  receiversData: state.receivers.receivers.filter((receiver) => receiver.bankName === 'EIGHT.Bank').map((receiver) => ({
+  receiversData: state.receivers.receivers.filter(
+    (receiver) => receiver.bankID === getBankIDFromStorage()
+  ).map((receiver) => ({
     accountName: receiver.nickname,
     accountID: receiver.accountID,
     bankID: receiver.bankID,

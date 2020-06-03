@@ -7,18 +7,17 @@ import MenuTab from '../common/presentational/Menu.Tab'
 import TableCreatedByYou from './presentational/Table.CreatedByYou'
 import TableReceivedFromOthers from './presentational/Table.ReceivedFromOthers'
 import {
-  fecthDebtsDataCreatedByYouIfNeeded,
-  fecthDebtsDataReceivedFromOthersIfNeeded,
-  invalidateDebtsDataReceivedFromOthers,
+  fecthDebtsDataIfNeeded,
+  invalidateDebtsData,
 } from '../../actions/debts'
-import {
-  fetchCardsDataIfNeeded,
-} from '../../actions/cards'
+// import {
+//   fetchCardsDataIfNeeded,
+// } from '../../actions/cards'
 import { DebtStatus } from '../../constants/constants'
 import RepayModal from './presentational/Modal.RepayDebt'
-import AddModal from './presentational/Modal.AddDebt'
+import AddModal from './container/Modal.AddDebt'
 import InfoModal from './presentational/Modal.InfoDebt'
-import RemoveModal from './container/Modal.RemoveDebt'
+import RemoveModal from './presentational/Modal.RemoveDebt'
 import SuccessModal from '../common/presentational/Modal.Success'
 import FailureModal from '../common/presentational/Modal.Failure'
 import ProcessingModal from '../common/presentational/Modal.Processing'
@@ -59,10 +58,11 @@ class ReceiversPage extends Component {
       showPayModal: false,
       showInfoModal: false,
       showRemoveModal: false,
-      createdByYouRemove: true,
+      createdByYouAction: true,
       showSuccess: false,
       showFailure: false,
       showProcessing: false,
+      successMessage: '',
       failureMessage: '',
     }
     this.handleTab = this.handleTab.bind(this)
@@ -80,17 +80,6 @@ class ReceiversPage extends Component {
     this.handleOpenFailureModal = this.handleOpenFailureModal.bind(this)
     this.handleCloseFailureModal = this.handleCloseFailureModal.bind(this)
     this.handleShowProcessing = this.handleShowProcessing.bind(this)
-  }
-
-  componentDidMount() {
-    const {
-      onFetchCreatedByYouData,
-      onFetchReceivedFromOthersData,
-      onFetchAccountsData,
-    } = this.props
-    onFetchCreatedByYouData()
-    onFetchReceivedFromOthersData()
-    onFetchAccountsData()
   }
 
   handleTab(value) {
@@ -181,27 +170,38 @@ class ReceiversPage extends Component {
     })
   }
 
-  handleOpenSuccessModal() {
+  handleOpenSuccessModal(message, createdByYouAction) {
     this.setState({
       showProcessing: false,
     })
     setTimeout(() => {
       this.setState({
         showSuccess: true,
+        successMessage: message,
+        createdByYouAction,
       })
     }, 1000)
   }
 
   handleCloseSuccessModal() {
     const {
-      invalidateReceivedFromOthersData,
-      onFetchReceivedFromOthersData,
+      onInvalidateData,
+      onFetchData,
     } = this.props
+    const {
+      createdByYouAction,
+    } = this.state
     this.setState({
       showSuccess: false,
+      successMessage: '',
     })
-    invalidateReceivedFromOthersData()
-    onFetchReceivedFromOthersData()
+    if (createdByYouAction) {
+      onInvalidateData('createdByYou')
+      onFetchData('createdByYou')
+    } else {
+      onInvalidateData('receivedFromOthers')
+      onFetchData('receivedFromOthers')
+    }
   }
 
   handleOpenFailureModal(message) {
@@ -219,6 +219,7 @@ class ReceiversPage extends Component {
   handleCloseFailureModal() {
     this.setState({
       showFailure: false,
+      failureMessage: '',
     })
   }
 
@@ -240,18 +241,10 @@ class ReceiversPage extends Component {
       showSuccess,
       showFailure,
       showProcessing,
+      successMessage,
       failureMessage,
     } = this.state
 
-    const {
-      createdByYouData,
-      createdByYouLoading,
-      //
-      receivedFromOthersData,
-      receivedFromOthersLoading,
-      //
-      accountsDataLoading,
-    } = this.props
 
     const menuTabData = [
       { name: 'Created by you', value: 0 },
@@ -275,64 +268,45 @@ class ReceiversPage extends Component {
             {
               [
                 <TableCreatedByYou
-                  data={createdByYouData}
-                  loading={createdByYouLoading}
                   onInfo={this.handleOpenInfoModal}
                   onRemove={this.handleOpenRemoveModal}
                 />,
                 <TableReceivedFromOthers
-                  data={receivedFromOthersData}
-                  loading={receivedFromOthersLoading || accountsDataLoading}
                   onPay={this.handleOpenPayModal}
                   onInfo={this.handleOpenInfoModal}
                   onRemove={this.handleOpenRemoveModal}
                 />,
               ][tab] || null
             }
-
-            {/* <Table
-              data={data}
-              loading={loading}
-              onInfo={this.handleOpenInfoModal}
-              onRemove={this.handleOpenRemoveModal}
-            /> */}
-            {/* <AddModel
-              show={showAddModal}
-              onClose={this.handleCloseAddModal}
-            />
-            <InfoModel
-              id={selectedItem.id}
-              bankID={selectedItem.bankID}
-              accountID={selectedItem.accountID}
-              nickname={selectedItem.nickname}
-              show={showInfoModal}
-              onClose={this.handleCloseInfoModal}
-            />
-            <RemoveModel
-              id={selectedItem.id}
-              show={showRemoveModal}
-              onClose={this.handleCloseRemoveModal}
-            /> */}
           </Wrapper>
-          <AddModal
-            show={showAddModal}
-            onClose={this.handleCloseAddModal}
-          />
-          <InfoModal
-            show={showInfoModal}
-            data={selectedItem}
-            onClose={this.handleCloseInfoModal}
-          />
-          <RemoveModal
-            show={showRemoveModal}
-            data={selectedItem}
-            onClose={this.handleCloseRemoveModal}
-            createdByYouRemove={createdByYouRemove}
-          />
+          {showAddModal
+            && (
+              <AddModal
+                onClose={this.handleCloseAddModal}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
+          {showInfoModal
+            && (
+              <InfoModal
+                data={selectedItem}
+                onClose={this.handleCloseInfoModal}
+              />
+            )}
+          {showRemoveModal
+            && (
+              <RemoveModal
+                data={selectedItem}
+                onClose={this.handleCloseRemoveModal}
+                createdByYouRemove={createdByYouRemove}
+                onSuccess={this.handleOpenSuccessModal}
+                onFailure={this.handleOpenFailureModal}
+              />
+            )}
           {showPayModal
             && (
             <RepayModal
-              show={showPayModal}
               data={selectedItem}
               onClose={this.handleClosePayModal}
               onSuccess={this.handleOpenSuccessModal}
@@ -340,27 +314,32 @@ class ReceiversPage extends Component {
               onProcessing={this.handleShowProcessing}
             />
             )}
-          <SuccessModal
-            show={showSuccess}
-            onClose={this.handleCloseSuccessModal}
-          >
-            <Description>Your transaction has been successfully done!</Description>
-          </SuccessModal>
-          <FailureModal
-            show={showFailure}
-            onClose={this.handleCloseFailureModal}
-          >
-            <Description>
-              Something wrong has happened that your transaction was canceled
-              <br />
-              Error message:
-              {' '}
-              {failureMessage}
-            </Description>
-          </FailureModal>
-          <ProcessingModal
-            show={showProcessing}
-          />
+          {showSuccess
+            && (
+            <SuccessModal
+              onClose={this.handleCloseSuccessModal}
+            >
+              <Description>{successMessage}</Description>
+            </SuccessModal>
+            )}
+          {showFailure
+            && (
+              <FailureModal
+                onClose={this.handleCloseFailureModal}
+              >
+                <Description>
+                  Something wrong has happened that your transaction was canceled
+                  <br />
+                  Error message:
+                  {' '}
+                  {failureMessage}
+                </Description>
+              </FailureModal>
+            )}
+          {showProcessing
+            && (
+              <ProcessingModal />
+            )}
         </>
       </Template>
     )
@@ -368,78 +347,19 @@ class ReceiversPage extends Component {
 }
 
 ReceiversPage.defaultProps = {
-  createdByYouData: [],
-  createdByYouLoading: false,
-  //
-  receivedFromOthersData: [],
-  receivedFromOthersLoading: false,
-  //
-  accountsDataLoading: false,
-  onFetchCreatedByYouData: (f) => f,
-  onFetchReceivedFromOthersData: (f) => f,
-  onFetchAccountsData: (f) => f,
-  invalidateReceivedFromOthersData: (f) => f,
+  onInvalidateData: (f) => f,
+  onFetchData: (f) => f,
 }
 ReceiversPage.propTypes = {
-  createdByYouData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      lenderName: PropTypes.string,
-      lenderID: PropTypes.string,
-      borrowerName: PropTypes.string,
-      borrowerID: PropTypes.string,
-      status: PropTypes.oneOf([
-        DebtStatus.UNPAID,
-        DebtStatus.PAID,
-        DebtStatus.CANCELLED,
-      ]),
-      amount: PropTypes.number,
-      message: PropTypes.string,
-      reasonOfCancel: PropTypes.string,
-    }),
-  ),
-  createdByYouLoading: PropTypes.bool,
-  //
-  receivedFromOthersData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string,
-      lenderName: PropTypes.string,
-      lenderID: PropTypes.string,
-      borrowerName: PropTypes.string,
-      borrowerID: PropTypes.string,
-      status: PropTypes.oneOf([
-        DebtStatus.UNPAID,
-        DebtStatus.PAID,
-        DebtStatus.CANCELLED,
-      ]),
-      amount: PropTypes.number,
-      message: PropTypes.string,
-      reasonOfCancel: PropTypes.string,
-    }),
-  ),
-  receivedFromOthersLoading: PropTypes.bool,
-  accountsDataLoading: PropTypes.bool,
-  onFetchCreatedByYouData: PropTypes.func,
-  onFetchReceivedFromOthersData: PropTypes.func,
-  onFetchAccountsData: PropTypes.func,
-  invalidateReceivedFromOthersData: PropTypes.func,
+  onInvalidateData: PropTypes.func,
+  onFetchData: PropTypes.func,
 }
-const mapStateToProps = (state) => ({
-  createdByYouData: state.debts.createdByYou.data,
-  createdByYouLoading: state.debts.createdByYou.loading,
-  //
-  receivedFromOthersData: state.debts.receivedFromOthers.data,
-  receivedFromOthersLoading: state.debts.receivedFromOthers.loading,
-  //
-  accountsDataLoading: state.cards.loading,
-})
+
 const mapDispatchToProps = (dispatch) => ({
-  onFetchCreatedByYouData: () => dispatch(fecthDebtsDataCreatedByYouIfNeeded()),
-  invalidateReceivedFromOthersData: () => dispatch(invalidateDebtsDataReceivedFromOthers()),
-  onFetchReceivedFromOthersData: () => dispatch(fecthDebtsDataReceivedFromOthersIfNeeded()),
-  onFetchAccountsData: () => dispatch(fetchCardsDataIfNeeded()),
+  onInvalidateData: (category) => dispatch(invalidateDebtsData(category)),
+  onFetchData: (category) => dispatch(fecthDebtsDataIfNeeded(category)),
 })
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps,
 )(ReceiversPage)

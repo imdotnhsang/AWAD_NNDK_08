@@ -6,7 +6,6 @@ import Template from '../../common/presentational/Template.Modal'
 import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
-import { fetchReceiversDataIfNeeded, invalidateReceiversData } from '../../../actions/receivers'
 import api from '../../../api/api'
 
 const InputWrapper = styled.div`
@@ -48,8 +47,8 @@ class EditReceiverModal extends Component {
     } = this.state
     const {
       onClose,
-      onInvalidateReceiversData,
-      onRefreshReceiversData,
+      onSuccess,
+      onFailure,
     } = this.props
 
     if (!nickname) {
@@ -75,17 +74,16 @@ class EditReceiverModal extends Component {
     if (res.error) {
       const { error } = res
       this.setState({
-        error,
-        loading: false,
-      })
-    } else {
-      this.setState({
-        error: '',
         loading: false,
       })
       onClose()
-      onInvalidateReceiversData()
-      onRefreshReceiversData()
+      onFailure(error)
+    } else {
+      this.setState({
+        loading: false,
+      })
+      onClose()
+      onSuccess('You have successfully updated your receiver\'s information!')
     }
   }
 
@@ -98,14 +96,15 @@ class EditReceiverModal extends Component {
       bankID,
       accountID,
       nickname,
-      show,
       onClose,
+      //
+      bankLoading,
     } = this.props
     return (
       <Template
-        show={show}
         name="Edit receiver"
         onClose={onClose}
+        loading={bankLoading}
       >
         <Text>Enter the new infomation for this contact</Text>
         <InputWrapper>
@@ -148,28 +147,26 @@ EditReceiverModal.defaultProps = {
   bankID: '',
   accountID: '',
   nickname: '',
-  show: true,
   onClose: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
   //
-  onInvalidateReceiversData: (f) => f,
-  onRefreshReceiversData: (f) => f,
+  bankLoading: false,
 }
 EditReceiverModal.propTypes = {
   id: PropTypes.string,
   bankID: PropTypes.string,
   accountID: PropTypes.string,
   nickname: PropTypes.string,
-  show: PropTypes.bool,
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
   //
-  onInvalidateReceiversData: PropTypes.func,
-  onRefreshReceiversData: PropTypes.func,
+  bankLoading: PropTypes.bool,
 }
-const mapDispatchToProps = (dispatch) => ({
-  onInvalidateReceiversData: () => dispatch(invalidateReceiversData()),
-  onRefreshReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
+const mapStateToProps = (state) => ({
+  bankLoading: state.banks.loading,
 })
 export default connect(
-  null,
-  mapDispatchToProps,
+  mapStateToProps,
 )(EditReceiverModal)

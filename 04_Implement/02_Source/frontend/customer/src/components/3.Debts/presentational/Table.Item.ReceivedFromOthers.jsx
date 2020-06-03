@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
-import Status from './Status'
+import Status from './Status.Debt'
 import { spaceSeparating, resolveTagFromProps } from '../../../utils/utils'
 import { DebtStatus } from '../../../constants/constants'
 

@@ -16,6 +16,10 @@ export const receiveCardsData = (data) => ({
   data,
 })
 
+export const invalidateCardsData = () => ({
+  type: Cards.INVALIDATE_CARDS_DATA,
+})
+
 export const failedRequestCardsData = () => ({
   type: Cards.FAILED_REQUEST_CARDS_DATA,
 })
@@ -34,8 +38,9 @@ const fetchCardsData = () => async (dispatch) => {
 }
 
 const shouldFetchCardsData = (state) => {
-  const data = state.cards
+  const { cards: data, didInvalidate } = state
   if (!data.length) return true
+  if (didInvalidate) return true
   return false
 }
 

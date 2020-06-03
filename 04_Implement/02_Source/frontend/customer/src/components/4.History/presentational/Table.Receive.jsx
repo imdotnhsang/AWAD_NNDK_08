@@ -1,16 +1,16 @@
 import React, { Component, createRef } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import ScrollArea from 'react-scrollbar'
 import { connect } from 'react-redux'
-import Header from './Table.Header'
-import Item from './Table.Item.CreatedByYou'
+import ScrollArea from 'react-scrollbar'
+import Header from './Table.Header.Receive'
+import Item from './Table.Item.Receive'
 import Loading from '../../common/presentational/Loading.Table'
 import { DebtStatus } from '../../../constants/constants'
 import {
-  // invalidateDebtsData,
-  fecthDebtsDataIfNeeded,
-} from '../../../actions/debts'
+  invalidateHistoryData,
+  fecthHistoryDataIfNeeded,
+} from '../../../actions/history'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -24,57 +24,57 @@ const Content = styled.div`
   height: 590px;
   position: relative;
 `
-
 class Table extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      filter: '',
+      desc: null,
     }
     this.ref = createRef()
-    this.hanldeFilter = this.hanldeFilter.bind(this)
+    this.handleDesc = this.handleDesc.bind(this)
   }
 
   componentDidMount() {
     const {
       loading,
+      // onInvalidateData,
       onFetchData,
     } = this.props
-    if (!loading) this.ref.current.scrollArea.scrollTop()
-    onFetchData('createdByYou')
+    if (!loading) {
+      this.ref.current.scrollArea.scrollTop()
+    }
+    // onInvalidateData()
+    onFetchData('receive')
   }
 
   componentDidUpdate() {
     const { loading } = this.props
-    if (!loading) this.ref.current.scrollArea.scrollTop()
+    if (!loading) {
+      this.ref.current.scrollArea.scrollTop()
+    }
   }
 
-  hanldeFilter(value) {
-    this.setState({
-      filter: value,
-    })
+  handleDesc() {
+    this.setState((prevState) => ({
+      desc: prevState.desc === null ? false : !prevState.desc,
+    }))
   }
 
   render() {
+    const { desc } = this.state
     const {
       data,
       loading,
-      onInfo,
-      onRemove,
     } = this.props
-    const {
-      filter,
-    } = this.state
-
-    let filteredData = data
-    if (filter) {
-      filteredData = filteredData.filter((o) => o.status === filter)
+    let sortedData = data
+    if (desc !== null) {
+      sortedData = sortedData.sort((a, b) => (desc ? a.date - b.date : b.date - a.date))
     }
-
     return (
       <Wrapper>
         <Header
-          onFilter={this.hanldeFilter}
+          desc={desc}
+          onChange={this.handleDesc}
         />
         <Content>
           {
@@ -92,17 +92,16 @@ class Table extends Component {
                   ref={this.ref}
                 >
                   {
-                    filteredData.map((item, index) => (
+                    sortedData.map((item, index) => (
                       <Item
-                        key={item.id}
+                        key={item.senderID}
                         index={index + 1}
-                        accountID={item.borrowerID}
-                        accountName={item.borrowerName}
-                        status={item.status}
+                        accountID={item.senderID}
+                        accountName={item.senderName}
                         amount={item.amount}
+                        bankName={item.bankName}
+                        date={item.date}
                         lastItem={index === data.length - 1}
-                        onInfo={() => onInfo(item)}
-                        onRemove={() => onRemove(item, true)}
                       />
                     ))
                   }
@@ -118,10 +117,7 @@ class Table extends Component {
 Table.defaultProps = {
   data: [],
   loading: false,
-  onInfo: (f) => f,
-  onRemove: (f) => f,
-  //
-  // onInvalidateData: (f) => f,
+  // onInvalidateDate: (f) => f,
   onFetchData: (f) => f,
 }
 Table.propTypes = {
@@ -137,19 +133,16 @@ Table.propTypes = {
     amount: PropTypes.number,
   })),
   loading: PropTypes.bool,
-  onInfo: PropTypes.func,
-  onRemove: PropTypes.func,
-  //
-  // onInvalidateData: PropTypes.func,
+  // onInvalidateDate: PropTypes.func,
   onFetchData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
-  loading: state.debts.createdByYou.loading,
-  data: state.debts.createdByYou.data,
+  loading: state.history.receive.loading,
+  data: state.history.receive.data,
 })
 const mapDispatchToProps = (dispatch) => ({
-  // onInvalidateData: (category) => dispatch(invalidateDebtsData(category)),
-  onFetchData: (category) => dispatch(fecthDebtsDataIfNeeded(category)),
+  onInvalidateDate: (category) => dispatch(invalidateHistoryData(category)),
+  onFetchData: (category) => dispatch(fecthHistoryDataIfNeeded(category)),
 })
 export default connect(
   mapStateToProps,

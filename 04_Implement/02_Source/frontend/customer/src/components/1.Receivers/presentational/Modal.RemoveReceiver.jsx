@@ -1,11 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { connect } from 'react-redux'
 import DeleteButton from '../../common/presentational/Button.Loading'
 import CancelButton from '../../common/presentational/Button'
 import Template from '../../common/presentational/Template.Modal'
-import { fetchReceiversDataIfNeeded, invalidateReceiversData } from '../../../actions/receivers'
 import api from '../../../api/api'
 
 const Text = styled.span`
@@ -14,11 +12,6 @@ const Text = styled.span`
   color: #fff;
   line-height: 16px;
 `
-const Error = styled(Text)`
-  color: ${(props) => props.theme.yellow};
-  margin: 14px 0;
-`
-
 const ButtonWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -29,26 +22,21 @@ const ButtonWrapper = styled.div`
 `
 const DeleteWrapper = styled.div`
   width: 100%;
-  margin-right: 10px;
+  margin-left: 10px;
 `
 const CancelWrapper = styled.div`
   width: 100%;
-  margin-left: 10px;
+  margin-right: 10px;
 `
-
 const RemoveReceiverModal = ({
   id,
-  show,
   onClose,
-  //
-  onInvalidateReceiversData,
-  onRefreshReceiversData,
+  onSuccess,
+  onFailure,
 }) => {
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleDelete = async () => {
-    setError('')
     setLoading(true)
     const data = {
       id,
@@ -60,30 +48,26 @@ const RemoveReceiverModal = ({
     }
     const res = await api.delete('/receivers/remove', data, config)
     if (res.error) {
-      setError(res.error)
       setLoading(false)
+      onClose()
+      onFailure(res.error)
     } else {
       setLoading(false)
       onClose()
-      onInvalidateReceiversData()
-      onRefreshReceiversData()
+      onSuccess('You have successfully removed a receiver')
     }
   }
   return (
     <Template
-      show={show}
-      name="Alert"
+      name="Remove receiver"
       onClose={onClose}
     >
       <Text>
-        You are about to remove a contact!
+        You are about to remove a receiver
         <br />
         {' '}
-        This action cannot be restored!
+        This action cannot be restored
       </Text>
-      {
-        error && <Error>{error}</Error>
-      }
       <ButtonWrapper>
         <CancelWrapper>
           <CancelButton
@@ -107,23 +91,14 @@ const RemoveReceiverModal = ({
 }
 RemoveReceiverModal.defaultProps = {
   id: '',
-  show: true,
   onClose: (f) => f,
-  onInvalidateReceiversData: (f) => f,
-  onRefreshReceiversData: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
 }
 RemoveReceiverModal.propTypes = {
   id: PropTypes.string,
-  show: PropTypes.bool,
   onClose: PropTypes.func,
-  onInvalidateReceiversData: PropTypes.func,
-  onRefreshReceiversData: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
 }
-const mapDispatchToProps = (dispatch) => ({
-  onInvalidateReceiversData: () => dispatch(invalidateReceiversData()),
-  onRefreshReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
-})
-export default connect(
-  null,
-  mapDispatchToProps,
-)(RemoveReceiverModal)
+export default RemoveReceiverModal

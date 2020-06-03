@@ -6,7 +6,6 @@ import Template from '../../common/presentational/Template.Modal'
 import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
-import { fetchReceiversDataIfNeeded, invalidateReceiversData } from '../../../actions/receivers'
 import api from '../../../api/api'
 
 const InputWrapper = styled.div`
@@ -121,8 +120,8 @@ class AddReceiverModal extends Component {
     } = this.state
     const {
       onClose,
-      onInvalidateReceiversData,
-      onRefreshReceiversData,
+      onSuccess,
+      onFailure,
     } = this.props
     if (!bankID || !accountID || !nickname) {
       this.setState({
@@ -154,17 +153,17 @@ class AddReceiverModal extends Component {
     if (res.error) {
       const { error } = res
       this.setState({
-        error,
         loading: false,
       })
+      onClose()
+      onFailure(error)
     } else {
       this.setState({
         error: '',
         loading: false,
       })
       onClose()
-      onInvalidateReceiversData()
-      onRefreshReceiversData()
+      onSuccess('You have successfully added a new receiver!')
     }
   }
 
@@ -180,16 +179,15 @@ class AddReceiverModal extends Component {
       accountIDError,
     } = this.state
     const {
-      show,
       onClose,
       //
       bankLoading,
     } = this.props
     return (
       <Template
-        show={show}
         name="Add receiver"
         onClose={onClose}
+        loading={bankLoading}
       >
         <Text>Enter the infomation for your new contact</Text>
         <InputWrapper>
@@ -206,7 +204,7 @@ class AddReceiverModal extends Component {
             placeholder="Enter the receiver's card number"
             value={accountID}
             onChange={this.handleAccountID}
-            disabled={loading || bankLoading || bankID === ''}
+            disabled={loading || bankID === ''}
             error={error || accountIDError}
             loading={accountIDLoading}
             onBlur={this.handleValidateAccountID}
@@ -218,7 +216,7 @@ class AddReceiverModal extends Component {
           value={nickname}
           error={error}
           onChange={this.handleNickname}
-          disabled={loading || bankLoading || !accountIDValid}
+          disabled={loading || !accountIDValid}
         />
         <ButtonWrapper>
           <Button
@@ -234,29 +232,22 @@ class AddReceiverModal extends Component {
 }
 
 AddReceiverModal.defaultProps = {
-  show: true,
   onClose: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
   //
   bankLoading: false,
-  onInvalidateReceiversData: (f) => f,
-  onRefreshReceiversData: (f) => f,
 }
 AddReceiverModal.propTypes = {
-  show: PropTypes.bool,
   onClose: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onFailure: PropTypes.func,
   //
   bankLoading: PropTypes.bool,
-  onInvalidateReceiversData: PropTypes.func,
-  onRefreshReceiversData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   bankLoading: state.banks.loading,
 })
-const mapDispatchToProps = (dispatch) => ({
-  onInvalidateReceiversData: () => dispatch(invalidateReceiversData()),
-  onRefreshReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
-})
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
 )(AddReceiverModal)

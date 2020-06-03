@@ -1,5 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 import React from 'react'
+import { DebtType } from '../constants/constants'
 
 export function isValidEmail(email) {
   // eslint-disable-next-line no-control-regex
@@ -32,6 +33,25 @@ export function getEmailFromStorage() {
   const data = sessionStorage.getItem('email')
   return data
 }
+
+export function setBankIDToStorage(id) {
+  sessionStorage.setItem('bankID', id)
+}
+
+export function getBankIDFromStorage() {
+  const data = sessionStorage.getItem('bankID')
+  return data
+}
+
+export function setAccountIDToStorage(id) {
+  sessionStorage.setItem('accountID', id)
+}
+
+export function getAccountIDFromStorage() {
+  const data = sessionStorage.getItem('accountID')
+  return data
+}
+
 
 export function clearStorage() {
   sessionStorage.clear()
@@ -78,3 +98,13 @@ export const resolveTagFromProps = (styleModifiers, tag) => (({ children, ...pro
   styleModifiers.map((propName) => !!props.hasOwnProperty(propName) && delete props[propName])
   return React.createElement(tag, props, children)
 })
+
+export function getUrlFromCategory(category) {
+  return category.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)
+}
+
+export function getDebtType(lenderID) {
+  const yourID = getAccountIDFromStorage()
+  if (lenderID === yourID) return DebtType.LOAN
+  return DebtType.DEBT
+}

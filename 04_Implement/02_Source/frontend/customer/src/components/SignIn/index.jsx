@@ -21,14 +21,17 @@ const SignInPage = ({ location }) => {
     <Template>
       <>
         <SignInForm referer={referer} />
-        <Modal show={showModal} onClose={() => setShowModal(false)}>
-          <Description>
-            You have successfully resetted your password
-            <br />
-            {' '}
-            You can now use your new information to login!
-          </Description>
-        </Modal>
+        {showModal
+          && (
+          <Modal onClose={() => setShowModal(false)}>
+            <Description>
+              You have successfully resetted your password
+              <br />
+              {' '}
+              You can now use your new information to login!
+            </Description>
+          </Modal>
+          )}
       </>
     </Template>
   )

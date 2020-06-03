@@ -1,8 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import PropTypes from 'prop-types'
 import { Row, Col } from 'react-bootstrap'
-import Filter from './Filter.Status.Debt'
+import ButtonSort from '../../common/presentational/Button.Sort'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -11,32 +11,38 @@ const Wrapper = styled.div`
   background-color: ${(props) => props.theme.blackDark};
 `
 const Text = styled.span`
-  font-family: OpenSans-SemiBold;
+  font-family: OpenSans-Regular;
   font-size: 15px;
   color: #fff;
+  font-weight: 600;
 `
 const TableHeader = ({
-  onFilter,
+  desc,
+  onChange,
 }) => (
   <Wrapper>
     <Row>
       <Col md={1} />
-      <Col md={3}><Text>Debt account:</Text></Col>
+      <Col md={3}><Text>Sender account</Text></Col>
       <Col md={3}><Text>Amount</Text></Col>
+      <Col md={2}><Text>Bank</Text></Col>
       <Col md={3}>
-        <Filter
-          onChange={onFilter}
+        <ButtonSort
+          name="Date"
+          desc={desc}
+          onClick={onChange}
         />
       </Col>
-      <Col md={2}><Text>Actions</Text></Col>
     </Row>
   </Wrapper>
 )
 TableHeader.defaultProps = {
-  onFilter: (f) => f,
+  desc: false,
+  onChange: (f) => f,
 }
 TableHeader.propTypes = {
-  onFilter: PropTypes.func,
+  desc: PropTypes.bool,
+  onChange: PropTypes.func,
 }
 
 export default TableHeader

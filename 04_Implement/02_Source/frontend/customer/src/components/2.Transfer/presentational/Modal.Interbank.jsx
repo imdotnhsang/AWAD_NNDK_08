@@ -13,7 +13,7 @@ class InternalModal extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      senderAccountID: '',
+      // senderAccountID: '',
       receiver: {
         accountName: '',
         accountID: '',
@@ -58,14 +58,14 @@ class InternalModal extends Component {
     } = this.props
     onClose()
     const {
-      senderAccountID,
+      // senderAccountID,
       receiver,
       amount,
       detail,
       chargedBySender,
     } = this.state
     const data = {
-      senderAccountID,
+      // senderAccountID,
       receiverAccountID: receiver.accountID,
       receiverBankID: receiver.bankID,
       amount,
@@ -90,14 +90,14 @@ class InternalModal extends Component {
   render() {
     const {
       step,
-      senderAccountID,
+      // senderAccountID,
       receiver,
       amount,
       detail,
       chargedBySender,
     } = this.state
     const {
-      show,
+      loading,
       onClose,
       onNewReceiver,
     } = this.props
@@ -106,18 +106,18 @@ class InternalModal extends Component {
       <Template
         width={604}
         name="Interbank transfer"
-        show={show}
+        loading={loading}
         onClose={onClose}
       >
         {
           [
             null,
-            <Step1
-              value={senderAccountID}
-              onChange={this.handleOnChange}
-              onClose={onClose}
-              onNext={this.handleNext}
-            />,
+            // <Step1
+            //   value={senderAccountID}
+            //   onChange={this.handleOnChange}
+            //   onClose={onClose}
+            //   onNext={this.handleNext}
+            // />,
             <Step2
               value={receiver}
               onChange={this.handleOnChange}
@@ -130,7 +130,7 @@ class InternalModal extends Component {
                 amount,
                 detail,
                 chargedBySender,
-                senderAccountID,
+                // senderAccountID,
               }}
               onChange={this.handleOnChange}
               onBack={this.handleBack}
@@ -138,7 +138,7 @@ class InternalModal extends Component {
             />,
             <Step4
               value={{
-                senderAccountID,
+                // senderAccountID,
                 receiver,
                 amount,
                 chargedBySender,
@@ -156,7 +156,7 @@ class InternalModal extends Component {
   }
 }
 InternalModal.defaultProps = {
-  show: true,
+  loading: false,
   onClose: (f) => f,
   onSuccess: (f) => f,
   onFailure: (f) => f,
@@ -164,7 +164,7 @@ InternalModal.defaultProps = {
   onNewReceiver: (f) => f,
 }
 InternalModal.propTypes = {
-  show: PropTypes.bool,
+  loading: PropTypes.bool,
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,

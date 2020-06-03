@@ -30,13 +30,6 @@ const ButtonWrapper = styled.div`
     margin-left: 10px;
   }
 `
-const Error = styled.span`
-  font-family: OpenSans-Regular;
-  font-size: 12px;
-  color: #fff;
-  margin-top: 30px;
-  color: ${(props) => props.theme.yellow};
-`
 
 class SaveReceiverModal extends Component {
   constructor(props) {
@@ -44,7 +37,6 @@ class SaveReceiverModal extends Component {
     this.state = {
       nickname: '',
       loading: false,
-      error: '',
       step: 0,
     }
     this.handleNext = this.handleNext.bind(this)
@@ -69,6 +61,9 @@ class SaveReceiverModal extends Component {
     } = this.state
     const {
       onClose,
+      onSuccess,
+      onFailure,
+      //
       invalidateData,
     } = this.props
     // eslint-disable-next-line react/destructuring-assignment
@@ -84,22 +79,22 @@ class SaveReceiverModal extends Component {
     }
     this.setState({
       loading: true,
-      error: '',
     })
     const res = await api.post('/receivers/create', data, config)
     if (res.error) {
       const { error } = res
       this.setState({
-        error,
         loading: false,
       })
+      onClose()
+      onFailure(error)
     } else {
       this.setState({
-        error: '',
         loading: false,
       })
       onClose()
       invalidateData()
+      onSuccess('You have successfully added a new receiver')
     }
   }
 
@@ -107,7 +102,6 @@ class SaveReceiverModal extends Component {
     const {
       nickname,
       loading,
-      error,
       step,
     } = this.state
     const {
@@ -160,7 +154,6 @@ class SaveReceiverModal extends Component {
               value={nickname}
               onChange={this.handleNickname}
             />
-            {error && <Error>{error}</Error>}
             <ButtonWrapper>
               <Button
                 secondary
@@ -191,6 +184,8 @@ SaveReceiverModal.defaultProps = {
     bankName: '',
   },
   onClose: (f) => f,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
   //
   invalidateData: (f) => f,
 }
@@ -203,6 +198,8 @@ SaveReceiverModal.propTypes = {
     bankName: PropTypes.string,
   }),
   onClose: PropTypes.func,
+  onSuccess: (f) => f,
+  onFailure: (f) => f,
   //
   invalidateData: PropTypes.func,
 }

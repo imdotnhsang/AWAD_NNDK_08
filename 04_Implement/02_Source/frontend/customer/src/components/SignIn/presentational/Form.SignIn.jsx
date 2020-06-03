@@ -11,6 +11,8 @@ import {
   isAuthenticated,
   setNameToStorage,
   setEmailToStorage,
+  setBankIDToStorage,
+  setAccountIDToStorage,
 } from '../../../utils/utils'
 import api from '../../../api/api'
 
@@ -148,10 +150,12 @@ class SignInModal extends Component {
         })
       }
     } else {
-      const { token, name } = res
+      const { token, name, bankID, accountID } = res
       setJwtToStorage(token)
       setNameToStorage(name)
       setEmailToStorage(email)
+      setBankIDToStorage(bankID)
+      setAccountIDToStorage(accountID)
       this.setState({
         loading: false,
       })
