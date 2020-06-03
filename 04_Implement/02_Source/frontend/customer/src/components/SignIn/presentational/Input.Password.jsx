@@ -32,7 +32,7 @@ const Col = styled.div`
 `
 
 // eslint-disable-next-line react/jsx-props-no-spreading
-const StyledCol = styled(({ icon, ...rest}) => <Col {...rest} />)`
+const StyledCol = styled(({ icon, ...rest }) => <Col {...rest} />)`
   margin: ${(props) => (!props.icon && '12px 0')};
   padding-left: ${(props) => (!props.icon && '16px')};
 `

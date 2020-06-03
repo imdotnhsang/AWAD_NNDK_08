@@ -273,8 +273,10 @@ class Step2AddDebtContent extends Component {
                     value={tab2Input || newReceiver.accountID}
                     error={error}
                     onChange={this.handleTab2Input}
+                    disabled={loading}
                   />
                   <SearchButton
+                    disabled={loading}
                     onClick={this.handleSearch}
                   />
                 </SearchWrapper>
@@ -293,7 +295,6 @@ class Step2AddDebtContent extends Component {
             secondary
             name="Cancel"
             onClick={onClose}
-            disabled={loading}
           />
           <Button
             fluid

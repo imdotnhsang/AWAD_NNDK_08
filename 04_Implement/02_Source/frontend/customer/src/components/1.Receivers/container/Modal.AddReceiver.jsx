@@ -66,6 +66,10 @@ class AddReceiverModal extends Component {
   }
 
   async handleValidateAccountID() {
+    this.setState({
+      accountIDValid: false,
+      nickname: '',
+    })
     const { bankID, accountID } = this.state
     if (accountID.length !== 16) {
       this.setState({

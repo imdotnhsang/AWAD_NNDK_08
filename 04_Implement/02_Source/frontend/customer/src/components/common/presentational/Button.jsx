@@ -15,8 +15,8 @@ const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
   justify-content: center;
   align-items: center;
   &:hover {
-    box-shadow: 4px 4px 0px #111111;
-    transform: translate(-4px, -4px);
+    box-shadow: ${(props) => (!props.disabled && '4px 4px 0px #111111')};
+    transform: ${(props) => (!props.disabled && 'translate(-4px, -4px)')};
   }
   transition: transform 0.2s linear;
   cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};

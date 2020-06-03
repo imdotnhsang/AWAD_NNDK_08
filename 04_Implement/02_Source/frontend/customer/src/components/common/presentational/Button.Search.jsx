@@ -15,20 +15,22 @@ const Wrapper = styled(resolveTagFromProps(styleModifiers, 'button'))`
   justify-content: center;
   align-items: center;
   &:hover {
-    box-shadow: 4px 4px 0px #111111;
-    transform: translate(-4px, -4px);
+    box-shadow: ${(props) => (!props.disabled && '4px 4px 0px #111111')};
+    transform: ${(props) => (!props.disabled && 'translate(-4px, -4px)')};
   }
   transition: transform 0.2s linear;
   cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `
 
 const GeneralButton = ({
+  disabled,
   secondary,
   fluid,
   onClick,
 }) => (
   <Wrapper
     type="button"
+    disabled={disabled}
     secondary={secondary}
     fluid={fluid}
     onClick={onClick}
@@ -42,11 +44,13 @@ const GeneralButton = ({
 GeneralButton.defaultProps = {
   secondary: false,
   fluid: false,
+  disabled: false,
   onClick: (f) => f,
 }
 GeneralButton.propTypes = {
   secondary: PropTypes.bool,
   fluid: PropTypes.bool,
+  disabled: PropTypes.bool,
   onClick: PropTypes.func,
 }
 

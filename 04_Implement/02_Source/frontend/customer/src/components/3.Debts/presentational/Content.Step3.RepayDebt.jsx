@@ -39,10 +39,12 @@ class Step3RepayContent extends Component {
   }
 
   async handleFinish() {
+    const { onDisabled } = this.props
     this.setState({
       error: '',
       loading: true,
     })
+    onDisabled(true)
     const {
       otp,
     } = this.state
@@ -86,6 +88,7 @@ class Step3RepayContent extends Component {
         })
       }
     }
+    onDisabled(false)
   }
 
   render() {
@@ -128,9 +131,11 @@ class Step3RepayContent extends Component {
   }
 }
 Step3RepayContent.defaultProps = {
+  onDisabled: (f) => f,
   onRepay: (f) => f,
 }
 Step3RepayContent.propTypes = {
   onRepay: PropTypes.func,
+  onDisabled: PropTypes.func,
 }
 export default Step3RepayContent

@@ -136,46 +136,46 @@ class Step2Content extends Component {
   }
 
   async handleSearch() {
-    const { tab2Input, loading } = this.state
-    if (!loading) {
-      const { banksData } = this.props
-      // eslint-disable-next-line no-restricted-globals
-      if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
-        this.setState({
-          error: 'Invalid value',
-        })
-        return
-      }
+    const { tab2Input } = this.state
+    const {
+      banksData,
+    } = this.props
+    // eslint-disable-next-line no-restricted-globals
+    if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
       this.setState({
-        loading: true,
-        error: '',
+        error: 'Invalid value',
       })
-      const bankID = banksData.find((bank) => bank.name === 'EIGHT.Bank').id
-      const data = {
-        accountID: tab2Input,
-        bankID,
-      }
-      const res = await api.get('/banks/account', data)
-      if (res.error) {
-        const { error } = res
+      return
+    }
+    this.setState({
+      loading: true,
+      error: '',
+    })
+    const bankID = banksData.find((bank) => bank.name === 'EIGHT.Bank').id
+    const data = {
+      accountID: tab2Input,
+      bankID,
+    }
+    const res = await api.get('/banks/account', data)
+    if (res.error) {
+      const { error } = res
+      this.setState({
+        error,
+        loading: false,
+      })
+    } else {
+      const { valid } = res
+      if (valid) {
         this.setState({
-          error,
+          loading: false,
+          newReceiver: res.data,
+        })
+        this.handleOnChange(res.data)
+      } else {
+        this.setState({
+          error: 'Invalid card number',
           loading: false,
         })
-      } else {
-        const { valid } = res
-        if (valid) {
-          this.setState({
-            loading: false,
-            newReceiver: res.data,
-          })
-          this.handleOnChange(res.data)
-        } else {
-          this.setState({
-            error: 'Invalid card number',
-            loading: false,
-          })
-        }
       }
     }
   }
@@ -201,28 +201,25 @@ class Step2Content extends Component {
       tab,
       existedReceiver,
       newReceiver,
-      loading,
     } = this.state
 
     const {
       onNext,
     } = this.props
 
-    if (!loading) {
-      if (tab === 1) {
-        if (existedReceiver.accountID) onNext()
-        else {
-          this.setState({
-            error: 'Please choose a receiver',
-          })
-        }
-      } else if (newReceiver.accountID) {
-        onNext()
-      } else {
+    if (tab === 1) {
+      if (existedReceiver.accountID) onNext()
+      else {
         this.setState({
           error: 'Please choose a receiver',
         })
       }
+    } else if (newReceiver.accountID) {
+      onNext()
+    } else {
+      this.setState({
+        error: 'Please choose a receiver',
+      })
     }
   }
 
@@ -284,9 +281,10 @@ class Step2Content extends Component {
                     value={tab2Input || newReceiver.accountID}
                     error={error}
                     onChange={this.handleTab2Input}
-                    pattern="[0-9]*"
+                    disabled={loading}
                   />
                   <SearchButton
+                    disabled={loading}
                     onClick={this.handleSearch}
                   />
                 </SearchWrapper>
@@ -305,7 +303,6 @@ class Step2Content extends Component {
             secondary
             // name="Back"
             name="Cancel"
-            disabled={loading}
             onClick={onBack}
           />
           <Button
