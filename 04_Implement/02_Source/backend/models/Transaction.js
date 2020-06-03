@@ -45,6 +45,13 @@ const TransactionSchema = new mongoose.Schema({
 		type: String,
 		require: true,
 	},
+	transaction_message: {
+		type: String,
+	},
+	transaction_payer: {
+		type: String,
+		require: true,
+	},
 	transaction_balance_before: {
 		type: Number,
 		required: true,
