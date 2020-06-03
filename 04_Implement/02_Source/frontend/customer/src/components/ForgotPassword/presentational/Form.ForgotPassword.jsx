@@ -190,6 +190,7 @@ class ForgotPasswordForm extends Component {
         <Button
           fluid
           name={verifyOTPStage ? 'Verify' : 'Reset password'}
+          disabled={loading}
           loading={loading}
           onClick={this.handleForgotPassword}
         />

@@ -103,6 +103,7 @@ class RemoveDebtModal extends Component {
         show={show}
         name="Debt cancellation"
         onClose={onClose}
+        disabled={loading}
       >
         <>
           <Instruction>
@@ -116,18 +117,21 @@ class RemoveDebtModal extends Component {
               label="Reason"
               placeholder="Enter the reason of this debt's cancellation"
               onChange={this.handleReason}
+              disabled={loading}
             />
           </TextAreaWrapper>
           <ButtonWrapper>
             <CancelButton
               fluid
               secondary
+              disabled={loading}
               name="Cancel"
               onClick={onClose}
             />
             <SubmitButton
               name="Delete"
               fluid
+              disabled={loading}
               loading={loading}
               onClick={this.handleDelete}
             />

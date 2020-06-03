@@ -164,6 +164,7 @@ class ResetPasswordForm extends Component {
             name="Confirm password changes"
             loading={loading}
             onClick={this.handleSubmit}
+            disabled={loading}
           />
         </ButtonWrapper>
       </Wrapper>

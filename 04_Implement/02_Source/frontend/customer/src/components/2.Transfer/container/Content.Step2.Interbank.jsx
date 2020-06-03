@@ -175,7 +175,6 @@ class Step2Content extends Component {
       loading: true,
       error: '',
     })
-
     const data = {
       accountID: tab2Input,
       bankID,
@@ -302,6 +301,7 @@ class Step2Content extends Component {
                 <SelectWrapper>
                   <Select
                     associated
+                    disabled={loading}
                     value={newReceiver.bankID}
                     error={errorSelect}
                     onChange={this.handleSelect}
@@ -313,9 +313,11 @@ class Step2Content extends Component {
                     placeholder="Enter the receiver's card number"
                     value={tab2Input || newReceiver.accountID}
                     error={error}
+                    disabled={loading}
                     onChange={this.handleTab2Input}
                   />
                   <SearchButton
+                    disabled={loading}
                     onClick={this.handleSearch}
                   />
                 </SearchWrapper>
@@ -332,8 +334,8 @@ class Step2Content extends Component {
           <Button
             fluid
             secondary
-            name="Back"
-            disabled={loading}
+            // name="Back"
+            name="Close"
             onClick={onBack}
           />
           <Button

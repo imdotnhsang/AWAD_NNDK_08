@@ -39,10 +39,12 @@ class Step5Content extends Component {
   }
 
   async handleFinish() {
+    const { onDisabled } = this.props
     this.setState({
       error: '',
       loading: true,
     })
+    onDisabled(true)
     const {
       otp,
     } = this.state
@@ -86,6 +88,7 @@ class Step5Content extends Component {
         })
       }
     }
+    onDisabled(false)
   }
 
   render() {
@@ -128,9 +131,11 @@ class Step5Content extends Component {
   }
 }
 Step5Content.defaultProps = {
+  onDisabled: (f) => f,
   onTransfer: (f) => f,
 }
 Step5Content.propTypes = {
+  onDisabled: PropTypes.func,
   onTransfer: PropTypes.func,
 }
 export default Step5Content

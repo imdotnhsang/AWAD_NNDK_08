@@ -91,12 +91,13 @@ class Step2AddDebtContent extends Component {
       onClose,
       onSuccess,
       onFailure,
+      onDisabled,
     } = this.props
     if (!error) {
       this.setState({
         loading: true,
       })
-
+      onDisabled(true)
       const { borrowerID, amount, message } = value
       const data = {
         borrowerID,
@@ -119,6 +120,7 @@ class Step2AddDebtContent extends Component {
         onClose()
         onSuccess('You have successfully created a new debt!', true)
       }
+      onDisabled(false)
     }
   }
 
@@ -147,6 +149,7 @@ class Step2AddDebtContent extends Component {
             value={amount}
             onChange={this.handleAmount}
             error={error}
+            disabled={loading}
           />
         </InputWrapper>
         <TextAreaWrapper>
@@ -154,6 +157,7 @@ class Step2AddDebtContent extends Component {
             label="Description:"
             placeholder="Enter some descriptions for the debt"
             value={message}
+            disabled={loading}
             onChange={this.handleMessage}
           />
         </TextAreaWrapper>
@@ -188,6 +192,7 @@ Step2AddDebtContent.defaultProps = {
   onClose: (f) => f,
   onSuccess: (f) => f,
   onFailure: (f) => f,
+  onDisabled: (f) => f,
 }
 Step2AddDebtContent.propTypes = {
   value: PropTypes.shape({
@@ -200,5 +205,6 @@ Step2AddDebtContent.propTypes = {
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
+  onDisabled: PropTypes.func,
 }
 export default Step2AddDebtContent

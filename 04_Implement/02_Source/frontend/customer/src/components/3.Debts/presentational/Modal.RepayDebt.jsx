@@ -15,11 +15,19 @@ class RepayDebtModal extends Component {
     this.state = {
       // accountID: '',
       step: 1,
+      disabled: false,
     }
+    this.handleDisabled = this.handleDisabled.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
     this.handleNext = this.handleNext.bind(this)
     this.handleBack = this.handleBack.bind(this)
     this.handleRepay = this.handleRepay.bind(this)
+  }
+
+  handleDisabled(value) {
+    this.setState({
+      disabled: value,
+    })
   }
 
   handleOnChange(value) {
@@ -80,6 +88,7 @@ class RepayDebtModal extends Component {
   render() {
     const {
       step,
+      disabled,
       // accountID,
     } = this.state
     const {
@@ -94,6 +103,7 @@ class RepayDebtModal extends Component {
         name="Repay debt"
         show={show}
         onClose={onClose}
+        disabled={disabled}
       >
         {
           [
@@ -112,6 +122,7 @@ class RepayDebtModal extends Component {
             />,
             <Step3
               onRepay={this.handleRepay}
+              onDisabled={this.handleDisabled}
             />,
           ][step] || null
         }

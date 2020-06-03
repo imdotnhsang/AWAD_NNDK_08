@@ -24,11 +24,19 @@ class InternalModal extends Component {
       detail: '',
       chargedBySender: true,
       step: 1,
+      disabled: false,
     }
+    this.handleDisabled = this.handleDisabled.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
     this.handleNext = this.handleNext.bind(this)
     this.handleBack = this.handleBack.bind(this)
     this.handleTransfer = this.handleTransfer.bind(this)
+  }
+
+  handleDisabled(value) {
+    this.setState({
+      disabled: value,
+    })
   }
 
   handleOnChange(value) {
@@ -95,6 +103,7 @@ class InternalModal extends Component {
       amount,
       detail,
       chargedBySender,
+      disabled,
     } = this.state
     const {
       loading,
@@ -108,6 +117,7 @@ class InternalModal extends Component {
         name="Interbank transfer"
         loading={loading}
         onClose={onClose}
+        disabled={disabled}
       >
         {
           [
@@ -147,6 +157,7 @@ class InternalModal extends Component {
               onNext={this.handleNext}
             />,
             <Step5
+              onDisabled={this.handleDisabled}
               onTransfer={this.handleTransfer}
             />,
           ][step] || null

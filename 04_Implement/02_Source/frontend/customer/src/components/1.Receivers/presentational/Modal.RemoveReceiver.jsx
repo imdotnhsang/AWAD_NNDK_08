@@ -75,6 +75,7 @@ const RemoveReceiverModal = ({
             name="Cancel"
             secondary
             fluid
+            disabled={loading}
             onClick={onClose}
           />
         </CancelWrapper>

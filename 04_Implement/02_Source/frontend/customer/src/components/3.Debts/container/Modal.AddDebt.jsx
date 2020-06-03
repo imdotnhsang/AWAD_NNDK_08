@@ -5,6 +5,8 @@ import Template from '../../common/presentational/Template.Modal'
 import Step1 from './Content.Step1.AddDebt'
 import Step2 from '../presentational/Content.Step2.AddDebt'
 import { fetchBanksDataIfNeeded } from '../../../actions/banks'
+import { fetchReceiversDataIfNeeded } from '../../../actions/receivers'
+
 
 class AddDebtModal extends Component {
   constructor(props) {
@@ -19,15 +21,24 @@ class AddDebtModal extends Component {
       amount: 50000,
       message: '',
       step: 0,
+      disabled: false,
     }
+    this.handleDisabled = this.handleDisabled.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
     this.handleNext = this.handleNext.bind(this)
     this.handleBack = this.handleBack.bind(this)
   }
 
   componentDidMount() {
-    const { onFetchBanksData } = this.props
+    const { onFetchBanksData, onFetchReceiversData } = this.props
     onFetchBanksData()
+    onFetchReceiversData()
+  }
+
+  handleDisabled(value) {
+    this.setState({
+      disabled: value,
+    })
   }
 
   handleOnChange(value) {
@@ -54,6 +65,7 @@ class AddDebtModal extends Component {
       borrower,
       amount,
       message,
+      disabled,
     } = this.state
 
     const {
@@ -62,6 +74,7 @@ class AddDebtModal extends Component {
       onFailure,
       //
       banksLoading,
+      receiversLoading,
     } = this.props
 
     return (
@@ -69,7 +82,8 @@ class AddDebtModal extends Component {
         onClose={onClose}
         name="Add debt"
         width={604}
-        loading={banksLoading}
+        loading={banksLoading || receiversLoading}
+        disabled={disabled}
       >
         {
           [
@@ -90,6 +104,7 @@ class AddDebtModal extends Component {
               onClose={onClose}
               onSuccess={onSuccess}
               onFailure={onFailure}
+              onDisabled={this.handleDisabled}
             />,
           ][step] || null
         }
@@ -103,7 +118,9 @@ AddDebtModal.defaultProps = {
   onFailure: (f) => f,
   //
   banksLoading: false,
+  receiversLoading: false,
   onFetchBanksData: (f) => f,
+  onFetchReceiversData: (f) => f,
 }
 AddDebtModal.propTypes = {
   onClose: PropTypes.func,
@@ -111,13 +128,17 @@ AddDebtModal.propTypes = {
   onFailure: PropTypes.func,
   //
   banksLoading: PropTypes.bool,
+  receiversLoading: PropTypes.bool,
   onFetchBanksData: PropTypes.func,
+  onFetchReceiversData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   banksLoading: state.banks.loading,
+  receiversLoading: state.receivers.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
   onFetchBanksData: () => dispatch(fetchBanksDataIfNeeded()),
+  onFetchReceiversData: () => dispatch(fetchReceiversDataIfNeeded()),
 })
 export default connect(
   mapStateToProps,

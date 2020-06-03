@@ -150,7 +150,12 @@ class SignInModal extends Component {
         })
       }
     } else {
-      const { token, name, bankID, accountID } = res
+      const {
+        token,
+        name,
+        bankID,
+        accountID,
+      } = res
       setJwtToStorage(token)
       setNameToStorage(name)
       setEmailToStorage(email)
@@ -202,6 +207,7 @@ class SignInModal extends Component {
           onClick={this.handleSubmit}
           name="Log in"
           loading={loading}
+          disabled={loading}
         />
       </Wrapper>
     )

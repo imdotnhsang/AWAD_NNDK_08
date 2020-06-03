@@ -53,13 +53,13 @@ class Step4Content extends Component {
   }
 
   async handleConfirm() {
+    const {
+      onNext,
+    } = this.props
     this.setState({
       loading: true,
       error: '',
     })
-    const {
-      onNext,
-    } = this.props
     const data = {
       email: getEmailFromStorage(),
     }
