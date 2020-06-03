@@ -12,6 +12,30 @@ const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 const Transaction = require('../../models/Transaction')
 
+// @route     GET /employees/init-page
+// @desc      Get all information of employee page
+// @access    Private (employee)
+router.get('/init-page', [auth, employee], async (req, res) => {
+	try {
+		const allCustomers = (await Customer.find()).map((e) => {
+			return {
+				full_name: e.full_name,
+				default_account_id: e.default_account_id,
+				email: e.email,
+				phone_number: e.phone_number,
+			}
+		})
+
+		const response = {
+			msg: 'Information page successfully initialized',
+			data: allCustomers,
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server Error' })
+	}
+})
+
 // @route     POST /employees/register-customer
 // @desc      Create customer account
 // @access    Private (employee)
@@ -220,11 +244,11 @@ router.post(
 				entry_time: Date.now(),
 				from_account_id: 'EIGHT_BANK',
 				from_fullname: 'Eight Bank',
-				to_account_id: rechargeAccountId,
+				to_account_id: customer.default_account_id,
 				to_fullname: customer.full_name,
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
-				transaction_type: 'RECEIVE',
+				transaction_type: 'RECHARGE',
 				transaction_amount: rechargeAmount,
 				transaction_balance_before: account.balance,
 				transaction_balance_after: account.balance,
@@ -268,30 +292,6 @@ router.post(
 	}
 )
 
-// @route     GET /employees/all-customers
-// @desc      Get all customers
-// @access    Private (employee)
-router.get('/all-customers', [auth, employee], async (req, res) => {
-	try {
-		const allCustomers = (await Customer.find()).map((e) => {
-			return {
-				full_name: e.full_name,
-				default_account_id: e.default_account_id,
-				email: e.email,
-				phone_number: e.phone_number,
-			}
-		})
-
-		const response = {
-			msg: 'All customers successfully got',
-			data: allCustomers,
-		}
-		return res.status(200).json(response)
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server Error' })
-	}
-})
-
 // @route     GET /employees/transaction-history
 // @desc      View transaction history of any customer account
 // @access    Private (employee)
@@ -300,32 +300,25 @@ router.get(
 	[
 		auth,
 		employee,
-		check('historyEmail', 'Please include a valid email').isEmail(),
+		check('historyAccountId', 'Account id is required').not().notEmpty(),
 	],
 	async (req, res) => {
-		const { historyEmail } = req.body
+		const { historyAccountId } = req.body
 
 		try {
-			const customer = await Customer.findOne({ email: historyEmail })
+			const customer = await Customer.findOne({
+				default_account_id: historyAccountId,
+			})
 			if (!customer) {
 				return res
 					.status(400)
 					.json({ errors: [{ msg: 'Customer does not exist' }] })
 			}
 
-			const listAccount = [
-				customer.default_account_id,
-				...customer.saving_accounts_id,
-			]
-
 			const transactionHistory = await Transaction.find({
 				$or: [
-					{
-						from_account_id: {
-							$in: listAccount,
-						},
-					},
-					{ to_account_id: { $in: listAccount } },
+					{ from_account_id: customer.default_account_id },
+					{ to_account_id: customer.default_account_id },
 				],
 			})
 
