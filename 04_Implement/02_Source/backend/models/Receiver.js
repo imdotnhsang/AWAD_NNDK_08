@@ -19,6 +19,10 @@ const ReceiverSchema = new mongoose.Schema({
 		type: String,
 		require: true,
 	},
+	full_name: {
+		type: String,
+		require: true,
+	},
 })
 
 module.exports = Receiver = mongoose.model('receiver', ReceiverSchema)

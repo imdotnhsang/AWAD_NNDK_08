@@ -11,6 +11,57 @@ const administrator = require('../../middlewares/administrator')
 const Transaction = require('../../models/Transaction')
 const Staff = require('../../models/Staff')
 
+// @route     GET /administrators/init-page
+// @desc      Get all information administrator page
+// @access    Private (administrator)
+router.get('/init-page', [auth, administrator], async (req, res) => {
+	try {
+		const allStaffs = (await Staff.find()).map((e) => {
+			return {
+				full_name: e.full_name,
+				username: e.username,
+				email: e.email,
+				phone_number: e.phone_number,
+				position: e.position,
+				is_active: e.is_active,
+				create_at: e.create_at,
+			}
+		})
+
+		const allInterbankTransactions = (await Transaction.find())
+			.filter(
+				(e) =>
+					(e.transaction_type === 'RECEIVE' && e.from_bank_id !== 'EIGHT') ||
+					(e.transaction_type === 'TRANSFER' && e.to_bank_id !== 'EIGHT')
+			)
+			.map((e) => {
+				return {
+					entry_time: e.entry_time,
+					from_bank_id: e.from_bank_id,
+					to_bank_id: e.to_bank_id,
+					from_account_id: e.from_account_id,
+					from_fullname: e.from_fullname,
+					to_account_id: e.to_account_id,
+					to_fullname: e.to_fullname,
+					transaction_type: e.transaction_type,
+					transaction_amount: e.transaction_amount,
+					transaction_status: e.transaction_status,
+				}
+			})
+
+		const response = {
+			msg: 'Information page successfully initialized',
+			data: {
+				all_staffs: allStaffs,
+				all_interbank_transactions: allInterbankTransactions,
+			},
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server Error' })
+	}
+})
+
 // @route     POST /administrator/register-staff
 // @desc      Create new staff (employee or administrator)
 // @access    Private (administrator)
@@ -103,30 +154,6 @@ router.post(
 	}
 )
 
-// @route     GET /administrators/all-staffs
-// @desc      Get all staffs (administrators and employees)
-// @access    Private (administrator)
-router.get('/all-staffs', [auth, administrator], async (req, res) => {
-	try {
-		const allStaffs = (await Staff.find()).map((e) => {
-			return {
-				full_name: e.full_name,
-				username: e.username,
-				email: e.email,
-				phone_number: e.phone_number,
-				position: e.position,
-				is_active: e.is_active,
-				create_at: e.create_at,
-			}
-		})
-
-		const response = { msg: 'All staffs successfully got', data: allStaffs }
-		return res.status(200).json(response)
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server Error' })
-	}
-})
-
 // @route     PUT /administrators/update-staff
 // @desc      Update information staff (full name, email => username)
 // @access    Private (administrator)
@@ -135,7 +162,7 @@ router.put(
 	[
 		auth,
 		administrator,
-		check('username', 'User is required').not().notEmpty(),
+		check('username', 'Username is required').not().notEmpty(),
 		check('fullName', 'Full name is required').not().notEmpty(),
 		check('email', 'Please include a valid email').isEmail(),
 	],

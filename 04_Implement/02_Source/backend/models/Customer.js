@@ -28,7 +28,7 @@ const CustomerSchema = new mongoose.Schema({
 	saving_accounts_id: {
 		type: Array,
 	},
-	list_receivers_id: {
+	list_receiver_id: {
 		type: Array,
 	},
 	is_active: {
