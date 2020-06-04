@@ -457,6 +457,66 @@ router.get('/transaction-history', auth, async (req, res) => {
 	}
 })
 
+// @route     GET /customers/cards-information
+// @desc      Get all information of customer page
+// @access    Public
+router.get('/information-cards', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer not exists',
+					},
+				],
+			})
+		}
+
+		const {
+			default_account_id: defaultAccountId,
+			saving_accounts_id: savingAccountsId,
+		} = customer
+
+		const savingAccounts = (
+			await Account.find({
+				account_id: {
+					$in: savingAccountsId.map((e) => e),
+				},
+			})
+		).map((e) => {
+			return {
+				account_id: e.account_id,
+				account_type: e.account_type,
+				balance: e.balance,
+				account_service: e.account_service,
+			}
+		})
+
+		const defaultAccount = await Account.findOne({
+			account_id: defaultAccountId,
+		})
+
+		const response = {
+			msg: 'Information cards successfully got',
+			data: {
+				default_account: {
+					account_id: defaultAccount.account_id,
+					account_type: defaultAccount.account_type,
+					balance: defaultAccount.balance,
+					account_service: defaultAccount.account_service,
+				},
+				saving_accounts: savingAccounts,
+			},
+		}
+
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({ msg: 'Server error' })
+	}
+})
+
 // @route     PUT /customers/change-password
 // @desc      Change password customer
 // @access    Public
