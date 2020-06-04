@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { connect } from 'react-redux'
 import DeleteButton from '../../common/presentational/Button.Loading'
 import CancelButton from '../../common/presentational/Button'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
+import { removeAReceiver } from '../../../actions/receivers'
 
 const Text = styled.span`
   font-family: OpenSans-Regular;
@@ -33,6 +35,8 @@ const RemoveReceiverModal = ({
   onClose,
   onSuccess,
   onFailure,
+  //
+  onRemoveReceiver,
 }) => {
   const [loading, setLoading] = useState(false)
 
@@ -55,6 +59,7 @@ const RemoveReceiverModal = ({
       setLoading(false)
       onClose()
       onSuccess('You have successfully removed a receiver')
+      onRemoveReceiver(id)
     }
   }
   return (
@@ -97,11 +102,21 @@ RemoveReceiverModal.defaultProps = {
   onClose: (f) => f,
   onSuccess: (f) => f,
   onFailure: (f) => f,
+  //
+  onRemoveReceiver: (f) => f,
 }
 RemoveReceiverModal.propTypes = {
   id: PropTypes.string,
   onClose: PropTypes.func,
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
+  //
+  onRemoveReceiver: PropTypes.func,
 }
-export default RemoveReceiverModal
+const mapDispatchToProps = (dispatch) => ({
+  onRemoveReceiver: (id) => dispatch(removeAReceiver(id)),
+})
+export default connect(
+  null,
+  mapDispatchToProps,
+)(RemoveReceiverModal)

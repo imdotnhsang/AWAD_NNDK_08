@@ -6,7 +6,11 @@ import api from '../../../api/api'
 // import Step1 from '../container/Content.Step1.RepayDebt'
 import Step2 from './Content.Step2.RepayDebt'
 import Step3 from './Content.Step3.RepayDebt'
-import { invalidateCardsData } from '../../../actions/cards'
+import {
+  // invalidateCardsData,
+  fetchCardsDataIfNeeded,
+  updateDefaultCardBalance,
+} from '../../../actions/cards'
 
 
 class RepayDebtModal extends Component {
@@ -22,6 +26,13 @@ class RepayDebtModal extends Component {
     this.handleNext = this.handleNext.bind(this)
     this.handleBack = this.handleBack.bind(this)
     this.handleRepay = this.handleRepay.bind(this)
+  }
+
+  componentDidMount() {
+    const {
+      onFetchCardsData,
+    } = this.props
+    onFetchCardsData()
   }
 
   handleDisabled(value) {
@@ -55,7 +66,8 @@ class RepayDebtModal extends Component {
       onClose,
       onProcessing,
       //
-      onInvalidateData,
+      // onInvalidateData,
+      onUpdateBalance,
     } = this.props
     onClose()
 
@@ -81,7 +93,8 @@ class RepayDebtModal extends Component {
       onFailure(error)
     } else {
       onSuccess('You have successfully repay this debt', false)
-      onInvalidateData()
+      // onInvalidateData()
+      onUpdateBalance(res.balance)
     }
   }
 
@@ -95,6 +108,8 @@ class RepayDebtModal extends Component {
       show,
       data,
       onClose,
+      //
+      cardsLoading,
     } = this.props
 
     return (
@@ -104,6 +119,7 @@ class RepayDebtModal extends Component {
         show={show}
         onClose={onClose}
         disabled={disabled}
+        loading={cardsLoading}
       >
         {
           [
@@ -146,7 +162,10 @@ RepayDebtModal.defaultProps = {
   onFailure: (f) => f,
   onProcessing: (f) => f,
   //
-  onInvalidateData: (f) => f,
+  cardsLoading: (f) => f,
+  // onInvalidateData: (f) => f,
+  onFetchCardsData: (f) => f,
+  onUpdateBalance: (f) => f,
 }
 RepayDebtModal.propTypes = {
   show: PropTypes.bool,
@@ -164,12 +183,20 @@ RepayDebtModal.propTypes = {
   onFailure: PropTypes.func,
   onProcessing: PropTypes.func,
   //
-  onInvalidateData: PropTypes.func,
+  cardsLoading: PropTypes.bool,
+  // onInvalidateData: PropTypes.func,
+  onFetchCardsData: PropTypes.func,
+  onUpdateBalance: PropTypes.func,
 }
+const mapStateToProps = (state) => ({
+  cardsLoading: state.cards.loading,
+})
 const mapDispatchToProps = (dispatch) => ({
-  onInvalidateData: () => dispatch(invalidateCardsData()),
+  // onInvalidateData: () => dispatch(invalidateCardsData()),
+  onUpdateBalance: (balance) => dispatch(updateDefaultCardBalance(balance)),
+  onFetchCardsData: () => dispatch(fetchCardsDataIfNeeded()),
 })
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(RepayDebtModal)

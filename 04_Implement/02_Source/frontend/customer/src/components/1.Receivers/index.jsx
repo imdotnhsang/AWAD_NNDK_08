@@ -136,16 +136,16 @@ class ReceiversPage extends Component {
   }
 
   handleCloseSuccessModal() {
-    const {
-      onInvalidateData,
-      onFetchData,
-    } = this.props
+    // const {
+    //   onInvalidateData,
+    //   onFetchData,
+    // } = this.props
     this.setState({
       showSuccessModal: false,
       successMessage: '',
     })
-    onInvalidateData()
-    onFetchData()
+    // onInvalidateData()
+    // onFetchData()
   }
 
   handleOpenFailureModal(message) {
@@ -258,7 +258,7 @@ ReceiversPage.defaultProps = {
   loading: false,
   //
   onFetchData: (f) => f,
-  onInvalidateData: (f) => f,
+  // onInvalidateData: (f) => f,
 }
 ReceiversPage.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape({
@@ -271,14 +271,14 @@ ReceiversPage.propTypes = {
   loading: PropTypes.bool,
   //
   onFetchData: PropTypes.func,
-  onInvalidateData: PropTypes.func,
+  // onInvalidateData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   data: state.receivers.receivers,
   loading: state.receivers.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
-  onInvalidateData: () => dispatch(invalidateReceiversData()),
+  // onInvalidateData: () => dispatch(invalidateReceiversData()),
   onFetchData: () => dispatch(fetchReceiversDataIfNeeded()),
 })
 export default connect(

@@ -58,7 +58,7 @@ class ReceiversPage extends Component {
       showPayModal: false,
       showInfoModal: false,
       showRemoveModal: false,
-      createdByYouAction: true,
+      // createdByYouAction: true,
       showSuccess: false,
       showFailure: false,
       showProcessing: false,
@@ -170,6 +170,7 @@ class ReceiversPage extends Component {
     })
   }
 
+  // eslint-disable-next-line no-unused-vars
   handleOpenSuccessModal(message, createdByYouAction) {
     this.setState({
       showProcessing: false,
@@ -178,30 +179,30 @@ class ReceiversPage extends Component {
       this.setState({
         showSuccess: true,
         successMessage: message,
-        createdByYouAction,
+        // createdByYouAction,
       })
     }, 1000)
   }
 
   handleCloseSuccessModal() {
-    const {
-      onInvalidateData,
-      onFetchData,
-    } = this.props
-    const {
-      createdByYouAction,
-    } = this.state
+    // const {
+    //   onInvalidateData,
+    //   onFetchData,
+    // } = this.props
+    // const {
+    //   createdByYouAction,
+    // } = this.state
     this.setState({
       showSuccess: false,
       successMessage: '',
     })
-    if (createdByYouAction) {
-      onInvalidateData('createdByYou')
-      onFetchData('createdByYou')
-    } else {
-      onInvalidateData('receivedFromOthers')
-      onFetchData('receivedFromOthers')
-    }
+    // if (createdByYouAction) {
+    //   onInvalidateData('createdByYou')
+    //   onFetchData('createdByYou')
+    // } else {
+    //   onInvalidateData('receivedFromOthers')
+    //   onFetchData('receivedFromOthers')
+    // }
   }
 
   handleOpenFailureModal(message) {
@@ -346,20 +347,22 @@ class ReceiversPage extends Component {
   }
 }
 
-ReceiversPage.defaultProps = {
-  onInvalidateData: (f) => f,
-  onFetchData: (f) => f,
-}
-ReceiversPage.propTypes = {
-  onInvalidateData: PropTypes.func,
-  onFetchData: PropTypes.func,
-}
+// ReceiversPage.defaultProps = {
+//   onInvalidateData: (f) => f,
+//   onFetchData: (f) => f,
+// }
+// ReceiversPage.propTypes = {
+//   onInvalidateData: PropTypes.func,
+//   onFetchData: PropTypes.func,
+// }
 
-const mapDispatchToProps = (dispatch) => ({
-  onInvalidateData: (category) => dispatch(invalidateDebtsData(category)),
-  onFetchData: (category) => dispatch(fecthDebtsDataIfNeeded(category)),
-})
-export default connect(
-  null,
-  mapDispatchToProps,
-)(ReceiversPage)
+// const mapDispatchToProps = (dispatch) => ({
+//   onInvalidateData: (category) => dispatch(invalidateDebtsData(category)),
+//   onFetchData: (category) => dispatch(fecthDebtsDataIfNeeded(category)),
+// })
+// export default connect(
+//   null,
+//   mapDispatchToProps,
+// )(ReceiversPage)
+
+export default ReceiversPage

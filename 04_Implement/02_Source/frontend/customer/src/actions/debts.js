@@ -144,3 +144,14 @@ export const fecthDebtsDataIfNeeded = (category) => (dispatch, getState) => {
   }
   return Promise.resolve()
 }
+
+export const addADebt = (data) => ({
+  type: Debts.ADD_A_DEBT,
+  data,
+})
+
+export const cancelADebt = (category, id) => ({
+  type: Debts.CANCEL_A_DEBT,
+  category,
+  id,
+})
