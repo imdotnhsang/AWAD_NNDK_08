@@ -612,7 +612,7 @@ router.post(
 			await sendOTPCode(email, customer.full_name, otpCode, 'forgotPassword')
 
 			customer.OTP.code = otpCode
-			customer.OTP.expired_at = Date.now() + 180000
+			customer.OTP.expired_at = Date.now() + 300000
 			customer.OTP.is_confirmed = false
 			customer.OTP.is_used = false
 			await customer.save()
