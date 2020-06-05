@@ -3,9 +3,12 @@ const mongoose = require('mongoose')
 
 const router = express.Router()
 
+const { customAlphabet } = require('nanoid')
 const bcrypt = require('bcrypt')
 const { check, validationResult } = require('express-validator')
 const auth = require('../../middlewares/auth')
+
+const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
 
 const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
@@ -575,5 +578,63 @@ router.put(
 		}
 	}
 )
+
+router.post(
+	'/sent-otp-password',
+	[check('email', 'Please include a valid email').isEmail()],
+	async (req, res) => {
+		const { email } = req.body
+
+		try {
+			const customer = await Customer.findOne({ email })
+
+			if (!customer) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Customer does not exist',
+						},
+					],
+				})
+			}
+
+			const nanoidPassword = await customAlphabet('1234567890', 6)
+			const otpCode = nanoidPassword()
+
+			await sendOTPCode(email, customer.full_name, otpCode, 'forgotPassword')
+
+			const response = { msg: 'OTP successfully sent' }
+			return res.status(200).json(response)
+		} catch (error) {
+			return res.status(500).json({ msg: 'Server error' })
+		}
+	}
+)
+
+router.post('/sent-otp-transferring', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer does not exist',
+					},
+				],
+			})
+		}
+
+		const nanoidPassword = await customAlphabet('1234567890', 6)
+		const otpCode = nanoidPassword()
+
+		await sendOTPCode(customer.email, customer.full_name, otpCode, 'transfer')
+
+		const response = { msg: 'OTP successfully sent' }
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error' })
+	}
+})
 
 module.exports = router
