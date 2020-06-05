@@ -7,6 +7,7 @@ import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
 import api from '../../../api/api'
+import { addAReceiver } from '../../../actions/receivers'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -127,6 +128,7 @@ class AddReceiverModal extends Component {
       onClose,
       onSuccess,
       onFailure,
+      onAddAReceiver,
     } = this.props
     if (!bankID || !accountID || !nickname) {
       this.setState({
@@ -169,6 +171,8 @@ class AddReceiverModal extends Component {
       })
       onClose()
       onSuccess('You have successfully added a new receiver!')
+      const { data: newData } = res
+      onAddAReceiver(newData)
     }
   }
 
@@ -246,6 +250,7 @@ AddReceiverModal.defaultProps = {
   onFailure: (f) => f,
   //
   bankLoading: false,
+  onAddAReceiver: (f) => f,
 }
 AddReceiverModal.propTypes = {
   onClose: PropTypes.func,
@@ -253,10 +258,15 @@ AddReceiverModal.propTypes = {
   onFailure: PropTypes.func,
   //
   bankLoading: PropTypes.bool,
+  onAddAReceiver: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   bankLoading: state.banks.loading,
 })
+const mapDispatchToProps = (dispatch) => ({
+  onAddAReceiver: (data) => dispatch(addAReceiver(data)),
+})
 export default connect(
   mapStateToProps,
+  mapDispatchToProps,
 )(AddReceiverModal)

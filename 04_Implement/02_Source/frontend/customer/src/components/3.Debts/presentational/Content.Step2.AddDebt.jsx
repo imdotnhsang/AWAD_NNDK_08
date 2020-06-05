@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { connect } from 'react-redux'
 import Input from '../../common/presentational/Input'
 import TextArea from '../../common/presentational/TextArea'
 import api from '../../../api/api'
 import AddButton from '../../common/presentational/Button.Loading'
 import BackButton from '../../common/presentational/Button'
 import Banner from '../../common/presentational/Banner.Step'
+import { addADebt } from '../../../actions/debts'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -92,6 +94,8 @@ class Step2AddDebtContent extends Component {
       onSuccess,
       onFailure,
       onDisabled,
+      //
+      onAddADebt,
     } = this.props
     if (!error) {
       this.setState({
@@ -119,6 +123,7 @@ class Step2AddDebtContent extends Component {
       } else {
         onClose()
         onSuccess('You have successfully created a new debt!', true)
+        onAddADebt(res.data)
       }
       onDisabled(false)
     }
@@ -193,6 +198,8 @@ Step2AddDebtContent.defaultProps = {
   onSuccess: (f) => f,
   onFailure: (f) => f,
   onDisabled: (f) => f,
+  //
+  onAddADebt: (f) => f,
 }
 Step2AddDebtContent.propTypes = {
   value: PropTypes.shape({
@@ -206,5 +213,13 @@ Step2AddDebtContent.propTypes = {
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
   onDisabled: PropTypes.func,
+  //
+  onAddADebt: PropTypes.func,
 }
-export default Step2AddDebtContent
+const mapDispatchToProps = (dispatch) => ({
+  onAddADebt: (data) => dispatch(addADebt(data)),
+})
+export default connect(
+  null,
+  mapDispatchToProps,
+)(Step2AddDebtContent)

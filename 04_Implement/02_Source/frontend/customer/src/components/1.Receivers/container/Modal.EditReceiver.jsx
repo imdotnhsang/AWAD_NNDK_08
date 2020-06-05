@@ -7,6 +7,7 @@ import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
 import api from '../../../api/api'
+import { editAReceiver } from '../../../actions/receivers'
 
 const InputWrapper = styled.div`
   width: 100%;
@@ -50,6 +51,7 @@ class EditReceiverModal extends Component {
       onClose,
       onSuccess,
       onFailure,
+      onEditReceiver,
     } = this.props
     if (!nickname) {
       this.setState({
@@ -84,6 +86,7 @@ class EditReceiverModal extends Component {
       })
       onClose()
       onSuccess('You have successfully updated your receiver\'s information!')
+      onEditReceiver(res.data)
     }
   }
 
@@ -155,6 +158,7 @@ EditReceiverModal.defaultProps = {
   onFailure: (f) => f,
   //
   bankLoading: false,
+  onEditReceiver: (f) => f,
 }
 EditReceiverModal.propTypes = {
   id: PropTypes.string,
@@ -166,10 +170,15 @@ EditReceiverModal.propTypes = {
   onFailure: PropTypes.func,
   //
   bankLoading: PropTypes.bool,
+  onEditReceiver: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
   bankLoading: state.banks.loading,
 })
+const mapDispatchToProps = (dispatch) => ({
+  onEditReceiver: (data) => dispatch(editAReceiver(data)),
+})
 export default connect(
   mapStateToProps,
+  mapDispatchToProps,
 )(EditReceiverModal)

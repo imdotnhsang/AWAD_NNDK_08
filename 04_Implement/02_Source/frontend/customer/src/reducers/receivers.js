@@ -30,6 +30,24 @@ const receivers = (state = initialState, action) => {
         ...state,
         didInvalidate: true,
       }
+    case Receivers.ADD_A_RECEIVER:
+      return {
+        ...state,
+        receivers: [
+          action.data,
+          ...state.receivers,
+        ],
+      }
+    case Receivers.EDIT_A_RECEIVER:
+      return {
+        ...state,
+        receivers: state.receivers.map((e) => (e.id === action.data.id ? action.data : e)),
+      }
+    case Receivers.REMOVE_A_RECEIVER:
+      return {
+        ...state,
+        receivers: state.receivers.filter((e) => e.id !== action.id),
+      }
     default:
       return state
   }

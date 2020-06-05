@@ -1,4 +1,5 @@
 import { Debts } from '../constants/actionTypes'
+import { DebtStatus } from '../constants/constants'
 
 const initialState = {
   createdByYou: {
@@ -38,6 +39,24 @@ const tab = (state, action) => {
         loading: false,
         didInvalidate: false,
       }
+    case Debts.CANCEL_A_DEBT:
+      return {
+        ...state,
+        data: state.data.map((debt) => (debt.id === action.id
+          ? ({
+            ...debt,
+            status: DebtStatus.CANCELLED,
+          })
+          : debt)),
+      }
+    case Debts.ADD_A_DEBT:
+      return {
+        ...state,
+        data: [
+          action.data,
+          ...state.data,
+        ],
+      }
     default:
       return state
   }
@@ -48,9 +67,15 @@ const debts = (state = initialState, action) => {
     case Debts.RECEIVE_DEBTS_DATA:
     case Debts.FAILED_REQUEST_DEBTS_DATA:
     case Debts.INVALIDATE_DEBTS_DATA:
+    case Debts.CANCEL_A_DEBT:
       return {
         ...state,
         [action.category]: tab(state[action.category], action),
+      }
+    case Debts.ADD_A_DEBT:
+      return {
+        ...state,
+        createdByYou: tab(state.createdByYou, action),
       }
     default:
       return state

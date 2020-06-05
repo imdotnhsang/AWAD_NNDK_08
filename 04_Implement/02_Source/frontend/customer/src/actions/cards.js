@@ -48,3 +48,8 @@ export const fetchCardsDataIfNeeded = () => (dispatch, getState) => {
   if (shouldFetchCardsData(getState().cards)) return dispatch(fetchCardsData())
   return Promise.resolve()
 }
+
+export const updateDefaultCardBalance = (balance) => ({
+  type: Cards.UPDATE_DEFAULT_CARD_BALANCE,
+  balance,
+})

@@ -1,4 +1,5 @@
 import { Cards } from '../constants/actionTypes'
+import { getAccountIDFromStorage } from '../utils/utils'
 
 const initialState = {
   currentCard: '',
@@ -40,6 +41,16 @@ const cards = (state = initialState, action) => {
         ...state,
         loading: false,
         didInvalidate: false,
+      }
+    case Cards.UPDATE_DEFAULT_CARD_BALANCE:
+      return {
+        ...state,
+        cards: state.cards.map((card) => (card.accountID === getAccountIDFromStorage()
+          ? ({
+            ...card,
+            balance: action.balance,
+          })
+          : card)),
       }
     default:
       return state

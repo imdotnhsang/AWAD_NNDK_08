@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
 import TextArea from '../../common/presentational/TextArea'
 import SubmitButton from '../../common/presentational/Button.Loading'
 import CancelButton from '../../common/presentational/Button'
 import api from '../../../api/api'
+import { cancelADebt } from '../../../actions/debts'
 
 const Instruction = styled.span`
   font-family: OpenSans-Regular;
@@ -61,6 +63,8 @@ class RemoveDebtModal extends Component {
       onClose,
       onSuccess,
       onFailure,
+      //
+      onCancelDebt,
     } = this.props
 
     const data = {
@@ -85,6 +89,7 @@ class RemoveDebtModal extends Component {
       })
       onClose()
       onSuccess('You have successfully removed this debt reminder', createdByYouRemove)
+      onCancelDebt(createdByYouRemove ? 'createdByYou' : 'receivedFromOthers', res.id)
     }
   }
 
@@ -150,6 +155,8 @@ RemoveDebtModal.defaultProps = {
   onClose: (f) => f,
   onSuccess: (f) => f,
   onFailure: (f) => f,
+  //
+  onCancelDebt: (f) => f,
 }
 RemoveDebtModal.propTypes = {
   data: PropTypes.shape({
@@ -158,8 +165,15 @@ RemoveDebtModal.propTypes = {
   show: PropTypes.bool,
   createdByYouRemove: PropTypes.bool,
   onClose: PropTypes.func,
-  //
   onSuccess: PropTypes.func,
   onFailure: PropTypes.func,
+  //
+  onCancelDebt: PropTypes.func,
 }
-export default RemoveDebtModal
+const mapDispatchToProps = (dispatch) => ({
+  onCancelDebt: (category, id) => dispatch(cancelADebt(category, id)),
+})
+export default connect(
+  null,
+  mapDispatchToProps,
+)(RemoveDebtModal)

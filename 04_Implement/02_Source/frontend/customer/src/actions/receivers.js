@@ -44,3 +44,18 @@ export const fetchReceiversDataIfNeeded = () => (dispatch, getState) => {
   if (shouldFetchReceiversData(getState().receivers)) return dispatch(fetchReceiversData())
   return Promise.resolve()
 }
+
+export const addAReceiver = (data) => ({
+  type: Receivers.ADD_A_RECEIVER,
+  data,
+})
+
+export const editAReceiver = (data) => ({
+  type: Receivers.EDIT_A_RECEIVER,
+  data,
+})
+
+export const removeAReceiver = (id) => ({
+  type: Receivers.REMOVE_A_RECEIVER,
+  id,
+})

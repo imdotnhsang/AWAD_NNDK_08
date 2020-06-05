@@ -151,12 +151,12 @@ class TransferPage extends Component {
       successMessage: '',
     })
     const { newReceiver } = this.state
-    const {
-      onInvalidateCardsData,
-      onFetchCardsData,
-    } = this.props
-    onInvalidateCardsData()
-    onFetchCardsData()
+    // const {
+    //   onInvalidateCardsData,
+    //   onFetchCardsData,
+    // } = this.props
+    // onInvalidateCardsData()
+    // onFetchCardsData()
     if (newReceiver.accountID) {
       this.handleOpenSaveReceiverModal()
     }
@@ -345,7 +345,7 @@ TransferPage.defaultProps = {
   loadingCards: false,
   loadingReceivers: false,
   loadingBanks: false,
-  onInvalidateCardsData: (f) => f,
+  // onInvalidateCardsData: (f) => f,
   onFetchCardsData: (f) => f,
   onFetchReceiversData: (f) => f,
   onFetchBanksData: (f) => f,
@@ -354,7 +354,7 @@ TransferPage.propTypes = {
   loadingCards: PropTypes.bool,
   loadingReceivers: PropTypes.bool,
   loadingBanks: PropTypes.bool,
-  onInvalidateCardsData: PropTypes.func,
+  // onInvalidateCardsData: PropTypes.func,
   onFetchCardsData: PropTypes.func,
   onFetchReceiversData: PropTypes.func,
   onFetchBanksData: PropTypes.func,

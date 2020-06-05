@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
 import api from '../../../api/api'
 // import Step1 from '../container/Content.Step1'
@@ -7,6 +8,7 @@ import Step2 from '../container/Content.Step2.Internal'
 import Step3 from '../container/Content.Step3'
 import Step4 from './Content.Step4'
 import Step5 from './Content.Step5'
+import { updateDefaultCardBalance } from '../../../actions/cards'
 
 
 class InternalModal extends Component {
@@ -63,6 +65,8 @@ class InternalModal extends Component {
       onFailure,
       onClose,
       onProcessing,
+      //
+      onUpdateBalance,
     } = this.props
     onClose()
     const {
@@ -92,6 +96,7 @@ class InternalModal extends Component {
       onFailure(error)
     } else {
       onSuccess()
+      onUpdateBalance(res.balance)
     }
   }
 
@@ -174,6 +179,8 @@ InternalModal.defaultProps = {
   onFailure: (f) => f,
   onProcessing: (f) => f,
   onNewReceiver: (f) => f,
+  //
+  onUpdateBalance: (f) => f,
 }
 InternalModal.propTypes = {
   loading: PropTypes.bool,
@@ -182,5 +189,13 @@ InternalModal.propTypes = {
   onFailure: PropTypes.func,
   onProcessing: PropTypes.func,
   onNewReceiver: PropTypes.func,
+  //
+  onUpdateBalance: PropTypes.func,
 }
-export default InternalModal
+const mapDispatchToProps = (dispatch) => ({
+  onUpdateBalance: (balance) => dispatch(updateDefaultCardBalance(balance)),
+})
+export default connect(
+  null,
+  mapDispatchToProps,
+)(InternalModal)

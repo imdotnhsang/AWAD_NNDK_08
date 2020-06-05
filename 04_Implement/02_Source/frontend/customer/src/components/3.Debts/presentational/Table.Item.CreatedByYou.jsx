@@ -54,6 +54,7 @@ const ActionButton = styled.button`
   justify-content: center;
   align-items: center;
   cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+  opacity: ${((props) => (props.disabled && '0.5'))};
 `
 
 const TableItem = ({
@@ -95,7 +96,7 @@ const TableItem = ({
               <circle cx="12.5" cy="6.875" r="1.875" fill="#EF230C" />
             </svg>
           </ActionButton>
-          <ActionButton onClick={onRemove} type="button">
+          <ActionButton onClick={onRemove} type="button" disabled={status === DebtStatus.CANCELLED}>
             <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M8.30357 18.3333C8.30357 19.25 9.02679 20 9.91071 20H16.3393C17.2232 20 17.9464 19.25 17.9464 18.3333V8.33333H8.30357V18.3333ZM18.75 5.83333H15.9375L15.1339 5H11.1161L10.3125 5.83333H7.5V7.5H18.75V5.83333Z" fill="#EF230C" />
             </svg>

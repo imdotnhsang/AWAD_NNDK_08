@@ -8,7 +8,10 @@ import api from '../../../api/api'
 import Button from '../../common/presentational/Button'
 import ButtonLoading from '../../common/presentational/Button.Loading'
 import Input from '../../common/presentational/Input'
-import { invalidateReceiversData } from '../../../actions/receivers'
+import {
+  // invalidateReceiversData,
+  addAReceiver,
+} from '../../../actions/receivers'
 
 const Instruction = styled.span`
   font-family: OpenSans-Regular;
@@ -41,6 +44,7 @@ class SaveReceiverModal extends Component {
     }
     this.handleNext = this.handleNext.bind(this)
     this.handleAdd = this.handleAdd.bind(this)
+    this.handleNickname = this.handleNickname.bind(this)
   }
 
   handleNext() {
@@ -64,13 +68,14 @@ class SaveReceiverModal extends Component {
       onSuccess,
       onFailure,
       //
-      invalidateData,
+      // invalidateData,
+      onAddAReceiver,
     } = this.props
     // eslint-disable-next-line react/destructuring-assignment
-    const { accountID, bankID } = this.props.data
+    const { accountID, bankID, accountName } = this.props.data
     // Validate account ID
     const data = {
-      bankID, accountID, nickname,
+      bankID, accountID, nickname: nickname || accountName,
     }
     const config = {
       headers: {
@@ -93,8 +98,9 @@ class SaveReceiverModal extends Component {
         loading: false,
       })
       onClose()
-      invalidateData()
+      // invalidateData()
       onSuccess('You have successfully added a new receiver')
+      onAddAReceiver(res.data)
     }
   }
 
@@ -187,7 +193,8 @@ SaveReceiverModal.defaultProps = {
   onSuccess: (f) => f,
   onFailure: (f) => f,
   //
-  invalidateData: (f) => f,
+  // invalidateData: (f) => f,
+  onAddAReceiver: (f) => f,
 }
 SaveReceiverModal.propTypes = {
   show: PropTypes.bool,
@@ -201,10 +208,12 @@ SaveReceiverModal.propTypes = {
   onSuccess: (f) => f,
   onFailure: (f) => f,
   //
-  invalidateData: PropTypes.func,
+  // invalidateData: PropTypes.func,
+  onAddAReceiver: PropTypes.func,
 }
 const mapDispatchToProps = (dispatch) => ({
-  invalidateData: () => dispatch(invalidateReceiversData()),
+  // invalidateData: () => dispatch(invalidateReceiversData()),
+  onAddAReceiver: (data) => dispatch(addAReceiver(data)),
 })
 export default connect(
   null,
