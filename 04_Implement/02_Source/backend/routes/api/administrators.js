@@ -50,7 +50,7 @@ router.get('/init-page', [auth, administrator], async (req, res) => {
 			})
 
 		const response = {
-			msg: 'Information page successfully initialized',
+			msg: 'Information page successfully initialized.',
 			data: {
 				all_staffs: allStaffs,
 				all_interbank_transactions: allInterbankTransactions,
@@ -58,7 +58,7 @@ router.get('/init-page', [auth, administrator], async (req, res) => {
 		}
 		return res.status(200).json(response)
 	} catch (error) {
-		return res.status(500).json({ msg: 'Server Error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
@@ -94,7 +94,7 @@ router.post(
 			})
 			if (isExist) {
 				return res.status(400).json({
-					errors: [{ msg: 'Email or phone number already exists' }],
+					errors: [{ msg: 'Email or phone number already exists.' }],
 				})
 			}
 
@@ -103,7 +103,7 @@ router.post(
 				positionRegister !== 'ADMINISTRATOR'
 			) {
 				return res.status(400).json({
-					errors: [{ msg: 'Position Register does not exist' }],
+					errors: [{ msg: 'Position Register does not exist.' }],
 				})
 			}
 
@@ -132,7 +132,7 @@ router.post(
 			let response = {}
 			if (positionRegister === 'EMPLOYEE') {
 				response = {
-					msg: 'Employee successfully created',
+					msg: 'Employee successfully created.',
 					data: {
 						username,
 						password,
@@ -140,7 +140,7 @@ router.post(
 				}
 			} else if (positionRegister === 'ADMINISTRATOR') {
 				response = {
-					msg: 'Administrator successfully created',
+					msg: 'Administrator successfully created.',
 					data: {
 						username,
 						password,
@@ -149,7 +149,7 @@ router.post(
 			}
 			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -180,7 +180,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Staff not exists',
+							msg: 'Staff not exists.',
 						},
 					],
 				})
@@ -190,7 +190,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'New information cannot coincide with old information',
+							msg: 'New information cannot coincide with old information.',
 						},
 					],
 				})
@@ -201,7 +201,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'New email already exists',
+							msg: 'New email already exists.',
 						},
 					],
 				})
@@ -212,10 +212,10 @@ router.put(
 			staff.username = email.split('@')[0].toLowerCase()
 			await staff.save()
 
-			const response = { msg: 'Staff successfully updated' }
+			const response = { msg: 'Staff successfully updated.' }
 			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -244,7 +244,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Staff not exists',
+							msg: 'Staff not exists.',
 						},
 					],
 				})
@@ -254,7 +254,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Staff was deactivated',
+							msg: 'Staff was deactivated.',
 						},
 					],
 				})
@@ -263,10 +263,10 @@ router.put(
 			staff.is_active = false
 			await staff.save()
 
-			const response = { msg: 'Staff successfully deactivate' }
+			const response = { msg: 'Staff successfully deactivated.' }
 			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -295,7 +295,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Staff not exists',
+							msg: 'Staff not exists.',
 						},
 					],
 				})
@@ -305,7 +305,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Staff was activated',
+							msg: 'Staff was activated.',
 						},
 					],
 				})
@@ -314,10 +314,10 @@ router.put(
 			staff.is_active = true
 			await staff.save()
 
-			const response = { msg: 'Staff successfully activated' }
+			const response = { msg: 'Staff successfully activated.' }
 			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -352,13 +352,13 @@ router.get(
 				})
 
 			const response = {
-				msg: 'All transactions successfully got',
+				msg: 'All transactions successfully got.',
 				data: allInterbankTransactions,
 			}
 			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).json({
-				msg: 'Server error',
+				msg: 'Server error...',
 			})
 		}
 	}

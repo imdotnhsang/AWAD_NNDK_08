@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
 
 	// Check if not token
 	if (!accessToken || !refreshToken) {
-		return res.status(401).json({ msg: 'No access token or refresh token, authorization denied' })
+		return res.status(401).json({ msg: 'No access token or refresh token, authorization denied.' })
 	}
 
 	// Verify token
@@ -33,7 +33,7 @@ module.exports = async (req, res, next) => {
 				const redisToken = JSON.parse(await redisClient.getAsync(userId))
 
 				if (!redisToken || redisToken.refresh_token !== refreshToken) {
-					return res.status(401).json({ msg: 'Refresh token is not valid' })
+					return res.status(401).json({ msg: 'Refresh token is not valid.' })
 				} else {
 					if (redisToken.expired_at < Date.now()) {
 						redisClient.del(userId)
@@ -41,7 +41,7 @@ module.exports = async (req, res, next) => {
 						res.clearCookie('access_token')
 						res.clearCookie('refresh_token')
 
-						return res.status(401).json({ msg: 'Login timeout' })
+						return res.status(401).json({ msg: 'Login timeout.' })
 					}
 
 					const accessTokenNew = jwt.sign({ user: { id: userId } }, config.get('jwtSecret'), {
@@ -60,7 +60,7 @@ module.exports = async (req, res, next) => {
 				}
 			})
 		} else {
-			return res.status(401).json({ msg: 'Access token is not valid' })
+			return res.status(401).json({ msg: 'Access token is not valid.' })
 		}
 	}
 }

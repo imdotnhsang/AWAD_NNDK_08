@@ -59,17 +59,7 @@ const TransactionSchema = new mongoose.Schema({
 	transaction_balance_after: {
 		type: Number,
 		required: true,
-	},
-	OTP: {
-		code: {
-			type: String,
-			// required: true
-		},
-		expired_at: {
-			type: Number,
-			// required: true
-		},
-	},
+	}
 })
 
 module.exports = Transaction = mongoose.model('transaction', TransactionSchema)

@@ -38,14 +38,14 @@ const router = express.Router()
 
 // 			if (!customer) {
 // 				return res.status(400).json({
-// 					errors: [{ msg: 'Customer not exists' }],
+// 					errors: [{ msg: 'Customer not exists.' }],
 // 				})
 // 			}
 
 // 			if (accountId === customer.default_account_id) {
 // 				return res.status(400).json({
 // 					errors: [
-// 						{ msg: 'Beneficiary account cannot coincide with debit account' },
+// 						{ msg: 'Beneficiary account cannot coincide with debit account.' },
 // 					],
 // 				})
 // 			}
@@ -62,14 +62,14 @@ const router = express.Router()
 
 // 			if (list_accountReceivers_id.indexOf(accountId) !== -1) {
 // 				return res.status(400).json({
-// 					errors: [{ msg: 'Account exists' }],
+// 					errors: [{ msg: 'Account exists.' }],
 // 				})
 // 			}
 // 			const linkedBank = await LinkedBank.findOne({ bank_id: bankId })
 
 // 			if (bankId !== 'EIGHT' && !linkedBank) {
 // 				return res.status(400).json({
-// 					errors: [{ msg: 'Bank is not connected' }],
+// 					errors: [{ msg: 'Bank is not connected.' }],
 // 				})
 // 			}
 
@@ -90,7 +90,7 @@ const router = express.Router()
 // 			await customer.save()
 
 // 			const response = {
-// 				msg: 'Receiver successfully added',
+// 				msg: 'Receiver successfully added.',
 // 				data: {
 // 					nickname: responseReceiver.nickname,
 // 					account_id: responseReceiver.account_id,
@@ -103,7 +103,7 @@ const router = express.Router()
 // 				await Receiver.findByIdAndRemove(checkErrorsMongoose.createReceiver.id)
 // 			}
 
-// 			return res.status(500).json({ msg: 'Server error' })
+// 			return res.status(500).json({ msg: 'Server error...' })
 // 		}
 // 	}
 // )

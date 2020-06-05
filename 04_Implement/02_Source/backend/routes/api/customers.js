@@ -18,7 +18,7 @@ const Transaction = require('../../models/Transaction')
 
 // @route     GET /customers/init-page
 // @desc      Get all information of customer page
-// @access    Public
+// @access    Private (customer)
 router.get('/init-page', auth, async (req, res) => {
 	try {
 		const customer = await Customer.findById(req.user.id)
@@ -26,7 +26,7 @@ router.get('/init-page', auth, async (req, res) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: 'Customer not exists',
+						msg: 'Customer not exists.',
 					},
 				],
 			})
@@ -81,7 +81,7 @@ router.get('/init-page', auth, async (req, res) => {
 		})
 
 		const response = {
-			msg: 'Information page successfully initialized',
+			msg: 'Information page successfully initialized.',
 			data: {
 				personal_info: {
 					full_name: customer.full_name,
@@ -158,13 +158,13 @@ router.get('/init-page', auth, async (req, res) => {
 		return res.status(200).json(response)
 	} catch (error) {
 		console.log(error)
-		return res.status(500).json({ msg: 'Server error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
 // @route     POST /customers/add-receiver
 // @desc      Add receiver to list receiver which is received payment
-// @access    Public
+// @access    Private (customer)
 router.post(
 	'/add-receiver',
 	[
@@ -195,7 +195,7 @@ router.post(
 			const customer = await Customer.findById(userId)
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists' }],
+					errors: [{ msg: 'Customer not exists.' }],
 				})
 			}
 
@@ -203,14 +203,14 @@ router.post(
 
 			if (bankId !== 'EIGHT' && !linkedBank) {
 				return res.status(400).json({
-					errors: [{ msg: 'Bank is not connected' }],
+					errors: [{ msg: 'Bank is not connected.' }],
 				})
 			}
 
 			if (accountId === customer.default_account_id) {
 				return res.status(400).json({
 					errors: [
-						{ msg: 'Beneficiary account cannot coincide with debit account' },
+						{ msg: 'Beneficiary account cannot coincide with debit account.' },
 					],
 				})
 			}
@@ -227,7 +227,7 @@ router.post(
 
 			if (list_accountReceivers_id.indexOf(accountId) !== -1) {
 				return res.status(400).json({
-					errors: [{ msg: 'Account exists' }],
+					errors: [{ msg: 'Account exists.' }],
 				})
 			}
 
@@ -249,7 +249,7 @@ router.post(
 			await customer.save()
 
 			const response = {
-				msg: 'Receiver successfully added',
+				msg: 'Receiver successfully added.',
 				data: {
 					receiver_id: responseReceiver._id,
 					nickname: responseReceiver.nickname,
@@ -264,14 +264,14 @@ router.post(
 				await Receiver.findByIdAndRemove(checkErrorsMongoose.createReceiver.id)
 			}
 
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
 
 // @route     PUT /customers/update-receiver
 // @desc      Update information receiver
-// @access    Public
+// @access    Private (customer)
 router.put(
 	'/update-receiver',
 	[
@@ -293,20 +293,20 @@ router.put(
 			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists' }],
+					errors: [{ msg: 'Customer not exists.' }],
 				})
 			}
 
 			if (customer.list_receiver_id.indexOf(receiverId) === -1) {
 				return res.status(400).json({
-					errors: [{ msg: 'Receiver not exists' }],
+					errors: [{ msg: 'Receiver not exists.' }],
 				})
 			}
 
 			const receiver = await Receiver.findById(receiverId)
 			if (nickname === receiver.nickname) {
 				return res.status(400).json({
-					errors: [{ msg: 'New nickname cannot coincide with old nickname' }],
+					errors: [{ msg: 'New nickname cannot coincide with old nickname.' }],
 				})
 			}
 
@@ -314,7 +314,7 @@ router.put(
 			const responseReceiver = await receiver.save()
 
 			const response = {
-				msg: 'Receiver successfully updated',
+				msg: 'Receiver successfully updated.',
 				data: {
 					receiver_id: responseReceiver._id,
 					nickname: responseReceiver.nickname,
@@ -326,14 +326,14 @@ router.put(
 			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
 
 // @route     DELETE /customers/delete-receiver
 // @desc      Delete receiver from list receiver
-// @access    Public
+// @access    Private (customer)
 router.delete(
 	'/delete-receiver',
 	[auth, check('receiverId', 'Receiver id is required').not().notEmpty()],
@@ -351,7 +351,7 @@ router.delete(
 			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists' }],
+					errors: [{ msg: 'Customer not exists.' }],
 				})
 			}
 
@@ -359,7 +359,7 @@ router.delete(
 
 			if (inxItem === -1) {
 				return res.status(400).json({
-					errors: [{ msg: 'Receiver not exists' }],
+					errors: [{ msg: 'Receiver not exists.' }],
 				})
 			}
 
@@ -368,25 +368,25 @@ router.delete(
 			customer.list_receiver_id.splice(inxItem, 1)
 			await customer.save()
 
-			const response = { msg: 'Receiver successfully deleted' }
+			const response = { msg: 'Receiver successfully deleted.' }
 			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
 
 // @route     GET /customers/transaction-history
 // @desc      View transaction history of customer account
-// @access    Public
+// @access    Private (customer)
 router.get('/transaction-history', auth, async (req, res) => {
 	try {
 		const customer = await Customer.findById(req.user.id)
 		if (!customer) {
 			return res
 				.status(400)
-				.json({ errors: [{ msg: 'Customer does not exist' }] })
+				.json({ errors: [{ msg: 'Customer does not exist.' }] })
 		}
 
 		const transactionHistory = await Transaction.find({
@@ -397,7 +397,7 @@ router.get('/transaction-history', auth, async (req, res) => {
 		})
 
 		const response = {
-			msg: 'Transaction history successfully got',
+			msg: 'Transaction history successfully got.',
 			data: {
 				receive: transactionHistory
 					.filter(
@@ -456,13 +456,13 @@ router.get('/transaction-history', auth, async (req, res) => {
 		return res.status(200).json(response)
 	} catch (error) {
 		console.log(error)
-		return res.status(500).json({ msg: 'Server error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
 // @route     GET /customers/cards-information
 // @desc      Get all information of customer page
-// @access    Public
+// @access    Private (customer)
 router.get('/information-cards', auth, async (req, res) => {
 	try {
 		const customer = await Customer.findById(req.user.id)
@@ -470,7 +470,7 @@ router.get('/information-cards', auth, async (req, res) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: 'Customer not exists',
+						msg: 'Customer not exists.',
 					},
 				],
 			})
@@ -501,7 +501,7 @@ router.get('/information-cards', auth, async (req, res) => {
 		})
 
 		const response = {
-			msg: 'Information cards successfully got',
+			msg: 'Information cards successfully got.',
 			data: {
 				default_account: {
 					account_id: defaultAccount.account_id,
@@ -516,13 +516,13 @@ router.get('/information-cards', auth, async (req, res) => {
 		return res.status(200).json(response)
 	} catch (error) {
 		console.log(error)
-		return res.status(500).json({ msg: 'Server error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
 // @route     PUT /customers/change-password
 // @desc      Change password customer
-// @access    Public
+// @access    Private (customer)
 router.put(
 	'/change-password',
 	[
@@ -545,14 +545,14 @@ router.put(
 		try {
 			if (newPassword === oldPassword) {
 				return res.status(400).json({
-					errors: [{ msg: 'New password cannot coincide with old password' }],
+					errors: [{ msg: 'New password cannot coincide with old password.' }],
 				})
 			}
 
 			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists' }],
+					errors: [{ msg: 'Customer not exists.' }],
 				})
 			}
 
@@ -561,7 +561,7 @@ router.put(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Old password is incorrect',
+							msg: 'Old password is incorrect.',
 						},
 					],
 				})
@@ -572,17 +572,25 @@ router.put(
 
 			await customer.save()
 
-			return res.status(200).json({ msg: 'Password successfully changed' })
+			return res.status(200).json({ msg: 'Password successfully changed.' })
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
 
+// @route     POST /customers/send-password-otp
+// @desc      Send OTP to email which supports to reset password
+// @access    Public
 router.post(
-	'/sent-otp-password',
+	'/send-password-otp',
 	[check('email', 'Please include a valid email').isEmail()],
 	async (req, res) => {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
+		}
+
 		const { email } = req.body
 
 		try {
@@ -592,7 +600,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Customer does not exist',
+							msg: 'Customer does not exist.',
 						},
 					],
 				})
@@ -603,38 +611,164 @@ router.post(
 
 			await sendOTPCode(email, customer.full_name, otpCode, 'forgotPassword')
 
-			const response = { msg: 'OTP successfully sent' }
+			customer.OTP.code = otpCode
+			customer.OTP.expired_at = Date.now() + 180000
+			customer.OTP.is_confirmed = false
+			customer.OTP.is_used = false
+			await customer.save()
+
+			const response = { msg: 'OTP successfully sent.' }
 			return res.status(200).json(response)
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
 
-router.post('/sent-otp-transferring', auth, async (req, res) => {
-	try {
-		const customer = await Customer.findById(req.user.id)
-
-		if (!customer) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Customer does not exist',
-					},
-				],
-			})
+// @route     POST /customers/send-password-otp
+// @desc      Check OTP for resetting password
+// @access    Public
+router.post(
+	'/validate-password-otp',
+	[
+		check('email', 'Please include a valid email').isEmail(),
+		check('otp', 'Please include a valid OTP').isLength({ min: 6, max: 6 }),
+	],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
 		}
 
-		const nanoidPassword = await customAlphabet('1234567890', 6)
-		const otpCode = nanoidPassword()
+		const { email, otp } = req.body
 
-		await sendOTPCode(customer.email, customer.full_name, otpCode, 'transfer')
+		try {
+			const customer = await Customer.findOne({ email })
+			if (!customer) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Customer does not exist.',
+						},
+					],
+				})
+			}
 
-		const response = { msg: 'OTP successfully sent' }
-		return res.status(200).json(response)
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server error' })
+			if (customer.OTP.is_used !== false) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP is only used once.',
+						},
+					],
+				})
+			}
+
+			if (otp !== customer.OTP.code) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP code is invalid.',
+						},
+					],
+				})
+			}
+
+			if (customer.OTP.expired_at < Date.now()) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP code has expired.',
+						},
+					],
+				})
+			}
+
+			customer.OTP.is_confirmed = true
+			customer.OTP.expired_at = Date.now() + 300000
+			customer.save()
+
+			const response = { msg: 'OTP is successfully passed.' }
+			return res.status(200).json(response)
+		} catch (error) {
+			return res.status(500).json({ msg: 'Server error...' })
+		}
 	}
-})
+)
+
+// @route     PUT /customers/reset-password
+// @desc      Reset password for customer
+// @access    Public
+router.put(
+	'/reset-password',
+	[
+		check('email', 'Please include a valid email').not().notEmpty(),
+		check('newPassword', 'Please include a valid password').isLength({
+			min: 8,
+		}),
+	],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
+		}
+
+		const { email, newPassword } = req.body
+
+		try {
+			const customer = await Customer.findOne({ email })
+
+			if (!customer) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Customer does not exist.',
+						},
+					],
+				})
+			}
+
+			if (customer.OTP.is_used !== false) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP is only used once.',
+						},
+					],
+				})
+			}
+
+			if (customer.OTP.is_confirmed !== true) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP is not be confirmed.',
+						},
+					],
+				})
+			}
+
+			if (customer.OTP.expired_at < Date.now()) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'The reset password timeout has expired.',
+						},
+					],
+				})
+			}
+
+			const salt = await bcrypt.genSalt(10)
+			customer.password = await bcrypt.hash(newPassword, salt)
+			customer.OTP.is_used = true
+			await customer.save()
+
+			const response = { msg: 'Password successfully reset.' }
+			return res.status(200).json(response)
+		} catch (error) {
+			return res.status(500).json({ msg: 'Server error...' })
+		}
+	}
+)
 
 module.exports = router

@@ -39,6 +39,24 @@ const CustomerSchema = new mongoose.Schema({
 		type: Number,
 		require: true,
 	},
+	OTP: {
+		code: {
+			type: String,
+			// required: true
+		},
+		expired_at: {
+			type: Number,
+			// required: true
+		},
+		is_confirmed: {
+			type: Boolean,
+			// required: true
+		},
+		is_used: {
+			type: Boolean,
+			// required: true
+		},
+	},
 })
 
 module.exports = Customer = mongoose.model('customer', CustomerSchema)

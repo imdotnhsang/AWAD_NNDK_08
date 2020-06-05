@@ -20,7 +20,7 @@ router.get('/users', auth, async (req, res) => {
 		return res.status(200).json(req.user)
 	} catch (error) {
 		console.log(error)
-		return res.status(500).json({ msg: 'Server error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
@@ -47,7 +47,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Email not exists',
+							msg: 'Email not exists.',
 						},
 					],
 				})
@@ -58,7 +58,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Password is incorrect',
+							msg: 'Password is incorrect.',
 						},
 					],
 				})
@@ -68,7 +68,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Customer is deactivated',
+							msg: 'Customer is deactivated.',
 						},
 					],
 				})
@@ -114,14 +114,14 @@ router.post(
 			)
 
 			return res.status(200).json({
-				msg: 'Signed in successfully',
+				msg: 'Signed in successfully.',
 				data: {
 					'access-token': accessToken,
 					'refresh-token': refreshTokenInfo.refresh_token,
 				},
 			})
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -149,7 +149,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Username does not exist',
+							msg: 'Username does not exist.',
 						},
 					],
 				})
@@ -160,7 +160,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Password is incorrect',
+							msg: 'Password is incorrect.',
 						},
 					],
 				})
@@ -170,7 +170,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Staff is deactivated',
+							msg: 'Staff is deactivated.',
 						},
 					],
 				})
@@ -213,7 +213,7 @@ router.post(
 			)
 
 			const response = {
-				msg: 'Signed in successfully',
+				msg: 'Signed in successfully.',
 				data: {
 					'access-token': accessToken,
 					'refresh-token': refreshTokenInfo.refresh_token,
@@ -222,7 +222,7 @@ router.post(
 			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -235,10 +235,10 @@ router.post('/logout', auth, async (req, res) => {
 		res.clearCookie('refresh_token')
 		// res.redirect('/')
 
-		const response = { msg: 'Logged out successfully' }
+		const response = { msg: 'Logged out successfully.' }
 		return res.status(200).json(response)
 	} catch (error) {
-		return res.status(500).json({ msg: 'Server error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 

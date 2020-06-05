@@ -55,7 +55,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
           font-size: 16px;
           margin: 0;
           background-color: #111111;
-          padding: 16px 24px;
+          padding: 10px 24px;
           width: fit-content;
           border-bottom: 1px solid #7c7f87;
         "
@@ -107,7 +107,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
             font-size: 16px;
             margin: 0;
             background-color: #111111;
-            padding: 16px 24px;
+            padding: 10px 24px;
             width: fit-content;
             border-bottom: 1px solid #7c7f87;
           "

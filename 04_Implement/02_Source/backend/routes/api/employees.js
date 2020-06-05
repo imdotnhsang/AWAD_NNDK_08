@@ -27,12 +27,12 @@ router.get('/init-page', [auth, employee], async (req, res) => {
 		})
 
 		const response = {
-			msg: 'Information page successfully initialized',
+			msg: 'Information page successfully initialized.',
 			data: allCustomers,
 		}
 		return res.status(200).json(response)
 	} catch (error) {
-		return res.status(500).json({ msg: 'Server Error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
@@ -67,7 +67,7 @@ router.post(
 			return res.status(400).json({
 				errors: [
 					{
-						msg: 'Service does not exist',
+						msg: 'Service does not exist.',
 					},
 				],
 			})
@@ -85,7 +85,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Email or phone number already exists',
+							msg: 'Email or phone number already exists.',
 						},
 					],
 				})
@@ -99,7 +99,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Account already exists',
+							msg: 'Account already exists.',
 						},
 					],
 				})
@@ -142,7 +142,7 @@ router.post(
 			const responseCustomer = await customer.save()
 
 			const response = {
-				msg: 'Customer successfully created',
+				msg: 'Customer successfully created.',
 				data: {
 					login_info: {
 						email,
@@ -168,7 +168,7 @@ router.post(
 				})
 			}
 
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -195,20 +195,20 @@ router.post(
 
 		if (!rechargeAccountId && !rechargeEmail) {
 			return res.status(400).json({
-				errors: [{ msg: 'Recharge account or recharge email is required' }],
+				errors: [{ msg: 'Recharge account or recharge email is required.' }],
 			})
 		}
 
 		if (rechargeAccountId && rechargeAccountId.length !== 14) {
 			return res.status(400).json({
-				errors: [{ msg: 'Please include a valid account it' }],
+				errors: [{ msg: 'Please include a valid account id.' }],
 			})
 		}
 
 		const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/gm
 		if (rechargeEmail && re.test(String(rechargeEmail)) === false) {
 			return res.status(400).json({
-				errors: [{ msg: 'Please include a valid email' }],
+				errors: [{ msg: 'Please include a valid email.' }],
 			})
 		}
 
@@ -227,7 +227,7 @@ router.post(
 			if (!customer) {
 				return res
 					.status(400)
-					.json({ errors: [{ msg: 'Customer does not exist' }] })
+					.json({ errors: [{ msg: 'Customer does not exist.' }] })
 			}
 
 			const account = await Account.findOne({
@@ -237,7 +237,7 @@ router.post(
 			if (!account || account.account_type !== 'DEFAULT') {
 				return res
 					.status(400)
-					.json({ errors: [{ msg: 'Account does not exist' }] })
+					.json({ errors: [{ msg: 'Account does not exist.' }] })
 			}
 
 			const transactionReceiver = {
@@ -269,7 +269,7 @@ router.post(
 			await new Transaction(transactionReceiver).save()
 
 			const response = {
-				msg: 'Account successfully recharged',
+				msg: 'Account successfully recharged.',
 				data: {
 					full_name: customer.full_name,
 					account_id: account.account_id,
@@ -287,7 +287,7 @@ router.post(
 				).save()
 			}
 
-			return res.status(500).json({ msg: 'Server Error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -312,7 +312,7 @@ router.get(
 			if (!customer) {
 				return res
 					.status(400)
-					.json({ errors: [{ msg: 'Customer does not exist' }] })
+					.json({ errors: [{ msg: 'Customer does not exist.' }] })
 			}
 
 			const transactionHistory = await Transaction.find({
@@ -323,7 +323,7 @@ router.get(
 			})
 
 			const response = {
-				msg: 'Transaction history successfully got',
+				msg: 'Transaction history successfully got.',
 				data: {
 					receive: transactionHistory
 						.filter(
@@ -382,7 +382,7 @@ router.get(
 			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )

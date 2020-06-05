@@ -17,12 +17,12 @@ const router = express.Router()
 // 		const staff = await Staff.findById(req.user.id)
 // 		if (!staff) {
 // 			return res.status(400).json({
-// 				errors: [{ msg: 'Staff not exists' }],
+// 				errors: [{ msg: 'Staff not exists.' }],
 // 			})
 // 		}
 
 // 		const response = {
-// 			msg: 'Information successfully got',
+// 			msg: 'Information successfully got.',
 // 			data: {
 // 				username: staff.username,
 // 				full_name: staff.full_name,
@@ -33,7 +33,7 @@ const router = express.Router()
 // 		}
 // 		return res.status(200).json(response)
 // 	} catch (error) {
-// 		return res.status(500).json({ msg: 'Server error' })
+// 		return res.status(500).json({ msg: 'Server error...' })
 // 	}
 // })
 
@@ -63,14 +63,14 @@ const router = express.Router()
 // 		try {
 // 			if (newPassword === oldPassword) {
 // 				return res.status(400).json({
-// 					errors: [{ msg: 'New password cannot coincide with old password' }],
+// 					errors: [{ msg: 'New password cannot coincide with old password.' }],
 // 				})
 // 			}
 
 // 			const staff = await Staff.findById(req.user.id)
 // 			if (!staff) {
 // 				return res.status(400).json({
-// 					errors: [{ msg: 'Staff not exists' }],
+// 					errors: [{ msg: 'Staff not exists.' }],
 // 				})
 // 			}
 
@@ -90,9 +90,9 @@ const router = express.Router()
 
 // 			await staff.save()
 
-// 			return res.status(200).json({ msg: 'Password successfully changed' })
+// 			return res.status(200).json({ msg: 'Password successfully changed.' })
 // 		} catch (error) {
-// 			return res.status(500).json({ msg: 'Server error' })
+// 			return res.status(500).json({ msg: 'Server error...' })
 // 		}
 // 	}
 // )

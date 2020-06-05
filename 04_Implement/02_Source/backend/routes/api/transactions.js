@@ -1,11 +1,13 @@
 const express = require('express')
 
 const router = express.Router()
+const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
 // const NodeRSA = require('node-rsa')
 const auth = require('../../middlewares/auth')
 const crypto = require('crypto')
 const openpgp = require('openpgp')
+const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
 
 const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 
@@ -58,7 +60,7 @@ router.post(
 
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists' }],
+					errors: [{ msg: 'Customer not exists.' }],
 				})
 			}
 
@@ -70,14 +72,16 @@ router.post(
 
 			if (listAccountId.indexOf(fromAccountId) === -1) {
 				return res.status(400).json({
-					errors: [{ msg: 'Transferring account id is not account\'s customer' }],
+					errors: [
+						{ msg: 'Transferring account id is not account\'s customer.' },
+					],
 				})
 			}
 
 			if (fromAccountId === toAccountId) {
 				return res.status(400).json({
 					errors: [
-						{ msg: 'Beneficiary account cannot coincide with debit account' },
+						{ msg: 'Beneficiary account cannot coincide with debit account.' },
 					],
 				})
 			}
@@ -91,14 +95,14 @@ router.post(
 			if (!accountTransferer || !accountReceiver) {
 				return res.status(400).json({
 					errors: [
-						{ msg: 'Account transferer or account receiver not exists' },
+						{ msg: 'Account transferer or account receiver not exists.' },
 					],
 				})
 			}
 
 			if (accountTransferer.balance - transactionAmount < 50000) {
 				return res.status(400).json({
-					errors: [{ msg: 'Insufficient funds' }],
+					errors: [{ msg: 'Insufficient funds.' }],
 				})
 			}
 
@@ -216,7 +220,7 @@ router.post(
 				).save()
 			}
 
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -234,7 +238,7 @@ router.get('/receiver-internal-banking/:accountId', auth, async (req, res) => {
 			return res.status(400).json({
 				errors: [
 					{
-						msg: 'Customer not exists',
+						msg: 'Customer not exists.',
 					},
 				],
 			})
@@ -242,7 +246,7 @@ router.get('/receiver-internal-banking/:accountId', auth, async (req, res) => {
 
 		return res.status(200).json({ full_name: customer.full_name })
 	} catch (error) {
-		return res.status(500).json({ msg: 'Server error' })
+		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
 
@@ -255,7 +259,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		if (!partnerCode) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Unauthorized,
-				message: 'Not allow to access this api',
+				message: 'Not allow to access this api.',
 			})
 		}
 
@@ -263,7 +267,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		if (!bankInfo) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Unauthorized,
-				message: 'Not allow to access this api',
+				message: 'Not allow to access this api.',
 			})
 		}
 
@@ -271,7 +275,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		if (!digitalSignature) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Forbidden,
-				message: 'Require digital signature',
+				message: 'Require digital signature.',
 			})
 		}
 
@@ -545,7 +549,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Customer not exists',
+							msg: 'Customer not exists.',
 						},
 					],
 				})
@@ -559,7 +563,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Account not exists',
+							msg: 'Account not exists.',
 						},
 					],
 				})
@@ -569,7 +573,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Insufficient funds',
+							msg: 'Insufficient funds.',
 						},
 					],
 				})
@@ -609,7 +613,7 @@ router.post(
 				.status(200)
 				.json({ transactionTransfererResponse, accountTransfererResponse })
 		} catch (error) {
-			return res.status(500).json({ msg: 'Server error' })
+			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
@@ -634,7 +638,7 @@ router.post(
 			if (!partnerCode) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Unauthorized,
-					message: 'Not allow to access this api',
+					message: 'Not allow to access this api.',
 				})
 			}
 
@@ -642,7 +646,7 @@ router.post(
 			if (!bankInfo) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Unauthorized,
-					message: 'Not allow to access this api',
+					message: 'Not allow to access this api.',
 				})
 			}
 
@@ -687,7 +691,7 @@ router.post(
 			if (isNaN(dataDecryptedObject.entryTime)) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
-					message: 'Entry time must be an unix number',
+					message: 'Entry time must be an unix number.',
 				})
 			}
 
@@ -696,7 +700,7 @@ router.post(
 			if (dataDecryptedObject.entryTime > currentTime) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
-					message: 'Entry time is invalid (entrytime is greater than now)',
+					message: 'Entry time is invalid (entrytime is greater than now).',
 				})
 			}
 
@@ -704,7 +708,7 @@ router.post(
 			if (currentTime - dataDecryptedObject.entryTime > 300) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
-					message: 'Your entrytime is expired. Please try again',
+					message: 'Your entrytime is expired. Please try again.',
 				})
 			}
 
@@ -721,7 +725,7 @@ router.post(
 			if (accessedApiHistoryResp.status == APIStatus.Ok) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
-					message: 'Your access is solved. Please make another request',
+					message: 'Your access is solved. Please make another request.',
 				})
 			}
 
@@ -735,7 +739,7 @@ router.post(
 			) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
-					message: 'Your data is invalid',
+					message: 'Your data is invalid.',
 				})
 			}
 
@@ -760,7 +764,7 @@ router.post(
 				if (!check) {
 					return MakeResponse(req, res, {
 						status: APIStatus.Invalid,
-						message: 'Signature is invalid',
+						message: 'Signature is invalid.',
 					})
 				}
 			} else if (bankInfo.encrypt_type == 'PGP') {
@@ -781,7 +785,7 @@ router.post(
 				if (!valid) {
 					return MakeResponse(req, res, {
 						stauts: APIStatus.Invalid,
-						message: 'Signature is invalid',
+						message: 'Signature is invalid.',
 					})
 				}
 			}
@@ -811,7 +815,7 @@ router.post(
 				return res.status(400).json({
 					errors: [
 						{
-							msg: 'Account not exists',
+							msg: 'Account not exists.',
 						},
 					],
 				})
@@ -850,5 +854,38 @@ router.post(
 		}
 	}
 )
+
+// @route     POST /transactions/send-transaction-otp
+// @desc      Send OTP to email which supports to confirm transaction
+// @access    Public
+router.post('/send-transaction-otp', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer does not exist.',
+					},
+				],
+			})
+		}
+
+		const nanoidPassword = await customAlphabet('1234567890', 6)
+		const otpCode = nanoidPassword()
+
+		await sendOTPCode(customer.email, customer.full_name, otpCode, 'transfer')
+
+		customer.OTP.code = otpCode
+		customer.OTP.expired_at = Date.now() + 90000
+		await customer.save()
+
+		const response = { msg: 'OTP successfully sent.' }
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
 
 module.exports = router
