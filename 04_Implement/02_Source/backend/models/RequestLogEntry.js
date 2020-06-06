@@ -40,7 +40,7 @@ const RequestLogEntrySchema = new mongoose.Schema({
         type: String
     },
     date: {
-        type: Number,
+        type: Date,
         required: true
     }
 })
