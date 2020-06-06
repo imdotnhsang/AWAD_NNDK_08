@@ -62,6 +62,15 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
       >
         ${otpCode}
       </p>
+      <p
+      style="
+        margin: 0;
+        padding-top: 16px;
+        font-size: 16px;
+      "
+    >
+    This code will expire five minutes after this mail was sent.
+    </p>
     </div>
   </div>`
 		break
@@ -114,6 +123,15 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
         >
           ${otpCode}
         </p>
+        <p
+        style="
+          margin: 0;
+          padding-top: 16px;
+          font-size: 16px;
+        "
+      >
+      This code will expire five minutes after this mail was sent.
+      </p>
       </div>
     </div>`
 		break

@@ -20,15 +20,52 @@ const DBModel = require('../../utils/DBModel')
 
 const DBModelInstance = new DBModel()
 
+// @route     POST /transactions/send-transaction-otp
+// @desc      Send OTP to email which supports to confirm transaction
+// @access    Public
+router.post('/send-transaction-otp', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer does not exist.',
+					},
+				],
+			})
+		}
+
+		const nanoidPassword = await customAlphabet('1234567890', 6)
+		const otpCode = nanoidPassword()
+
+		await sendOTPCode(customer.email, customer.full_name, otpCode, 'transfer')
+
+		customer.OTP.code = otpCode
+		customer.OTP.expired_at = Date.now() + 300000
+		customer.OTP.is_confirmed = false
+		customer.OTP.is_used = false
+		await customer.save()
+
+		const response = { msg: 'OTP successfully sent.' }
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
+
 // @route     POST /transactions/transferring-within-bank
-// @desc      Chuyển khoản trong ngân hàng
+// @desc      Transfer internal bank
 // @access    Public
 router.post(
 	'/transferring-internal-banking',
 	[
 		auth,
+		check('otp', 'Please include a valid OTP')
+			.isInt()
+			.isLength({ min: 6, max: 6 }),
 		check('entryTime', 'Entry time is required').not().notEmpty(),
-		check('fromAccountId', 'Transferer account is required').not().notEmpty(),
 		check('toAccountId', 'Receiver account is required').not().notEmpty(),
 		check('toFullName', 'Receiver full name is required').not().notEmpty(),
 		check('transactionAmount', 'Transaction amount is 50000 or more').isInt({
@@ -42,8 +79,8 @@ router.post(
 		}
 
 		const {
+			otp,
 			entryTime,
-			fromAccountId,
 			toAccountId,
 			toFullName,
 			transactionAmount,
@@ -52,6 +89,7 @@ router.post(
 		const checkErrorsMongoose = {
 			updateTransfererAccount: false,
 			createTransfererTransaction: false,
+			transfererTransactionFailed: false,
 			updateReceiverAccount: false,
 		}
 
@@ -65,20 +103,8 @@ router.post(
 			}
 
 			const fromFullName = customer.full_name
-			const listAccountId = [
-				...customer.saving_accounts_id,
-				customer.default_account_id,
-			]
 
-			if (listAccountId.indexOf(fromAccountId) === -1) {
-				return res.status(400).json({
-					errors: [
-						{ msg: 'Transferring account id is not account\'s customer.' },
-					],
-				})
-			}
-
-			if (fromAccountId === toAccountId) {
+			if (customer.default_account_id === toAccountId) {
 				return res.status(400).json({
 					errors: [
 						{ msg: 'Beneficiary account cannot coincide with debit account.' },
@@ -87,7 +113,7 @@ router.post(
 			}
 
 			const accountTransferer = await Account.findOne({
-				account_id: fromAccountId,
+				account_id: customer.default_account_id,
 			})
 
 			const accountReceiver = await Account.findOne({ account_id: toAccountId })
@@ -106,9 +132,39 @@ router.post(
 				})
 			}
 
+			if (customer.OTP.is_used !== false) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP is only used once.',
+						},
+					],
+				})
+			}
+
+			if (otp !== customer.OTP.code) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP code is invalid.',
+						},
+					],
+				})
+			}
+
+			if (customer.OTP.expired_at < Date.now()) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP code has expired.',
+						},
+					],
+				})
+			}
+
 			const transactionTransferer = {
 				entry_time: entryTime,
-				from_account_id: fromAccountId,
+				from_account_id: customer.default_account_id,
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
 				to_fullname: toFullName,
@@ -121,7 +177,7 @@ router.post(
 
 			const transactionReceiver = new Transaction({
 				entry_time: entryTime,
-				from_account_id: fromAccountId,
+				from_account_id: customer.default_account_id,
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
 				to_fullname: toFullName,
@@ -133,7 +189,7 @@ router.post(
 			})
 
 			const accountTransfererResponse = await Account.findOneAndUpdate(
-				{ account_id: fromAccountId },
+				{ account_id: customer.default_account_id },
 				{ $inc: { balance: -transactionAmount } },
 				{ new: true }
 			)
@@ -148,6 +204,8 @@ router.post(
 				transaction_balance_after: accountTransfererResponse.balance,
 				transaction_status: 'FAILED',
 			}).save()
+
+			checkErrorsMongoose.transfererTransactionFailed = transactionTransfererResponse
 
 			checkErrorsMongoose.createTransfererTransaction = {
 				...transactionTransferer,
@@ -179,12 +237,28 @@ router.post(
 			transactionReceiverResponse.transaction_status = 'SUCCESS'
 			transactionReceiverResponse.save()
 
-			return res.status(200).json({
-				transactionTransfererResponse,
-				transactionReceiverResponse,
-				accountTransfererResponse,
-				accountReceiverResponse,
-			})
+			customer.OTP.is_confirmed = true
+			customer.OTP.is_used = true
+			customer.save()
+
+			const response = {
+				msg: 'Transaction successfully transferred',
+				data: {
+					entry_time: transactionTransfererResponse.entry_time,
+					from_account_id: transactionTransfererResponse.from_account_id,
+					from_fullname: transactionTransfererResponse.from_fullname,
+					to_account_id: transactionTransfererResponse.to_account_id,
+					to_fullname: transactionTransfererResponse.to_fullname,
+					transaction_type: transactionTransfererResponse.transaction_type,
+					transaction_amount: transactionTransfererResponse.transaction_amount,
+					transaction_balance_before:
+						transactionTransfererResponse.transaction_balance_before,
+					transaction_balance_after:
+						transactionTransfererResponse.transaction_balance_after,
+					transaction_status: transactionTransfererResponse.transaction_status,
+				},
+			}
+			return res.status(200).json(response)
 		} catch (error) {
 			if (checkErrorsMongoose.updateReceiverAccount !== false) {
 				await Account.findOneAndUpdate(
@@ -215,9 +289,57 @@ router.post(
 			}
 
 			if (checkErrorsMongoose.createTransfererTransaction !== false) {
-				await new Transaction(
+				const transfererTransactionRefund = await new Transaction(
 					checkErrorsMongoose.createTransfererTransaction
 				).save()
+				return res.status(500).json({
+					msg: 'Server error...',
+					data: {
+						transaction_failed: {
+							entry_time:
+								checkErrorsMongoose.transfererTransactionFailed.entry_time,
+							from_account_id:
+								checkErrorsMongoose.transfererTransactionFailed.from_account_id,
+							from_fullname:
+								checkErrorsMongoose.transfererTransactionFailed.from_fullname,
+							to_account_id:
+								checkErrorsMongoose.transfererTransactionFailed.to_account_id,
+							to_fullname:
+								checkErrorsMongoose.transfererTransactionFailed.to_fullname,
+							transaction_type:
+								checkErrorsMongoose.transfererTransactionFailed
+									.transaction_type,
+							transaction_amount:
+								checkErrorsMongoose.transfererTransactionFailed
+									.transaction_amount,
+							transaction_balance_before:
+								checkErrorsMongoose.transfererTransactionFailed
+									.transaction_balance_before,
+							transaction_balance_after:
+								checkErrorsMongoose.transfererTransactionFailed
+									.transaction_balance_after,
+							transaction_status:
+								checkErrorsMongoose.transfererTransactionFailed
+									.transaction_status,
+						},
+						transaction_refund: {
+							entry_time: transfererTransactionRefund.entry_time,
+							from_account_id: transfererTransactionRefund.from_account_id,
+							from_fullname: transfererTransactionRefund.from_fullname,
+							to_account_id: transfererTransactionRefund.to_account_id,
+							to_fullname: transfererTransactionRefund.to_fullname,
+							transaction_type: transfererTransactionRefund.transaction_type,
+							transaction_amount:
+								transfererTransactionRefund.transaction_amount,
+							transaction_balance_before:
+								transfererTransactionRefund.transaction_balance_before,
+							transaction_balance_after:
+								transfererTransactionRefund.transaction_balance_after,
+							transaction_status:
+								transfererTransactionRefund.transaction_status,
+						},
+					},
+				})
 			}
 
 			return res.status(500).json({ msg: 'Server error...' })
@@ -225,12 +347,17 @@ router.post(
 	}
 )
 
-// @route     GET /transactions/receiver-withinbank/:accountId
-// @desc      Lấy họ và tên người nhận khi chuyển khoản cùng ngân hàng
+// @route     GET /transactions/receiver-receiver-internal-banking
+// @desc      Get full name from account id internal banking
 // @access    Public
-router.get('/receiver-internal-banking/:accountId', auth, async (req, res) => {
+router.get('/receiver-internal-banking/', auth, async (req, res) => {
+	const errors = validationResult(req)
+	if (!errors.isEmpty()) {
+		return res.status(400).send(errors)
+	}
+
 	try {
-		const { accountId } = req.params
+		const { accountId } = req.body
 
 		const customer = await Customer.findOne({ default_account_id: accountId })
 
@@ -251,7 +378,7 @@ router.get('/receiver-internal-banking/:accountId', auth, async (req, res) => {
 })
 
 // @route     GET /transactions/receiver-interbank/
-// @desc      Lấy họ và tên người nhận khi ngân hàng khác muốn chuyển khoản
+// @desc      Get full name from account id interbank
 // @access    Public
 router.get('/receiver-interbank', async (req, res) => {
 	try {
@@ -512,11 +639,11 @@ router.get('/receiver-interbank', async (req, res) => {
 	}
 })
 
-// @route     POST /transactions/sengding-interbank
-// @desc      Chuyển khoản đến ngân hàng khác
+// @route     POST /transactions/transferring-interbank
+// @desc      Transfer interbank
 // @access    Public
 router.post(
-	'/transfering-interbank',
+	'/transferring-interbank',
 	[
 		auth,
 		check('entryTime', 'Entry time is required').not().notEmpty(),
@@ -619,7 +746,7 @@ router.post(
 )
 
 // @route     POST /transactions/receiving-interbank
-// @desc      Ngân hàng khác chuyển khoản vào
+// @desc      Receive transferring interbank
 // @access    Public
 router.post(
 	'/receiving-interbank',
@@ -854,38 +981,5 @@ router.post(
 		}
 	}
 )
-
-// @route     POST /transactions/send-transaction-otp
-// @desc      Send OTP to email which supports to confirm transaction
-// @access    Public
-router.post('/send-transaction-otp', auth, async (req, res) => {
-	try {
-		const customer = await Customer.findById(req.user.id)
-
-		if (!customer) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Customer does not exist.',
-					},
-				],
-			})
-		}
-
-		const nanoidPassword = await customAlphabet('1234567890', 6)
-		const otpCode = nanoidPassword()
-
-		await sendOTPCode(customer.email, customer.full_name, otpCode, 'transfer')
-
-		customer.OTP.code = otpCode
-		customer.OTP.expired_at = Date.now() + 90000
-		await customer.save()
-
-		const response = { msg: 'OTP successfully sent.' }
-		return res.status(200).json(response)
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server error...' })
-	}
-})
 
 module.exports = router
