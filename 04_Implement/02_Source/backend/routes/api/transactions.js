@@ -65,7 +65,6 @@ router.post(
 		check('otp', 'Please include a valid OTP')
 			.isInt()
 			.isLength({ min: 6, max: 6 }),
-		check('entryTime', 'Entry time is required').not().notEmpty(),
 		check('toAccountId', 'Receiver account is required').not().notEmpty(),
 		check('toFullName', 'Receiver full name is required').not().notEmpty(),
 		check('transactionAmount', 'Transaction amount is 50000 or more').isInt({
@@ -78,13 +77,7 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const {
-			otp,
-			entryTime,
-			toAccountId,
-			toFullName,
-			transactionAmount,
-		} = req.body
+		const { otp, toAccountId, toFullName, transactionAmount } = req.body
 
 		const checkErrorsMongoose = {
 			updateTransfererAccount: false,
@@ -95,7 +88,6 @@ router.post(
 
 		try {
 			const customer = await Customer.findById(req.user.id)
-
 			if (!customer) {
 				return res.status(400).json({
 					errors: [{ msg: 'Customer not exists.' }],
@@ -163,7 +155,7 @@ router.post(
 			}
 
 			const transactionTransferer = {
-				entry_time: entryTime,
+				entry_time: Date.now(),
 				from_account_id: customer.default_account_id,
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
@@ -176,7 +168,7 @@ router.post(
 			}
 
 			const transactionReceiver = new Transaction({
-				entry_time: entryTime,
+				entry_time: Date.now(),
 				from_account_id: customer.default_account_id,
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,

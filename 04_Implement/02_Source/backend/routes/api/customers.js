@@ -15,6 +15,7 @@ const Account = require('../../models/Account')
 const Receiver = require('../../models/Receiver')
 const LinkedBank = require('../../models/LinkedBank')
 const Transaction = require('../../models/Transaction')
+// const DebtCollection = require('../../models/DebtCollection')
 
 // @route     GET /customers/init-page
 // @desc      Get all information of customer page
@@ -79,6 +80,13 @@ router.get('/init-page', auth, async (req, res) => {
 				{ to_account_id: defaultAccountId },
 			],
 		})
+
+		// const debtCollection = await DebtCollection.find({
+		// 	$or: [
+		// 		{ borrower_default_account: defaultAccountId },
+		// 		{ lender_default_account: defaultAccountId },
+		// 	],
+		// })
 
 		const response = {
 			msg: 'Information page successfully initialized.',

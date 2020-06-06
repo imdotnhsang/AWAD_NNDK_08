@@ -49,6 +49,7 @@ const TransactionSchema = new mongoose.Schema({
 		type: String,
 	},
 	transaction_payer: {
+		// TRANSFERER, RECEIVER
 		type: String,
 		require: true,
 	},
@@ -59,7 +60,7 @@ const TransactionSchema = new mongoose.Schema({
 	transaction_balance_after: {
 		type: Number,
 		required: true,
-	}
+	},
 })
 
 module.exports = Transaction = mongoose.model('transaction', TransactionSchema)
