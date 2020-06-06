@@ -997,11 +997,6 @@ router.post(
 				digital_sign = digital_sign.toString('base64')
 				response.digital_sign = digital_sign
 			}
-
-
-
-			
-
 			return res
 				.status(200)
 				.json({
