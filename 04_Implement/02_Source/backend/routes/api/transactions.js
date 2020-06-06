@@ -965,36 +965,40 @@ router.post(
 			)
 
 			const transactionReceiverResponse = await transactionReceiver.save()
-	
+
 			let response = {
 				transactionReceiverResponse,
-				accountReceiverResponse
+				accountReceiverResponse,
 			}
-			
-			if (bankInfo.encrypt_type == "PGP") {
-				const { keys: [privateKey] } = await openpgp.key.readArmored(bankInfo.our_private_key)
+
+			if (bankInfo.encrypt_type == 'PGP') {
+				const {
+					keys: [privateKey],
+				} = await openpgp.key.readArmored(bankInfo.our_private_key)
 				await privateKey.decrypt(bankInfo.passphrase)
 				let { data: digital_sign } = await openpgp.sign({
 					message: openpgp.cleartext.fromText(JSON.stringify(response)), // CleartextMessage or Message object
-					privateKeys: [privateKey]                             // for signing
-				});
+					privateKeys: [privateKey], // for signing
+				})
 				response.digital_sign = digital_sign
-			} else if (bankInfo.encrypt_type == "RSA") {
+			} else if (bankInfo.encrypt_type == 'RSA') {
 				let digital_sign = crypto.sign(
 					'SHA1',
-					Buffer.from(JSON.stringify(response),'base64'),
-					{ key: bankInfo.our_private_key, padding: crypto.constants.RSA_PKCS1_PSS_PADDING }
+					// eslint-disable-next-line no-undef
+					Buffer.from(JSON.stringify(response), 'base64'),
+					{
+						key: bankInfo.our_private_key,
+						padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+					}
 				)
-				
+
 				digital_sign = digital_sign.toString('base64')
 				response.digital_sign = digital_sign
 			}
-			return res
-				.status(200)
-				.json({
-					status: "OK",
-					data:response
-				})
+			return res.status(200).json({
+				status: 'OK',
+				data: response,
+			})
 		} catch (error) {
 			return res.status(500).json({ msg: error.toString() })
 		}
