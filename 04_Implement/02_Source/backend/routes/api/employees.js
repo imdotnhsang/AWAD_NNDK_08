@@ -157,6 +157,7 @@ router.post(
 					personal_info: {
 						full_name: responseCustomer.full_name,
 						phone_number: responseCustomer.phone_number,
+						created_at: responseCustomer.created_at,
 					},
 				},
 			}

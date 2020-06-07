@@ -43,7 +43,6 @@ router.post(
 			min: 10,
 			max: 10,
 		}),
-		check('positionRegister', 'Please choose a position').not().notEmpty(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -70,7 +69,7 @@ router.post(
 				positionRegister !== 'ADMINISTRATOR'
 			) {
 				return res.status(400).json({
-					errors: [{ msg: 'Position Register does not exist.' }],
+					errors: [{ msg: 'Position register does not exist.' }],
 				})
 			}
 
@@ -94,15 +93,24 @@ router.post(
 			const salt = await bcrypt.genSalt(10)
 			staff.password = await bcrypt.hash(password, salt)
 
-			await staff.save()
+			const responseStaff = await staff.save()
 
 			let response = {}
 			if (positionRegister === 'EMPLOYEE') {
 				response = {
 					msg: 'Employee successfully created.',
 					data: {
-						username,
-						password,
+						login_info: {
+							username,
+							password,
+						},
+						personal_info: {
+							full_name: responseStaff.full_name,
+							phone_number: responseStaff.phone_number,
+							email: responseStaff.email,
+							position: responseStaff.position,
+							created_at: responseStaff.created_at,
+						},
 					},
 				}
 			} else if (positionRegister === 'ADMINISTRATOR') {
@@ -130,8 +138,6 @@ router.put(
 		auth,
 		administrator,
 		check('username', 'Username is required').not().notEmpty(),
-		check('fullName', 'Full name is required').not().notEmpty(),
-		check('email', 'Please include a valid email').isEmail(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -153,7 +159,27 @@ router.put(
 				})
 			}
 
-			if (email === staff.email && fullName === staff.full_name) {
+			if (!email && !fullName) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Full name or email is required.',
+						},
+					],
+				})
+			}
+
+			const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/gm
+			if (email && re.test(String(email)) === false) {
+				return res.status(400).json({
+					errors: [{ msg: 'Please include a valid email.' }],
+				})
+			}
+
+			const newEmail = email || staff.email
+			const newFullname = fullName || staff.full_name
+
+			if (newEmail === staff.email && newFullname === staff.full_name) {
 				return res.status(400).json({
 					errors: [
 						{
@@ -163,8 +189,8 @@ router.put(
 				})
 			}
 
-			const isExist = await Staff.countDocuments({ email })
-			if (isExist && email !== staff.email) {
+			const isExist = email && (await Staff.countDocuments({ email }))
+			if (isExist) {
 				return res.status(400).json({
 					errors: [
 						{
@@ -174,14 +200,15 @@ router.put(
 				})
 			}
 
-			staff.full_name = fullName
-			staff.email = email
-			staff.username = email.split('@')[0].toLowerCase()
+			staff.full_name = newFullname
+			staff.email = newEmail
+			// staff.username = email.split('@')[0].toLowerCase()
 			await staff.save()
 
 			const response = { msg: 'Staff successfully updated.' }
 			return res.status(200).json(response)
 		} catch (error) {
+			console.log(error)
 			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
@@ -316,7 +343,7 @@ router.get(
 			)
 
 			const response = {
-				msg: 'All transactions successfully got.',
+				msg: 'All interbank transactions successfully got.',
 				data: allInterbankTransactions,
 			}
 			return res.status(200).json(response)
