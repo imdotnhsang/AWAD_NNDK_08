@@ -11,16 +11,18 @@ router.post('/', (req, res) => {
 
 router.get('/',async (req,res) => {
 	let testClient = client.newRestClient(
-	 'http://localhost/translate',
+	 'http://34.87.1.51/pms',
 		 'test',
 		60,
 		3,
 	3,
 	new DBModel()
 	)
-	let resp = await testClient.makeHTTPRequestProcess("GET",{
-		Accept: "application/json"
-	},{},null,"",null)
+	let resp = await testClient.makeHTTPRequestProcess("POST",{},{
+	
+	},{
+		categoryName: "Điện lạnh"
+	},"/category",null)
 
 //	console.log(resp)
 

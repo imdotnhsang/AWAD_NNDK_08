@@ -1,5 +1,4 @@
 const RequestLogEntry = require('../models/RequestLogEntry')
-const https = require('https')
 const axios = require('axios');
 class RestClient {
     constructor(baseURL, userAgent, logName, maxRetryTime, waitTime, timeOut, dbModel) {
@@ -38,45 +37,32 @@ class RestClient {
             req_header: headers,
             req_body: body,
             keys: key,
-            date: date
+            date: date,
+            results: []
         }
 
         let tStart = Math.round(date.getTime() / 1000000)
 
         let canRetryCount = this.maxRetryTime
 
-        let callResult = []
+      
 
         while (canRetryCount > 0) {
-            // let options = this.initRequest(httpMethod,headers,params,body,path)
 
-             let startCallTime =  Math.round(new Date().getTime() / 1000000)
+            let callResult = {}
 
-            // const req = https.request(options, (res) => {
-            //     console.log(`statusCode: ${res.statusCode}`)
-              
-            //     res.on('data', async (d) => {
-            //         console.log(d)
-            //         let tend = Math.round(new Date().getTime() / 1000000)
-            //         logEntry.status = "SUCCESS"
-            //         callResult.push({response_time:tend - startCallTime})
-            //         logEntry.result = callResult
-            //         await this.writeLog(logEntry)
-            //         return d
-            //     })
-            // })
-              
-            // req.on('error', (error) => {
-            //     console.error(error)
-            //     let tend = Math.round(new Date().getTime() / 1000000)
-            //     logEntry.status = "FAILED"
-            //     callResult.push({response_time:tend - startCallTime})
-            //     logEntry.result = callResult
-            // })
+            let options = this.initRequest(httpMethod,headers,params,body,path)
+
+            
+            let startCallTime =  Math.round(new Date().getTime() / 1000000)
+
+
 
             let instance = axios.create({
-                baseURL: 'http://localhost:3001/translate?text=hello&enToVi=true',
-                timeout: 5000
+                baseURL: options.host,
+                timeout: this.timeOut,
+                headers: options.headers,
+                data:options.body
             })
         
             instance.interceptors.request.use(
@@ -93,71 +79,107 @@ class RestClient {
             instance.interceptors.response.use((response) => {
                 return response;
             }, (error) => {
-              
                 return Promise.resolve({ error });
             });
         
             const response = await instance({
-                method:'get',
-                url:''
+                method:options.method,
             })
 
-            if (response && !response.error) {
-                let tend = Math.round(new Date().getTime() / 1000000)
+            if (response) {
+                let tEnd = Math.round(new Date().getTime() / 1000000)
                 logEntry.status = "SUCCESS"
-                callResult.push({response_time:tend - startCallTime})
-                logEntry.result = callResult
+                this.readBody(response,callResult,logEntry,canRetryCount,startCallTime,tStart)
                 await this.writeLog(logEntry)
                 return response
             } else {
-                let tend = Math.round(new Date().getTime() / 1000000)
-                logEntry.status = "FAILED"
-                callResult.push({response_time:tend - startCallTime})
-              //  await this.writeLog(logEntry)
-               
+                callResult["error_log"] = response
             }
-           
+
+            let tEnd = Math.round(new Date().getTime() / 1000000)
+            callResult["resp_time"] = startCallTime - tEnd
+
             canRetryCount--
+
+            if (canRetryCount >= 0) {
+                this.sleep(this.waitTime)
+            }
+
+            if (canRetryCount >= 0) {
+                logEntry["retry_count"] = this.maxRetryTime - canRetryCount
+            }
+
+            logEntry.results.push(callResult)
+
+
         }
+
+        let tEnd = Math.round(new Date().getTime() / 1000000)
+
+        logEntry["total_time"] = tEnd - tStart
+        logEntry.status = "FAILED"
+
         await this.writeLog(logEntry)
 
         return {
-            status :"OK",
-            message: "Can not call endpoint API"
+            status :"ERROR",
+            message: "fail to call endpoint api " + logEntry.req_url
         }
       
        
     }
 
     initRequest(httpMethod, headers,params, body,path) {
-        // let u = this.baseURL
-        // if (path != "") {
-        //     if (path.startsWith("/") || u.endsWith("/")) {
-        //         u = u + path
-        //     } else {
-        //         u = u + "/" + path
-        //     }
-        // }
+        let u = this.baseURL
+        if (path != "") {
+            if (path.startsWith("/") || u.endsWith("/")) {
+                u = u + path
+            } else {
+                u = u + "/" + path
+            }
+        }
 
-        // let urlStr  = addParams(u,params)
+        let urlStr  = addParams(u,params)
 
-        // const options = {
-        //     host: "localhost",
-        //     port: 3001,
-        //     path: '/translate',
-        //     method: httpMethod,
-        //     headers
-        // }
+        if (body != null) {
+            headers["Content-Type"] = "application/json"
+        }
 
-        // return options
+        headers["Accept"] = "application/json"
+        headers["User-Agent"] = "NodeJs-RESTClient/1.0"
+
+        const options = {
+            host: urlStr,
+            method: httpMethod,
+            headers,
+            body
+        }
+
+        return options
     }
 
     async writeLog(logEntry) {
         await this.dbModel.Create(RequestLogEntry,logEntry)
     }
 
-    readBody() {
+    readBody(response, callResult, logEntry, canRetryCount, startCallTime, tStart) {
+        callResult["resp_code"] = response.status
+        callResult["resp_body"] = response.data
+        callResult["resp_header"] = response.headers
 
+        if ((response.status >= 200 && response.status < 300) || (response.status >= 400 && response.status < 500)) {
+            let tEnd = Math.round(new Date().getTime() / 1000000)
+            callResult["resp_time"] = tEnd - startCallTime
+            logEntry["total_time"] = tEnd  -  tStart
+            if (canRetryCount >= 0) {
+                logEntry["retry_count"] = this.maxRetryTime - canRetryCount
+            }
+            logEntry.results.push(callResult)
+        }
+    }
+
+    sleep(msec) {
+        return new Promise(resolve => setTimeout(resolve, msec));
     }
 
 }
