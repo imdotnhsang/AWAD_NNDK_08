@@ -61,8 +61,7 @@ class RestClient {
             let instance = axios.create({
                 baseURL: options.host,
                 timeout: this.timeOut,
-                headers: options.headers,
-                data:options.body
+                headers: options.headers
             })
         
             instance.interceptors.request.use(
@@ -84,14 +83,15 @@ class RestClient {
         
             const response = await instance({
                 method:options.method,
+                data: options.body ? options.body : undefined
             })
 
-            if (response) {
+            if (response || (response.error && response.error.response)) {
                 let tEnd = Math.round(new Date().getTime() / 1000000)
                 logEntry.status = "SUCCESS"
                 this.readBody(response,callResult,logEntry,canRetryCount,startCallTime,tStart)
                 await this.writeLog(logEntry)
-                return response
+                return response && response.error && response.error.response ? response.error.response : response
             } else {
                 callResult["error_log"] = response
             }
@@ -163,11 +163,13 @@ class RestClient {
     }
 
     readBody(response, callResult, logEntry, canRetryCount, startCallTime, tStart) {
-        callResult["resp_code"] = response.status
-        callResult["resp_body"] = response.data
-        callResult["resp_header"] = response.headers
+        callResult["resp_code"] = response.status ? response.status : response.error.response.status
+        callResult["resp_body"] = response.data ? response.data : response.error.response.data
+        callResult["resp_header"] = response.headers ? response.headers : response.error.response.headers
 
-        if ((response.status >= 200 && response.status < 300) || (response.status >= 400 && response.status < 500)) {
+        let status = callResult["resp_code"]
+
+        if ((status >= 200 && status < 300) || (status >= 400 && status <= 500)) {
             let tEnd = Math.round(new Date().getTime() / 1000000)
             callResult["resp_time"] = tEnd - startCallTime
             logEntry["total_time"] = tEnd  -  tStart

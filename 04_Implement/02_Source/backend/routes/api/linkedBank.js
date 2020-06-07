@@ -13,15 +13,16 @@ router.get('/',async (req,res) => {
 	let testClient = client.newRestClient(
 	 'http://34.87.1.51/pms',
 		 'test',
-		60,
+		60000,
 		3,
 	3,
 	new DBModel()
 	)
 	let resp = await testClient.makeHTTPRequestProcess("POST",{},{
-	
+		// q: "{}",
+		// getTotal:true
 	},{
-		categoryName: "Điện lạnh"
+		categoryName: "Điện ảnh"
 	},"/category",null)
 
 //	console.log(resp)
