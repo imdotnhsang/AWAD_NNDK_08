@@ -21,24 +21,14 @@ router.get('/init-page', [auth, administrator], async (req, res) => {
 			{
 				$or: [
 					{
-						$and: [
-							{
-								transaction_type: 'RECEIVE',
-							},
-							{
-								from_bank_id: 'EIGHT',
-							},
-						],
+						transaction_type: 'TRANSFER',
+						to_bank_id: { $ne: 'EIGHT' },
+						from_bank_id: 'EIGHT',
 					},
 					{
-						$and: [
-							{
-								transaction_type: 'TRANSFER',
-							},
-							{
-								to_bank_id: 'EIGHT',
-							},
-						],
+						transaction_type: 'RECEIVE',
+						to_bank_id: 'EIGHT',
+						from_bank_id: { $ne: 'EIGHT' },
 					},
 				],
 			},

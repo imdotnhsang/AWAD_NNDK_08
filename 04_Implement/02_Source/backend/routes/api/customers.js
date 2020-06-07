@@ -64,16 +64,12 @@ router.get('/init-page', auth, async (req, res) => {
 			{
 				$or: [
 					{
-						$and: [
-							{ to_account_id: defaultAccountId },
-							{ transaction_type: 'RECEIVE' },
-						],
+						to_account_id: defaultAccountId,
+						transaction_type: 'RECEIVE',
 					},
 					{
-						$and: [
-							{ to_account_id: defaultAccountId },
-							{ transaction_type: 'RECHARGE' },
-						],
+						to_account_id: defaultAccountId,
+						transaction_type: 'RECHARGE',
 					},
 				],
 			},
@@ -81,10 +77,8 @@ router.get('/init-page', auth, async (req, res) => {
 		),
 		Transaction.find(
 			{
-				$and: [
-					{ from_account_id: defaultAccountId },
-					{ transaction_type: 'TRANSFER' },
-				],
+				from_account_id: defaultAccountId,
+				transaction_type: 'TRANSFER',
 			},
 			{ _id: 0, __v: 0 }
 		),
@@ -92,16 +86,12 @@ router.get('/init-page', auth, async (req, res) => {
 			{
 				$or: [
 					{
-						$and: [
-							{ from_account_id: defaultAccountId },
-							{ transaction_type: 'REPAYMENT' },
-						],
+						from_account_id: defaultAccountId,
+						transaction_type: 'REPAYMENT',
 					},
 					{
-						$and: [
-							{ to_account_id: defaultAccountId },
-							{ transaction_type: 'REPAYMENT' },
-						],
+						to_account_id: defaultAccountId,
+						transaction_type: 'REPAYMENT',
 					},
 				],
 			},
