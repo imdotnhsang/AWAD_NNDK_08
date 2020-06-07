@@ -12,24 +12,21 @@ const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 const Transaction = require('../../models/Transaction')
 
-// @route     GET /employees/init-page
+// @route     GET /employees/all-customers
 // @desc      Get all information of employee page
 // @access    Private (employee)
-router.get('/init-page', [auth, employee], async (req, res) => {
+router.get('/all-customers', [auth, employee], async (req, res) => {
 	try {
 		const allCustomers = await Customer.find(
 			{},
 			{
 				_id: 0,
-				full_name: 1,
-				default_account_id: 1,
-				email: 1,
-				phone_number: 1,
+				__v: 0,
 			}
 		)
 
 		const response = {
-			msg: 'Information page successfully initialized.',
+			msg: 'All customers page successfully got.',
 			data: allCustomers,
 		}
 		return res.status(200).json(response)

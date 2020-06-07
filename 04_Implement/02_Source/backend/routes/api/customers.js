@@ -17,10 +17,10 @@ const LinkedBank = require('../../models/LinkedBank')
 const Transaction = require('../../models/Transaction')
 const DebtCollection = require('../../models/DebtCollection')
 
-// @route     GET /customers/init-page
+// @route     GET /customers/all-cards
 // @desc      Get all information of customer page
 // @access    Private (customer)
-router.get('/init-page', auth, async (req, res) => {
+router.get('/all-cards', auth, async (req, res) => {
 	const customer = await Customer.findById(req.user.id)
 	if (!customer) {
 		return res.status(400).json({
@@ -35,7 +35,6 @@ router.get('/init-page', auth, async (req, res) => {
 	const {
 		default_account_id: defaultAccountId,
 		saving_accounts_id: savingAccountsId,
-		list_receiver_id: listReceiverId,
 	} = customer
 
 	Promise.all([
@@ -53,89 +52,17 @@ router.get('/init-page', auth, async (req, res) => {
 			},
 			{ _id: 0, __v: 0 }
 		),
-		Receiver.find({
-			_id: {
-				$in: listReceiverId.map((e) => mongoose.Types.ObjectId(e)),
-			},
-		}),
-		DebtCollection.find({ lender_default_account: defaultAccountId }),
-		DebtCollection.find({ borrower_default_account: defaultAccountId }),
-		Transaction.find(
-			{
-				$or: [
-					{
-						to_account_id: defaultAccountId,
-						transaction_type: 'RECEIVE',
-					},
-					{
-						to_account_id: defaultAccountId,
-						transaction_type: 'RECHARGE',
-					},
-				],
-			},
-			{ _id: 0, __v: 0 }
-		),
-		Transaction.find(
-			{
-				from_account_id: defaultAccountId,
-				transaction_type: 'TRANSFER',
-			},
-			{ _id: 0, __v: 0 }
-		),
-		Transaction.find(
-			{
-				$or: [
-					{
-						from_account_id: defaultAccountId,
-						transaction_type: 'REPAYMENT',
-					},
-					{
-						to_account_id: defaultAccountId,
-						transaction_type: 'REPAYMENT',
-					},
-				],
-			},
-			{ _id: 0, __v: 0 }
-		),
 	])
-		.then(
-			([
-				savingAccounts,
-				defaultAccount,
-				listReceiver,
-				debtCollectionsLoan,
-				debtCollectionsDebt,
-				transactionsReceive,
-				transactionsTransfer,
-				transactionsRepayment,
-			]) => {
-				const response = {
-					msg: 'Information page successfully initialized.',
-					data: {
-						personal_info: {
-							full_name: customer.full_name,
-							phone_number: customer.phone_number,
-							email: customer.email,
-						},
-						card_info: {
-							default_account: defaultAccount,
-							saving_accounts: savingAccounts,
-						},
-						receiver_info: listReceiver,
-						debt_collection_info: {
-							loan: debtCollectionsLoan,
-							debt: debtCollectionsDebt,
-						},
-						transaction_info: {
-							receive: transactionsReceive,
-							transfer: transactionsTransfer,
-							debt_repaying: transactionsRepayment,
-						},
-					},
-				}
-				return res.status(200).json(response)
+		.then(([savingAccounts, defaultAccount]) => {
+			const response = {
+				msg: 'Information page successfully initialized.',
+				data: {
+					default_account: defaultAccount,
+					saving_accounts: savingAccounts,
+				},
 			}
-		)
+			return res.status(200).json(response)
+		})
 		.catch((error) => {
 			console.log(error)
 			return res.status(500).json({ msg: 'Server error...' })
@@ -357,87 +284,113 @@ router.delete(
 	}
 )
 
+router.get('/debt-collections', auth, async (req, res) => {
+	const customer = await Customer.findById(req.user.id)
+	if (!customer) {
+		return res.status(400).json({
+			errors: [
+				{
+					msg: 'Customer not exists.',
+				},
+			],
+		})
+	}
+
+	const { default_account_id: defaultAccountId } = customer
+
+	Promise.all([
+		DebtCollection.find(
+			{ lender_default_account: defaultAccountId },
+			{ __v: 0 }
+		),
+		DebtCollection.find(
+			{ borrower_default_account: defaultAccountId },
+			{ __v: 0 }
+		),
+	])
+		.then(([debtCollectionsLoan, debtCollectionsDebt]) => {
+			const response = {
+				msg: 'Debt collections successfully got.',
+				data: {
+					loan: debtCollectionsLoan,
+					debt: debtCollectionsDebt,
+				},
+			}
+			return res.status(200).json(response)
+		})
+		.catch((error) => {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		})
+})
+
 // @route     GET /customers/transaction-history
 // @desc      View transaction history of customer account
 // @access    Private (customer)
 router.get('/transaction-history', auth, async (req, res) => {
-	try {
-		const customer = await Customer.findById(req.user.id)
-		if (!customer) {
-			return res
-				.status(400)
-				.json({ errors: [{ msg: 'Customer does not exist.' }] })
-		}
-
-		const transactionHistory = await Transaction.find({
-			$or: [
-				{ from_account_id: customer.default_account_id },
-				{ to_account_id: customer.default_account_id },
-			],
-		})
-
-		const response = {
-			msg: 'Transaction history successfully got.',
-			data: {
-				receive: transactionHistory
-					.filter(
-						(e) =>
-							e.transaction_type === 'RECEIVE' ||
-							e.transaction_type === 'RECHARGE'
-					)
-					.map((e) => {
-						return {
-							entry_time: e.entry_time,
-							from_bank_id: e.from_bank_id,
-							to_bank_id: e.to_bank_id,
-							from_account_id: e.from_account_id,
-							from_fullname: e.from_fullname,
-							to_account_id: e.to_account_id,
-							to_fullname: e.to_fullname,
-							transaction_type: e.transaction_type,
-							transaction_amount: e.transaction_amount,
-							transaction_status: e.transaction_status,
-						}
-					}),
-				transfer: transactionHistory
-					.filter((e) => e.transaction_type === 'TRANSFER')
-					.map((e) => {
-						return {
-							entry_time: e.entry_time,
-							from_bank_id: e.from_bank_id,
-							to_bank_id: e.to_bank_id,
-							from_account_id: e.from_account_id,
-							from_fullname: e.from_fullname,
-							to_account_id: e.to_account_id,
-							to_fullname: e.to_fullname,
-							transaction_type: e.transaction_type,
-							transaction_amount: e.transaction_amount,
-							transaction_status: e.transaction_status,
-						}
-					}),
-				debt: transactionHistory
-					.filter((e) => e.transaction_type === 'REPAYMENT')
-					.map((e) => {
-						return {
-							entry_time: e.entry_time,
-							from_bank_id: e.from_bank_id,
-							to_bank_id: e.to_bank_id,
-							from_account_id: e.from_account_id,
-							from_fullname: e.from_fullname,
-							to_account_id: e.to_account_id,
-							to_fullname: e.to_fullname,
-							transaction_type: e.transaction_type,
-							transaction_amount: e.transaction_amount,
-							transaction_status: e.transaction_status,
-						}
-					}),
-			},
-		}
-		return res.status(200).json(response)
-	} catch (error) {
-		console.log(error)
-		return res.status(500).json({ msg: 'Server error...' })
+	const customer = await Customer.findById(req.user.id)
+	if (!customer) {
+		return res
+			.status(400)
+			.json({ errors: [{ msg: 'Customer does not exist.' }] })
 	}
+	const { default_account_id: defaultAccountId } = customer
+	Promise.all([
+		Transaction.find(
+			{
+				$or: [
+					{
+						to_account_id: defaultAccountId,
+						transaction_type: 'RECEIVE',
+					},
+					{
+						to_account_id: defaultAccountId,
+						transaction_type: 'RECHARGE',
+					},
+				],
+			},
+			{ _id: 0, __v: 0 }
+		),
+		Transaction.find(
+			{
+				from_account_id: defaultAccountId,
+				transaction_type: 'TRANSFER',
+			},
+			{ _id: 0, __v: 0 }
+		),
+		Transaction.find(
+			{
+				$or: [
+					{
+						from_account_id: defaultAccountId,
+						transaction_type: 'REPAYMENT',
+					},
+					{
+						to_account_id: defaultAccountId,
+						transaction_type: 'REPAYMENT',
+					},
+				],
+			},
+			{ _id: 0, __v: 0 }
+		),
+	])
+		.then(
+			([transactionsReceive, transactionsTransfer, transactionsRepayment]) => {
+				const response = {
+					msg: 'Information page successfully initialized.',
+					data: {
+						receive: transactionsReceive,
+						transfer: transactionsTransfer,
+						debt_repaying: transactionsRepayment,
+					},
+				}
+				return res.status(200).json(response)
+			}
+		)
+		.catch((error) => {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		})
 })
 
 // @route     GET /customers/cards-information

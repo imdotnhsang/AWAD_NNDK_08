@@ -11,44 +11,22 @@ const administrator = require('../../middlewares/administrator')
 const Transaction = require('../../models/Transaction')
 const Staff = require('../../models/Staff')
 
-// @route     GET /administrators/init-page
+// @route     GET /administrators/all-staffs
 // @desc      Get all information administrator page
 // @access    Private (administrator)
-router.get('/init-page', [auth, administrator], async (req, res) => {
-	Promise.all([
-		Staff.find(),
-		Transaction.find(
-			{
-				$or: [
-					{
-						transaction_type: 'TRANSFER',
-						to_bank_id: { $ne: 'EIGHT' },
-						from_bank_id: 'EIGHT',
-					},
-					{
-						transaction_type: 'RECEIVE',
-						to_bank_id: 'EIGHT',
-						from_bank_id: { $ne: 'EIGHT' },
-					},
-				],
-			},
-			{ _id: 0, __v: 0 }
-		),
-	])
-		.then(([allStaffs, allInterbankTransactions]) => {
-			const response = {
-				msg: 'Information page successfully initialized.',
-				data: {
-					all_staffs: allStaffs,
-					all_interbank_transactions: allInterbankTransactions,
-				},
-			}
-			return res.status(200).json(response)
-		})
-		.catch((error) => {
-			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
-		})
+router.get('/all-staffs', [auth, administrator], async (req, res) => {
+	try {
+		const allStaffs = await Staff.find({}, { _id: 0, __v: 0 })
+
+		const response = {
+			msg: 'All staffs successfully got.',
+			data: allStaffs,
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({ msg: 'Server error...' })
+	}
 })
 
 // @route     POST /administrator/register-staff
@@ -319,26 +297,23 @@ router.get(
 	[auth, administrator],
 	async (req, res) => {
 		try {
-			const allInterbankTransactions = (await Transaction.find())
-				.filter(
-					(e) =>
-						(e.transaction_type === 'RECEIVE' && e.from_bank_id !== 'EIGHT') ||
-						(e.transaction_type === 'TRANSFER' && e.to_bank_id !== 'EIGHT')
-				)
-				.map((e) => {
-					return {
-						entry_time: e.entry_time,
-						from_bank_id: e.from_bank_id,
-						to_bank_id: e.to_bank_id,
-						from_account_id: e.from_account_id,
-						from_fullname: e.from_fullname,
-						to_account_id: e.to_account_id,
-						to_fullname: e.to_fullname,
-						transaction_type: e.transaction_type,
-						transaction_amount: e.transaction_amount,
-						transaction_status: e.transaction_status,
-					}
-				})
+			const allInterbankTransactions = await Transaction.find(
+				{
+					$or: [
+						{
+							transaction_type: 'TRANSFER',
+							to_bank_id: { $ne: 'EIGHT' },
+							from_bank_id: 'EIGHT',
+						},
+						{
+							transaction_type: 'RECEIVE',
+							to_bank_id: 'EIGHT',
+							from_bank_id: { $ne: 'EIGHT' },
+						},
+					],
+				},
+				{ _id: 0, __v: 0 }
+			)
 
 			const response = {
 				msg: 'All transactions successfully got.',
