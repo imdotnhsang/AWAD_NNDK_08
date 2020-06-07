@@ -15,51 +15,50 @@ const Staff = require('../../models/Staff')
 // @desc      Get all information administrator page
 // @access    Private (administrator)
 router.get('/init-page', [auth, administrator], async (req, res) => {
-	try {
-		const allStaffs = (await Staff.find()).map((e) => {
-			return {
-				full_name: e.full_name,
-				username: e.username,
-				email: e.email,
-				phone_number: e.phone_number,
-				position: e.position,
-				is_active: e.is_active,
-				create_at: e.create_at,
-			}
-		})
-
-		const allInterbankTransactions = (await Transaction.find())
-			.filter(
-				(e) =>
-					(e.transaction_type === 'RECEIVE' && e.from_bank_id !== 'EIGHT') ||
-					(e.transaction_type === 'TRANSFER' && e.to_bank_id !== 'EIGHT')
-			)
-			.map((e) => {
-				return {
-					entry_time: e.entry_time,
-					from_bank_id: e.from_bank_id,
-					to_bank_id: e.to_bank_id,
-					from_account_id: e.from_account_id,
-					from_fullname: e.from_fullname,
-					to_account_id: e.to_account_id,
-					to_fullname: e.to_fullname,
-					transaction_type: e.transaction_type,
-					transaction_amount: e.transaction_amount,
-					transaction_status: e.transaction_status,
-				}
-			})
-
-		const response = {
-			msg: 'Information page successfully initialized.',
-			data: {
-				all_staffs: allStaffs,
-				all_interbank_transactions: allInterbankTransactions,
+	Promise.all([
+		Staff.find(),
+		Transaction.find(
+			{
+				$or: [
+					{
+						$and: [
+							{
+								transaction_type: 'RECEIVE',
+							},
+							{
+								from_bank_id: 'EIGHT',
+							},
+						],
+					},
+					{
+						$and: [
+							{
+								transaction_type: 'TRANSFER',
+							},
+							{
+								to_bank_id: 'EIGHT',
+							},
+						],
+					},
+				],
 			},
-		}
-		return res.status(200).json(response)
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server error...' })
-	}
+			{ _id: 0, __v: 0 }
+		),
+	])
+		.then(([allStaffs, allInterbankTransactions]) => {
+			const response = {
+				msg: 'Information page successfully initialized.',
+				data: {
+					all_staffs: allStaffs,
+					all_interbank_transactions: allInterbankTransactions,
+				},
+			}
+			return res.status(200).json(response)
+		})
+		.catch((error) => {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		})
 })
 
 // @route     POST /administrator/register-staff

@@ -15,159 +15,141 @@ const Account = require('../../models/Account')
 const Receiver = require('../../models/Receiver')
 const LinkedBank = require('../../models/LinkedBank')
 const Transaction = require('../../models/Transaction')
-// const DebtCollection = require('../../models/DebtCollection')
+const DebtCollection = require('../../models/DebtCollection')
 
 // @route     GET /customers/init-page
 // @desc      Get all information of customer page
 // @access    Private (customer)
 router.get('/init-page', auth, async (req, res) => {
-	try {
-		const customer = await Customer.findById(req.user.id)
-		if (!customer) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Customer not exists.',
-					},
-				],
-			})
-		}
+	const customer = await Customer.findById(req.user.id)
+	if (!customer) {
+		return res.status(400).json({
+			errors: [
+				{
+					msg: 'Customer not exists.',
+				},
+			],
+		})
+	}
 
-		const {
-			default_account_id: defaultAccountId,
-			saving_accounts_id: savingAccountsId,
-			list_receiver_id: listReceiverId,
-		} = customer
+	const {
+		default_account_id: defaultAccountId,
+		saving_accounts_id: savingAccountsId,
+		list_receiver_id: listReceiverId,
+	} = customer
 
-		const savingAccounts = (
-			await Account.find({
+	Promise.all([
+		Account.find(
+			{
 				account_id: {
 					$in: savingAccountsId.map((e) => e),
 				},
-			})
-		).map((e) => {
-			return {
-				account_id: e.account_id,
-				account_type: e.account_type,
-				balance: e.balance,
-				account_service: e.account_service,
-			}
-		})
-
-		const defaultAccount = await Account.findOne({
-			account_id: defaultAccountId,
-		})
-
-		const listReceiver = (
-			await Receiver.find({
-				_id: {
-					$in: listReceiverId.map((e) => mongoose.Types.ObjectId(e)),
-				},
-			})
-		).map((e) => {
-			return {
-				receiver_id: e._id,
-				bank_name: e.bank_name,
-				account_id: e.account_id,
-				full_name: e.full_name,
-				nickname: e.nickname,
-			}
-		})
-
-		const transactionHistory = await Transaction.find({
-			$or: [
-				{ from_account_id: defaultAccountId },
-				{ to_account_id: defaultAccountId },
-			],
-		})
-
-		// const debtCollection = await DebtCollection.find({
-		// 	$or: [
-		// 		{ borrower_default_account: defaultAccountId },
-		// 		{ lender_default_account: defaultAccountId },
-		// 	],
-		// })
-
-		const response = {
-			msg: 'Information page successfully initialized.',
-			data: {
-				personal_info: {
-					full_name: customer.full_name,
-					phone_number: customer.phone_number,
-					email: customer.email,
-				},
-				card_info: {
-					default_account: {
-						account_id: defaultAccount.account_id,
-						account_type: defaultAccount.account_type,
-						balance: defaultAccount.balance,
-						account_service: defaultAccount.account_service,
-					},
-					saving_accounts: savingAccounts,
-				},
-				receiver_info: listReceiver,
-				transaction_info: {
-					receive: transactionHistory
-						.filter(
-							(e) =>
-								e.transaction_type === 'RECEIVE' ||
-								e.transaction_type === 'RECHARGE'
-						)
-						.map((e) => {
-							return {
-								entry_time: e.entry_time,
-								from_bank_id: e.from_bank_id,
-								to_bank_id: e.to_bank_id,
-								from_account_id: e.from_account_id,
-								from_fullname: e.from_fullname,
-								to_account_id: e.to_account_id,
-								to_fullname: e.to_fullname,
-								transaction_type: e.transaction_type,
-								transaction_amount: e.transaction_amount,
-								transaction_status: e.transaction_status,
-							}
-						}),
-					transfer: transactionHistory
-						.filter((e) => e.transaction_type === 'TRANSFER')
-						.map((e) => {
-							return {
-								entry_time: e.entry_time,
-								from_bank_id: e.from_bank_id,
-								to_bank_id: e.to_bank_id,
-								from_account_id: e.from_account_id,
-								from_fullname: e.from_fullname,
-								to_account_id: e.to_account_id,
-								to_fullname: e.to_fullname,
-								transaction_type: e.transaction_type,
-								transaction_amount: e.transaction_amount,
-								transaction_status: e.transaction_status,
-							}
-						}),
-					debt: transactionHistory
-						.filter((e) => e.transaction_type === 'REPAYMENT')
-						.map((e) => {
-							return {
-								entry_time: e.entry_time,
-								from_bank_id: e.from_bank_id,
-								to_bank_id: e.to_bank_id,
-								from_account_id: e.from_account_id,
-								from_fullname: e.from_fullname,
-								to_account_id: e.to_account_id,
-								to_fullname: e.to_fullname,
-								transaction_type: e.transaction_type,
-								transaction_amount: e.transaction_amount,
-								transaction_status: e.transaction_status,
-							}
-						}),
-				},
 			},
-		}
-
-		return res.status(200).json(response)
-	} catch (error) {
-		console.log(error)
-		return res.status(500).json({ msg: 'Server error...' })
-	}
+			{ _id: 0, __v: 0 }
+		),
+		Account.findOne(
+			{
+				account_id: defaultAccountId,
+			},
+			{ _id: 0, __v: 0 }
+		),
+		Receiver.find({
+			_id: {
+				$in: listReceiverId.map((e) => mongoose.Types.ObjectId(e)),
+			},
+		}),
+		DebtCollection.find({ lender_default_account: defaultAccountId }),
+		DebtCollection.find({ borrower_default_account: defaultAccountId }),
+		Transaction.find(
+			{
+				$or: [
+					{
+						$and: [
+							{ to_account_id: defaultAccountId },
+							{ transaction_type: 'RECEIVE' },
+						],
+					},
+					{
+						$and: [
+							{ to_account_id: defaultAccountId },
+							{ transaction_type: 'RECHARGE' },
+						],
+					},
+				],
+			},
+			{ _id: 0, __v: 0 }
+		),
+		Transaction.find(
+			{
+				$and: [
+					{ from_account_id: defaultAccountId },
+					{ transaction_type: 'TRANSFER' },
+				],
+			},
+			{ _id: 0, __v: 0 }
+		),
+		Transaction.find(
+			{
+				$or: [
+					{
+						$and: [
+							{ from_account_id: defaultAccountId },
+							{ transaction_type: 'REPAYMENT' },
+						],
+					},
+					{
+						$and: [
+							{ to_account_id: defaultAccountId },
+							{ transaction_type: 'REPAYMENT' },
+						],
+					},
+				],
+			},
+			{ _id: 0, __v: 0 }
+		),
+	])
+		.then(
+			([
+				savingAccounts,
+				defaultAccount,
+				listReceiver,
+				debtCollectionsLoan,
+				debtCollectionsDebt,
+				transactionsReceive,
+				transactionsTransfer,
+				transactionsRepayment,
+			]) => {
+				const response = {
+					msg: 'Information page successfully initialized.',
+					data: {
+						personal_info: {
+							full_name: customer.full_name,
+							phone_number: customer.phone_number,
+							email: customer.email,
+						},
+						card_info: {
+							default_account: defaultAccount,
+							saving_accounts: savingAccounts,
+						},
+						receiver_info: listReceiver,
+						debt_collection_info: {
+							loan: debtCollectionsLoan,
+							debt: debtCollectionsDebt,
+						},
+						transaction_info: {
+							receive: transactionsReceive,
+							transfer: transactionsTransfer,
+							debt_repaying: transactionsRepayment,
+						},
+					},
+				}
+				return res.status(200).json(response)
+			}
+		)
+		.catch((error) => {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		})
 })
 
 // @route     POST /customers/add-receiver

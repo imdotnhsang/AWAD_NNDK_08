@@ -17,14 +17,16 @@ const Transaction = require('../../models/Transaction')
 // @access    Private (employee)
 router.get('/init-page', [auth, employee], async (req, res) => {
 	try {
-		const allCustomers = (await Customer.find()).map((e) => {
-			return {
-				full_name: e.full_name,
-				default_account_id: e.default_account_id,
-				email: e.email,
-				phone_number: e.phone_number,
+		const allCustomers = await Customer.find(
+			{},
+			{
+				_id: 0,
+				full_name: 1,
+				default_account_id: 1,
+				email: 1,
+				phone_number: 1,
 			}
-		})
+		)
 
 		const response = {
 			msg: 'Information page successfully initialized.',
@@ -32,6 +34,7 @@ router.get('/init-page', [auth, employee], async (req, res) => {
 		}
 		return res.status(200).json(response)
 	} catch (error) {
+		console.log(error)
 		return res.status(500).json({ msg: 'Server error...' })
 	}
 })
