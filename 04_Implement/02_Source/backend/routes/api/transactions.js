@@ -70,6 +70,7 @@ router.post(
 		check('transactionAmount', 'Transaction amount is 50000 or more').isInt({
 			min: 50000,
 		}),
+		check('transactionPayer', 'Transaction payer is required').not().notEmpty(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -77,7 +78,13 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { otp, toAccountId, toFullName, transactionAmount } = req.body
+		const {
+			otp,
+			toAccountId,
+			toFullName,
+			transactionAmount,
+			transactionPayer,
+		} = req.body
 
 		const checkErrorsMongoose = {
 			updateTransfererAccount: false,
@@ -87,6 +94,15 @@ router.post(
 		}
 
 		try {
+			if (
+				transactionPayer !== 'TRANSFERER' &&
+				transactionPayer !== 'RECEIVER'
+			) {
+				return res.status(400).json({
+					errors: [{ msg: 'Please include a valid transaction payer' }],
+				})
+			}
+
 			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
@@ -163,6 +179,7 @@ router.post(
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
 				transaction_type: 'TRANSFER',
+				transaction_payer: transactionPayer,
 				transaction_amount: transactionAmount,
 				transaction_balance_before: accountTransferer.balance,
 			}
@@ -176,19 +193,30 @@ router.post(
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
 				transaction_type: 'RECEIVE',
+				transaction_payer: transactionPayer,
 				transaction_amount: transactionAmount,
 				transaction_balance_before: accountReceiver.balance,
 			})
 
 			const accountTransfererResponse = await Account.findOneAndUpdate(
 				{ account_id: customer.default_account_id },
-				{ $inc: { balance: -transactionAmount } },
+				{
+					$inc: {
+						balance:
+							transactionPayer === 'TRANSFERER'
+								? -(transactionAmount + 1100)
+								: -transactionAmount,
+					},
+				},
 				{ new: true }
 			)
 
 			checkErrorsMongoose.updateTransfererAccount = {
 				account_id: accountTransfererResponse.account_id,
-				transaction_amount: transactionAmount,
+				transaction_amount:
+					transactionPayer === 'TRANSFERER'
+						? -(transactionAmount + 1100)
+						: -transactionAmount,
 			}
 
 			const transactionTransfererResponse = await new Transaction({
@@ -208,13 +236,23 @@ router.post(
 
 			const accountReceiverResponse = await Account.findOneAndUpdate(
 				{ account_id: toAccountId },
-				{ $inc: { balance: transactionAmount } },
+				{
+					$inc: {
+						balance:
+							transactionPayer === 'TRANSFERER'
+								? transactionAmount
+								: transactionAmount - 1100,
+					},
+				},
 				{ new: true }
 			)
 
 			checkErrorsMongoose.updateReceiverAccount = {
 				account_id: accountReceiverResponse.account_id,
-				transaction_amount: transactionAmount,
+				transaction_amount:
+					transactionPayer === 'TRANSFERER'
+						? transactionAmount
+						: transactionAmount - 1100,
 			}
 
 			const transactionReceiverResponse = await Transaction({

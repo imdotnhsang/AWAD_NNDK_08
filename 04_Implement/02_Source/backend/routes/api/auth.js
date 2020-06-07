@@ -25,7 +25,7 @@ router.get('/users', auth, async (req, res) => {
 })
 
 // @route     POST /auth/customers/login
-// @desc      Xác thực đăng nhập của customer và trả về access-token
+// @desc      Auth customer and return access-token
 // @access    Public
 router.post(
 	'/customers/login',
@@ -127,7 +127,7 @@ router.post(
 )
 
 // @route     POST /auth/staff/login
-// @desc      Xác thực đăng nhập của staff (employee vs admin) và trả về access-token
+// @desc      Auth staff (employee vs admin) and return access-token
 // @access    Public
 router.post(
 	'/staffs/login',

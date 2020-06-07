@@ -19,7 +19,6 @@ router.post(
 	'/add-debt',
 	[
 		auth,
-		check('lenderAccountId', 'Lender account is required').not().notEmpty(),
 		check('borrowerAccountId', 'Borrower account is required').not().notEmpty(),
 		check('borrowerFullname', 'Borrower full name is required')
 			.not()
@@ -36,16 +35,13 @@ router.post(
 
 		const {
 			borrowerAccountId,
-			lenderAccountId,
 			borrowerFullname,
 			debtAmount,
 			debtMessage,
 		} = req.body
 
 		try {
-			const customer = await Customer.findOne({
-				default_account_id: lenderAccountId,
-			})
+			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
 					errors: [{ msg: 'Customer not exists.' }],
@@ -55,7 +51,7 @@ router.post(
 			const debtCollection = new DebtCollection({
 				borrower_default_account: borrowerAccountId,
 				borrower_fullname: borrowerFullname,
-				lender_default_account: lenderAccountId,
+				lender_default_account: customer.default_account_id,
 				lender_fullname: customer.full_name,
 				debt_status: 'UNPAID',
 				debt_amount: debtAmount,
@@ -182,7 +178,7 @@ router.put(
 	}
 )
 
-// @route     POST /transactions/send-repayment-otp
+// @route     POST /debt-collections/send-repayment-otp
 // @desc      Send OTP to email which supports to confirm repayment
 // @access    Public
 router.post('/send-repayment-otp', auth, async (req, res) => {
@@ -227,11 +223,12 @@ router.post(
 		check('otp', 'Please include a valid OTP')
 			.isInt()
 			.isLength({ min: 6, max: 6 }),
-		check('lenderAccountId', 'Lender account is required').not().notEmpty(),
-		check('lenderFullname', 'Lender full name is required').not().notEmpty(),
 		check('debtAmount', 'Transaction amount is 10000 or more').isInt({
 			min: 10000,
 		}),
+		check('debtCollectionId', 'Debt collection id is required')
+			.not()
+			.notEmpty(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -239,7 +236,7 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { otp, lenderAccountId, lenderFullname, debtAmount } = req.body
+		const { otp, debtAmount, debtCollectionId } = req.body
 
 		const checkErrorsMongoose = {
 			updateTransfererAccount: false,
@@ -249,19 +246,24 @@ router.post(
 		}
 
 		try {
-			const borrower = await Customer.findById(req.user.id)
-			if (!borrower) {
-				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists.' }],
-				})
+			const debtCollection = await DebtCollection.findById(debtCollectionId)
+			if (!debtCollection) {
+				return res
+					.status(400)
+					.json({ errors: [{ msg: 'Debt collection does not exist' }] })
+			}
+			if (debtCollection.debt_status !== 'UNPAID') {
+				return res
+					.status(400)
+					.json({ errors: [{ msg: 'Debt collection was cancelled or paid.' }] })
 			}
 
 			const accountBorrower = await Account.findOne({
-				account_id: borrower.default_account_id,
+				account_id: debtCollection.borrower_default_account,
 			})
 
 			const accountLender = await Account.findOne({
-				account_id: lenderAccountId,
+				account_id: debtCollection.lender_default_account,
 			})
 
 			if (accountBorrower.balance - debtAmount < 50000) {
@@ -269,6 +271,14 @@ router.post(
 					errors: [{ msg: 'Insufficient funds.' }],
 				})
 			}
+
+			const borrower = await Customer.findById(req.user.id)
+			if (!borrower) {
+				return res.status(400).json({
+					errors: [{ msg: 'Customer does not exist.' }],
+				})
+			}
+
 			if (borrower.OTP.is_used !== false) {
 				return res.status(400).json({
 					errors: [
@@ -303,8 +313,8 @@ router.post(
 				entry_time: Date.now(),
 				from_account_id: borrower.default_account_id,
 				from_fullname: borrower.full_name,
-				to_account_id: lenderAccountId,
-				to_fullname: lenderFullname,
+				to_account_id: debtCollection.lender_default_account,
+				to_fullname: debtCollection.lender_fullname,
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
 				transaction_type: 'REPAYMENT',
@@ -316,8 +326,8 @@ router.post(
 				entry_time: Date.now(),
 				from_account_id: borrower.default_account_id,
 				from_fullname: borrower.full_name,
-				to_account_id: lenderAccountId,
-				to_fullname: lenderFullname,
+				to_account_id: debtCollection.lender_default_account,
+				to_fullname: debtCollection.lender_fullname,
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
 				transaction_type: 'RECEIVE',
@@ -327,7 +337,7 @@ router.post(
 
 			const accountTransfererResponse = await Account.findOneAndUpdate(
 				{ account_id: borrower.default_account_id },
-				{ $inc: { balance: -debtAmount } },
+				{ $inc: { balance: -(debtAmount + 1100) } },
 				{ new: true }
 			)
 
@@ -352,7 +362,7 @@ router.post(
 			}
 
 			const accountReceiverResponse = await Account.findOneAndUpdate(
-				{ account_id: lenderAccountId },
+				{ account_id: debtCollection.lender_default_account },
 				{ $inc: { balance: debtAmount } },
 				{ new: true }
 			)
@@ -378,8 +388,11 @@ router.post(
 			borrower.OTP.is_used = true
 			borrower.save()
 
+			debtCollection.debt_status = 'PAID'
+			debtCollection.save()
+
 			const response = {
-				msg: 'Debt collection successfully repaid',
+				msg: 'Debt collection successfully paid',
 				data: {
 					entry_time: transactionBorrowerResponse.entry_time,
 					from_account_id: transactionBorrowerResponse.from_account_id,
