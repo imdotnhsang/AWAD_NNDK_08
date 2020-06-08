@@ -1,33 +1,32 @@
 const RequestLogEntry = require('../models/RequestLogEntry')
 const axios = require('axios');
 class RestClient {
-    constructor(baseURL, userAgent, logName, maxRetryTime, waitTime, timeOut, dbModel) {
+    constructor(baseURL, userAgent, maxRetryTime, waitTime, timeOut, dbModel) {
         this.baseURL = baseURL
         this.userAgent = userAgent
-        this.logName = logName
         this.maxRetryTime = maxRetryTime
         this.waitTime = waitTime
         this.timeOut = timeOut
         this.dbModel = dbModel
     }
 
-    newRestClient(baseURL,logName, timeOut, maxRetryTime, waitTime,dbModel) {
+    newRestClient(baseURL, timeOut, maxRetryTime, waitTime,dbModel) {
         if (!baseURL.startsWith("http")) {
             baseURL  = "http://" + baseURL
         }
-        return new RestClient(baseURL,"",logName,maxRetryTime,waitTime,timeOut,dbModel)
+        return new RestClient(baseURL,"",maxRetryTime,waitTime,timeOut,dbModel)
     }
 
-     makeHTTPRequest(httpMethod,headers,params,body,path,key) {
-        return new Promise((resolve,reject) => {
-          this.makeHTTPRequestProcess(httpMethod,headers,params,body,path,key).then(response => {
-            resolve(response)
-          }).catch(err => reject(err))
+    //  makeHTTPRequest(httpMethod,headers,params,body,path,key) {
+    //     return new Promise((resolve,reject) => {
+    //       this.makeHTTPRequestProcess(httpMethod,headers,params,body,path,key).then(response => {
+    //         resolve(response)
+    //       }).catch(err => reject(err))
           
-        })
-    }
+    //     })
+    // }
 
-    async makeHTTPRequestProcess(httpMethod, headers, params, body, path, key) {
+    async makeHTTPRequest(httpMethod, headers, params, body, path, key) {
         let date = new Date()
 
         let logEntry = {
@@ -163,6 +162,7 @@ class RestClient {
     }
 
     readBody(response, callResult, logEntry, canRetryCount, startCallTime, tStart) {
+
         callResult["resp_code"] = response.status ? response.status : response.error.response.status
         callResult["resp_body"] = response.data ? response.data : response.error.response.data
         callResult["resp_header"] = response.headers ? response.headers : response.error.response.headers
