@@ -13,7 +13,7 @@ const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
 const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 const Receiver = require('../../models/Receiver')
-const LinkedBank = require('../../models/LinkedBank')
+// const LinkedBank = require('../../models/LinkedBank')
 const Transaction = require('../../models/Transaction')
 const DebtCollection = require('../../models/DebtCollection')
 
@@ -21,20 +21,20 @@ const DebtCollection = require('../../models/DebtCollection')
 // @desc      Get information default account of customer
 // @access    Private (customer)
 router.get('/default-account', auth, async (req, res) => {
-	const customer = await Customer.findById(req.user.id)
-	if (!customer) {
-		return res.status(400).json({
-			errors: [
-				{
-					msg: 'Customer not exists.',
-				},
-			],
-		})
-	}
-
-	const { default_account_id: defaultAccountId } = customer
-
 	try {
+		const customer = await Customer.findById(req.user.id)
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer not exists.',
+					},
+				],
+			})
+		}
+
+		const { default_account_id: defaultAccountId } = customer
+
 		const defaultAccount = await Account.findOne(
 			{
 				account_id: defaultAccountId,
@@ -105,220 +105,101 @@ router.get('/all-accounts', auth, async (req, res) => {
 		})
 })
 
-// @route     POST /customers/add-receiver
-// @desc      Add receiver to list receiver which is received payment
-// @access    Private (customer)
+// @route     POST /add-saving-account
+// @desc      Create saving account
+// @access    Public
 router.post(
-	'/add-receiver',
+	'/add-saving-account',
 	[
 		auth,
-		check('bankName', 'Bank name is required').not().notEmpty(),
-		check('bankId', 'Bank id is required').not().notEmpty(),
-		check('accountId', 'Account id is required').not().notEmpty(),
-		check('fullName', 'Full name is required').not().notEmpty(),
-		check('nickname', 'Nickname is required').not().notEmpty(),
+		check('balance', 'Please enter a balance with 50000 or more').isInt({
+			min: 50000,
+		}),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
-		if (errors) {
-			if (!errors.isEmpty()) {
-				return res.status(400).send(errors)
-			}
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors)
 		}
 
-		const { bankName, bankId, accountId, nickname, fullName } = req.body
-
-		const userId = req.user.id
-
-		const checkErrorsMongoose = {
-			createReceiver: false,
-		}
+		const { balance } = req.body
+		const service = Date.now() % 2 === 1 ? 'MASTERCARD' : 'VISA'
 
 		try {
-			const customer = await Customer.findById(userId)
+			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists.' }],
+					errors: [{ msg: 'Customer not exists' }],
 				})
 			}
 
-			const linkedBank = await LinkedBank.findOne({ bank_id: bankId })
+			const nanoid = customAlphabet('1234567890', 14)
+			const accountId = nanoid()
 
-			if (bankId !== 'EIGHT' && !linkedBank) {
-				return res.status(400).json({
-					errors: [{ msg: 'Bank is not connected.' }],
-				})
-			}
-
-			if (accountId === customer.default_account_id) {
-				return res.status(400).json({
-					errors: [
-						{ msg: 'Beneficiary account cannot coincide with debit account.' },
-					],
-				})
-			}
-
-			const list_accountReceivers_id = (
-				await Receiver.find({
-					_id: {
-						$in: customer.list_receiver_id.map((e) =>
-							mongoose.Types.ObjectId(e)
-						),
-					},
-				})
-			).map((e) => e.account_id)
-
-			if (list_accountReceivers_id.indexOf(accountId) !== -1) {
-				return res.status(400).json({
-					errors: [{ msg: 'Account exists.' }],
-				})
-			}
-
-			const receiver = new Receiver({
-				bank_id: bankId,
-				bank_name: bankName,
+			const account = new Account({
 				account_id: accountId,
-				full_name: fullName,
-				nickname,
+				account_type: 'SAVING',
+				balance,
+				account_service: service,
 			})
 
-			const responseReceiver = await receiver.save()
+			const responseAccount = await account.save()
 
-			checkErrorsMongoose.createReceiver = {
-				id: responseReceiver._id,
-			}
-
-			customer.list_receiver_id.push(responseReceiver._id)
+			customer.saving_accounts_id.push(responseAccount.account_id)
 			await customer.save()
 
 			const response = {
-				msg: 'Receiver successfully added.',
+				msg: 'Saving account successfully created',
 				data: {
-					receiver_id: responseReceiver._id,
-					nickname: responseReceiver.nickname,
-					full_name: responseReceiver.full_name,
-					account_id: responseReceiver.account_id,
-					bank_name: responseReceiver.bank_name,
-				},
-			}
-			return res.status(200).json(response)
-		} catch (error) {
-			if (checkErrorsMongoose.createAccountDefault !== false) {
-				await Receiver.findByIdAndRemove(checkErrorsMongoose.createReceiver.id)
-			}
-
-			return res.status(500).json({ msg: 'Server error...' })
-		}
-	}
-)
-
-// @route     PUT /customers/update-receiver
-// @desc      Update information receiver
-// @access    Private (customer)
-router.put(
-	'/update-receiver',
-	[
-		auth,
-		check('receiverId', 'Receiver id is required').not().notEmpty(),
-		check('nickname', 'Nickname is required').not().notEmpty(),
-	],
-	async (req, res) => {
-		const errors = validationResult(req)
-		if (errors) {
-			if (!errors.isEmpty()) {
-				return res.status(400).send(errors)
-			}
-		}
-
-		const { receiverId, nickname } = req.body
-
-		try {
-			const customer = await Customer.findById(req.user.id)
-			if (!customer) {
-				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists.' }],
-				})
-			}
-
-			if (customer.list_receiver_id.indexOf(receiverId) === -1) {
-				return res.status(400).json({
-					errors: [{ msg: 'Receiver not exists.' }],
-				})
-			}
-
-			const receiver = await Receiver.findById(receiverId)
-			if (nickname === receiver.nickname) {
-				return res.status(400).json({
-					errors: [{ msg: 'New nickname cannot coincide with old nickname.' }],
-				})
-			}
-
-			receiver.nickname = nickname
-			const responseReceiver = await receiver.save()
-
-			const response = {
-				msg: 'Receiver successfully updated.',
-				data: {
-					receiver_id: responseReceiver._id,
-					nickname: responseReceiver.nickname,
-					full_name: responseReceiver.full_name,
-					account_id: responseReceiver.account_id,
-					bank_name: responseReceiver.bank_name,
+					account_id: responseAccount.account_id,
+					account_type: responseAccount.account_type,
+					balance: responseAccount.balance,
+					account_service: responseAccount.account_service,
 				},
 			}
 			return res.status(200).json(response)
 		} catch (error) {
 			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
+			return res.status(500).json({ msg: 'Server error' })
 		}
 	}
 )
 
-// @route     DELETE /customers/delete-receiver
-// @desc      Delete receiver from list receiver
+// @route     GET /customers/all-receivers
+// @desc      Get all receivers of customer
 // @access    Private (customer)
-router.delete(
-	'/delete-receiver',
-	[auth, check('receiverId', 'Receiver id is required').not().notEmpty()],
-	async (req, res) => {
-		const errors = validationResult(req)
-		if (errors) {
-			if (!errors.isEmpty()) {
-				return res.status(400).send(errors)
-			}
-		}
-
-		const { receiverId } = req.body
-
-		try {
-			const customer = await Customer.findById(req.user.id)
-			if (!customer) {
-				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists.' }],
-				})
-			}
-
-			const inxItem = customer.list_receiver_id.indexOf(receiverId)
-
-			if (inxItem === -1) {
-				return res.status(400).json({
-					errors: [{ msg: 'Receiver not exists.' }],
-				})
-			}
-
-			await Receiver.findByIdAndDelete(receiverId)
-
-			customer.list_receiver_id.splice(inxItem, 1)
-			await customer.save()
-
-			const response = { msg: 'Receiver successfully deleted.' }
-			return res.status(200).json(response)
-		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
-		}
+router.get('/all-receivers', auth, async (req, res) => {
+	const customer = await Customer.findById(req.user.id)
+	if (!customer) {
+		return res.status(400).json({
+			errors: [
+				{
+					msg: 'Customer not exists.',
+				},
+			],
+		})
 	}
-)
+
+	const { list_receiver_id: listReceiveId } = customer
+	console.log(listReceiveId)
+	try {
+		const listReceive = await Receiver.find(
+			{
+				_id: { $in: listReceiveId.map((e) => mongoose.Types.ObjectId(e)) },
+			},
+			{ _id: 0, __v: 0 }
+		)
+
+		const response = {
+			msg: 'All receivers successfully got.',
+			data: listReceive,
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
 
 router.get('/all-debt-collections', auth, async (req, res) => {
 	const customer = await Customer.findById(req.user.id)
@@ -370,7 +251,9 @@ router.get('/transaction-history', auth, async (req, res) => {
 			.status(400)
 			.json({ errors: [{ msg: 'Customer does not exist.' }] })
 	}
+
 	const { default_account_id: defaultAccountId } = customer
+
 	Promise.all([
 		Transaction.find(
 			{
@@ -427,6 +310,38 @@ router.get('/transaction-history', auth, async (req, res) => {
 			console.log(error)
 			return res.status(500).json({ msg: 'Server error...' })
 		})
+})
+
+// @route     GET /customers/personal-info
+// @desc      Get information default account of customer
+// @access    Private (customer)
+router.get('/personal-info', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id, {
+			_id: 0,
+			full_name: 1,
+			email: 1,
+			phone_number: 1,
+		})
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer not exists.',
+					},
+				],
+			})
+		}
+
+		const response = {
+			msg: 'Personal information successfully got.',
+			data: customer,
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({ msg: 'Server error...' })
+	}
 })
 
 // @route     PUT /customers/change-password

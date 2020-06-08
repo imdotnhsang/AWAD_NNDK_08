@@ -53,7 +53,6 @@ router.post(
 		check('balance', 'Please enter a balance with 50000 or more').isInt({
 			min: 50000,
 		}),
-		check('service', 'Service is required').not().notEmpty(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -94,18 +93,7 @@ router.post(
 			const nanoidAccountId = customAlphabet('1234567890', 14)
 			const accountId = nanoidAccountId()
 
-			let account = await Account.findOne({ account_id: accountId })
-			if (account) {
-				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Account already exists.',
-						},
-					],
-				})
-			}
-
-			account = new Account({
+			const account = new Account({
 				account_id: accountId,
 				account_type: 'DEFAULT',
 				balance,
@@ -118,7 +106,7 @@ router.post(
 				account_id: responseAccount.account_id,
 			}
 
-			const defaultAccountId = responseAccount.account_id
+			const { account_id: defaultAccountId } = responseAccount
 
 			const nanoidPassword = customAlphabet(
 				'1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM',
@@ -174,17 +162,18 @@ router.post(
 	}
 )
 
-// @route     POST /employees/recharge-account
-// @desc      Recharge any customer account
+// @route     POST /employees/recharge-customer
+// @desc      Recharge customer
 // @access    Private (employee)
 router.post(
-	'/recharge-account',
+	'/recharge-customer',
 	[
 		auth,
 		employee,
 		check('rechargeAmount', 'Recharge amount is 50000 or more').isInt({
 			min: 50000,
 		}),
+		check('rechargeAccountId', 'Recharge account id is required'),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -192,24 +181,11 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { rechargeAccountId, rechargeEmail, rechargeAmount } = req.body
+		const { rechargeAccountId, rechargeAmount } = req.body
 
-		if (!rechargeAccountId && !rechargeEmail) {
+		if (rechargeAccountId.length !== 14) {
 			return res.status(400).json({
-				errors: [{ msg: 'Recharge account or recharge email is required.' }],
-			})
-		}
-
-		if (rechargeAccountId && rechargeAccountId.length !== 14) {
-			return res.status(400).json({
-				errors: [{ msg: 'Please include a valid account id.' }],
-			})
-		}
-
-		const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/gm
-		if (rechargeEmail && re.test(String(rechargeEmail)) === false) {
-			return res.status(400).json({
-				errors: [{ msg: 'Please include a valid email.' }],
+				errors: [{ msg: 'Please include a valid recharge account id.' }],
 			})
 		}
 
@@ -219,10 +195,7 @@ router.post(
 
 		try {
 			const customer = await Customer.findOne({
-				$or: [
-					{ email: rechargeEmail },
-					{ default_account_id: rechargeAccountId },
-				],
+				default_account_id: rechargeAccountId,
 			})
 
 			if (!customer) {
@@ -252,7 +225,8 @@ router.post(
 				transaction_type: 'RECHARGE',
 				transaction_amount: rechargeAmount,
 				transaction_balance_before: account.balance,
-				transaction_balance_after: account.balance,
+				transaction_balance_after:
+					Number(account.balance) + Number(rechargeAmount),
 				transaction_status: 'FAILED',
 			}
 
@@ -267,17 +241,17 @@ router.post(
 			transactionReceiver.transaction_balance_after =
 				Number(account.balance) + Number(rechargeAmount)
 			transactionReceiver.transaction_status = 'SUCCESS'
-			await new Transaction(transactionReceiver).save()
+			const reponseTransaction = await new Transaction(
+				transactionReceiver
+			).save()
 
 			const response = {
 				msg: 'Account successfully recharged.',
 				data: {
-					full_name: customer.full_name,
-					account_id: account.account_id,
-					account_type: account.account_type,
-					balance_before: Number(account.balance),
-					balance_after: Number(account.balance) + Number(rechargeAmount),
-					account_service: account.account_service,
+					full_name: reponseTransaction.to_fullname,
+					account_id: reponseTransaction.to_account_id,
+					balance_before: reponseTransaction.transaction_balance_before,
+					balance_after: reponseTransaction.transaction_balance_after,
 				},
 			}
 			return res.status(200).json(response)
@@ -306,85 +280,83 @@ router.get(
 	async (req, res) => {
 		const { historyAccountId } = req.body
 
-		try {
-			const customer = await Customer.findOne({
-				default_account_id: historyAccountId,
+		if (historyAccountId.length !== 14) {
+			return res.status(400).json({
+				errors: [{ msg: 'Please include a valid account id.' }],
 			})
-			if (!customer) {
-				return res
-					.status(400)
-					.json({ errors: [{ msg: 'Customer does not exist.' }] })
-			}
-
-			const transactionHistory = await Transaction.find({
-				$or: [
-					{ from_account_id: customer.default_account_id },
-					{ to_account_id: customer.default_account_id },
-				],
-			})
-
-			const response = {
-				msg: 'Transaction history successfully got.',
-				data: {
-					receive: transactionHistory
-						.filter(
-							(e) =>
-								e.transaction_type === 'RECEIVE' ||
-								e.transaction_type === 'RECHARGE'
-						)
-						.map((e) => {
-							return {
-								entry_time: e.entry_time,
-								from_bank_id: e.from_bank_id,
-								to_bank_id: e.to_bank_id,
-								from_account_id: e.from_account_id,
-								from_fullname: e.from_fullname,
-								to_account_id: e.to_account_id,
-								to_fullname: e.to_fullname,
-								transaction_type: e.transaction_type,
-								transaction_amount: e.transaction_amount,
-								transaction_status: e.transaction_status,
-							}
-						}),
-					transfer: transactionHistory
-						.filter((e) => e.transaction_type === 'TRANSFER')
-						.map((e) => {
-							return {
-								entry_time: e.entry_time,
-								from_bank_id: e.from_bank_id,
-								to_bank_id: e.to_bank_id,
-								from_account_id: e.from_account_id,
-								from_fullname: e.from_fullname,
-								to_account_id: e.to_account_id,
-								to_fullname: e.to_fullname,
-								transaction_type: e.transaction_type,
-								transaction_amount: e.transaction_amount,
-								transaction_status: e.transaction_status,
-							}
-						}),
-					debt: transactionHistory
-						.filter((e) => e.transaction_type === 'REPAYMENT')
-						.map((e) => {
-							return {
-								entry_time: e.entry_time,
-								from_bank_id: e.from_bank_id,
-								to_bank_id: e.to_bank_id,
-								from_account_id: e.from_account_id,
-								from_fullname: e.from_fullname,
-								to_account_id: e.to_account_id,
-								to_fullname: e.to_fullname,
-								transaction_type: e.transaction_type,
-								transaction_amount: e.transaction_amount,
-								transaction_status: e.transaction_status,
-							}
-						}),
-				},
-			}
-			return res.status(200).json(response)
-		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
 		}
+
+		const customer = await Customer.findOne({
+			default_account_id: historyAccountId,
+		})
+		if (!customer) {
+			return res
+				.status(400)
+				.json({ errors: [{ msg: 'Customer does not exist.' }] })
+		}
+
+		const { default_account_id: defaultAccountId } = customer
+
+		Promise.all([
+			Transaction.find(
+				{
+					$or: [
+						{
+							to_account_id: defaultAccountId,
+							transaction_type: 'RECEIVE',
+						},
+						{
+							to_account_id: defaultAccountId,
+							transaction_type: 'RECHARGE',
+						},
+					],
+				},
+				{ _id: 0, __v: 0 }
+			),
+			Transaction.find(
+				{
+					from_account_id: defaultAccountId,
+					transaction_type: 'TRANSFER',
+				},
+				{ _id: 0, __v: 0 }
+			),
+			Transaction.find(
+				{
+					$or: [
+						{
+							from_account_id: defaultAccountId,
+							transaction_type: 'REPAYMENT',
+						},
+						{
+							to_account_id: defaultAccountId,
+							transaction_type: 'REPAYMENT',
+						},
+					],
+				},
+				{ _id: 0, __v: 0 }
+			),
+		])
+			.then(
+				([
+					transactionsReceive,
+					transactionsTransfer,
+					transactionsRepayment,
+				]) => {
+					const response = {
+						msg: 'Information page successfully initialized.',
+						data: {
+							receive: transactionsReceive,
+							transfer: transactionsTransfer,
+							debt_repaying: transactionsRepayment,
+						},
+					}
+					return res.status(200).json(response)
+				}
+			)
+			.catch((error) => {
+				console.log(error)
+				return res.status(500).json({ msg: 'Server error...' })
+			})
 	}
 )
 

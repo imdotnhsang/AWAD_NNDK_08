@@ -31,6 +31,12 @@ const DebtCollectionSchema = new mongoose.Schema({
 		type: String,
 		require: true,
 	},
+	cancelled_by_id: {
+		type: String,
+	},
+	cancelled_by_fullname: {
+		type: String,
+	},
 	debt_reason_cancel: {
 		type: String,
 	},

@@ -63,6 +63,7 @@ router.post(
 			const response = {
 				msg: 'Debt collection successfully added.',
 				data: {
+					debt_collection_id: debtCollectionResponse._id,
 					borrower_default_account:
 						debtCollectionResponse.borrower_default_account,
 					borrower_fullname: debtCollectionResponse.borrower_fullname,
@@ -100,8 +101,23 @@ router.put(
 		const { debtCollectionId, debtReasonCancel } = req.body
 
 		try {
+			const customer = await Customer.findById(req.user.id)
+			if (!customer) {
+				return res.status(400).json({
+					errors: [{ msg: 'Customer not exists.' }],
+				})
+			}
+
 			const debtCollection = await DebtCollection.findById(debtCollectionId)
 
+			if (debtCollection.debt_status !== 'UNPAID') {
+				return res.status(400).json({
+					errors: [{ msg: 'Debt collection was cancelled or paid.' }],
+				})
+			}
+
+			debtCollection.cancelled_by_id = customer.default_account_id
+			debtCollection.cancelled_by_fullname = customer.full_name
 			debtCollection.debt_status = 'CANCELLED'
 			debtCollection.debt_reason_cancel = debtReasonCancel || ''
 			debtCollection.save()
@@ -159,9 +175,6 @@ router.post(
 		check('otp', 'Please include a valid OTP')
 			.isInt()
 			.isLength({ min: 6, max: 6 }),
-		check('debtAmount', 'Transaction amount is 10000 or more').isInt({
-			min: 10000,
-		}),
 		check('debtCollectionId', 'Debt collection id is required')
 			.not()
 			.notEmpty(),
@@ -172,7 +185,7 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { otp, debtAmount, debtCollectionId } = req.body
+		const { otp, debtCollectionId } = req.body
 
 		const checkErrorsMongoose = {
 			updateTransfererAccount: false,
@@ -202,16 +215,24 @@ router.post(
 				account_id: debtCollection.lender_default_account,
 			})
 
-			if (accountBorrower.balance - debtAmount < 50000) {
+			if (accountBorrower.balance - debtCollection.debt_amount < 50000) {
 				return res.status(400).json({
 					errors: [{ msg: 'Insufficient funds.' }],
 				})
 			}
 
-			const borrower = await Customer.findById(req.user.id)
+			const borrower = await Customer.findOne({
+				default_account_id: debtCollection.borrower_default_account,
+			})
 			if (!borrower) {
 				return res.status(400).json({
 					errors: [{ msg: 'Customer does not exist.' }],
+				})
+			}
+
+			if (borrower._id != req.user.id) {
+				return res.status(400).json({
+					errors: [{ msg: 'Debt collection is not yours.' }],
 				})
 			}
 
@@ -254,7 +275,7 @@ router.post(
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
 				transaction_type: 'REPAYMENT',
-				transaction_amount: debtAmount,
+				transaction_amount: debtCollection.debt_amount,
 				transaction_balance_before: accountBorrower.balance,
 			}
 
@@ -267,19 +288,19 @@ router.post(
 				from_bank_id: 'EIGHT',
 				to_bank_id: 'EIGHT',
 				transaction_type: 'RECEIVE',
-				transaction_amount: debtAmount,
+				transaction_amount: debtCollection.debt_amount,
 				transaction_balance_before: accountLender.balance,
 			})
 
 			const accountTransfererResponse = await Account.findOneAndUpdate(
 				{ account_id: borrower.default_account_id },
-				{ $inc: { balance: -(debtAmount + 1100) } },
+				{ $inc: { balance: -(debtCollection.debt_amount + 1100) } },
 				{ new: true }
 			)
 
 			checkErrorsMongoose.updateTransfererAccount = {
 				account_id: accountTransfererResponse.account_id,
-				transaction_amount: debtAmount,
+				transaction_amount: debtCollection.debt_amount,
 			}
 
 			const transactionBorrowerResponse = await new Transaction({
@@ -299,13 +320,13 @@ router.post(
 
 			const accountReceiverResponse = await Account.findOneAndUpdate(
 				{ account_id: debtCollection.lender_default_account },
-				{ $inc: { balance: debtAmount } },
+				{ $inc: { balance: debtCollection.debt_amount } },
 				{ new: true }
 			)
 
 			checkErrorsMongoose.updateReceiverAccount = {
 				account_id: accountReceiverResponse.account_id,
-				transaction_amount: debtAmount,
+				transaction_amount: debtCollection.debt_amount,
 			}
 
 			const transactionLenderResponse = await Transaction({
@@ -330,18 +351,21 @@ router.post(
 			const response = {
 				msg: 'Debt collection successfully paid',
 				data: {
-					entry_time: transactionBorrowerResponse.entry_time,
-					from_account_id: transactionBorrowerResponse.from_account_id,
-					from_fullname: transactionBorrowerResponse.from_fullname,
-					to_account_id: transactionBorrowerResponse.to_account_id,
-					to_fullname: transactionBorrowerResponse.to_fullname,
-					transaction_type: transactionBorrowerResponse.transaction_type,
-					transaction_amount: transactionBorrowerResponse.transaction_amount,
-					transaction_balance_before:
-						transactionBorrowerResponse.transaction_balance_before,
-					transaction_balance_after:
-						transactionBorrowerResponse.transaction_balance_after,
-					transaction_status: transactionBorrowerResponse.transaction_status,
+					debt_collection_id: debtCollection._id,
+					transaction_info: {
+						entry_time: transactionBorrowerResponse.entry_time,
+						from_account_id: transactionBorrowerResponse.from_account_id,
+						from_fullname: transactionBorrowerResponse.from_fullname,
+						to_account_id: transactionBorrowerResponse.to_account_id,
+						to_fullname: transactionBorrowerResponse.to_fullname,
+						transaction_type: transactionBorrowerResponse.transaction_type,
+						transaction_amount: transactionBorrowerResponse.transaction_amount,
+						transaction_balance_before:
+							transactionBorrowerResponse.transaction_balance_before,
+						transaction_balance_after:
+							transactionBorrowerResponse.transaction_balance_after,
+						transaction_status: transactionBorrowerResponse.transaction_status,
+					},
 				},
 			}
 			return res.status(200).json(response)
