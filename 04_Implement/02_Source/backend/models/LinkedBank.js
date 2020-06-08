@@ -43,6 +43,21 @@ const LinkedBankSchema = new mongoose.Schema({
 	passphrase: {
 		type: String,
 	},
+	partner_public_key_pgp: {
+		type: String
+	},
+	our_private_key_pgp: {
+		type: String
+	},
+	our_public_key_pgp: {
+		type: String
+	},
+	secret_key_to_call_partner: {
+		type: String
+	},
+	our_passphrase_to_call_partner: {
+		type: String
+	}
 })
 
 module.exports = LinkedBank = mongoose.model('linked_bank', LinkedBankSchema)
