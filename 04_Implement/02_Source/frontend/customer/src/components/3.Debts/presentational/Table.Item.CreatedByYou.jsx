@@ -6,8 +6,8 @@ import Status from './Status.Debt'
 import {
 	spaceSeparating,
 	commaSeparating,
-  resolveTagFromProps,
-  aliasFullname
+	resolveTagFromProps,
+	aliasFullname,
 } from '../../../utils/utils'
 import { DebtStatus } from '../../../constants/constants'
 
@@ -116,7 +116,7 @@ const TableItem = ({
 					<ActionButton
 						onClick={onRemove}
 						type='button'
-						disabled={status === DebtStatus.CANCELLED}
+						disabled={status !== DebtStatus.UNPAID}
 					>
 						<svg
 							width='25'

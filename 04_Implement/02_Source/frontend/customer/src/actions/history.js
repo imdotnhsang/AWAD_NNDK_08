@@ -27,7 +27,7 @@ export const invalidateHistoryData = (category) => ({
 const fecthHistoryData = (category) => async (dispatch) => {
   dispatch(requestHistoryData(category))
 
-  const res = await api.get(`/history/${getUrlFromCategory(category)}`)
+  const res = await api.get(`/customers/transaction-history/${getUrlFromCategory(category)}`)
   if (res.error) {
     dispatch(failedRequestHistoryData(category))
     const { error } = res

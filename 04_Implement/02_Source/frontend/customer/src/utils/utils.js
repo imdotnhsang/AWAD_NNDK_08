@@ -88,7 +88,7 @@ export function aliasFullname(value) {
 	result = result.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
 	result = result.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
 	result = result.replace(/đ/g, 'd')
-	result = result.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|`|-|{|}|\||\\/g,' ')
+	result = result.replace(/!|@|%|\^|\*|\(|\)|\+|\[|\]|~|\$|_|`|-|{|}|\||\\/g,' ')
 	result = result.replace(/ + /g, ' ')
 	result = result.trim().toUpperCase()
 	return result

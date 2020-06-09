@@ -216,7 +216,7 @@ router.post(
 
 			const transactionReceiver = {
 				entry_time: Date.now(),
-				from_account_id: 'EIGHT_BANK',
+				from_account_id: '08************',
 				from_fullname: 'Eight Bank',
 				to_account_id: customer.default_account_id,
 				to_fullname: customer.full_name,

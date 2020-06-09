@@ -68,7 +68,7 @@ class Table extends Component {
     } = this.props
     let sortedData = data
     if (desc !== null) {
-      sortedData = sortedData.sort((a, b) => (desc ? a.date - b.date : b.date - a.date))
+      sortedData = sortedData.sort((a, b) => (desc ? a.entry_time - b.entry_time : b.entry_time - a.entry_time))
     }
     return (
       <Wrapper>
@@ -94,13 +94,13 @@ class Table extends Component {
                   {
                     sortedData.map((item, index) => (
                       <Item
-                        key={item.senderID}
+                        key={item._id}
                         index={index + 1}
-                        accountID={item.senderID}
-                        accountName={item.senderName}
-                        amount={item.amount}
-                        bankName={item.bankName}
-                        date={item.date}
+                        accountID={item.from_account_id}
+                        accountName={item.from_fullname}
+                        amount={item.transaction_amount}
+                        bankName={item.from_bank_id}
+                        date={item.entry_time}
                         lastItem={index === data.length - 1}
                       />
                     ))

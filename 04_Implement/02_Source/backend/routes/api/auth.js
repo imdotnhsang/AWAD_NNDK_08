@@ -118,6 +118,7 @@ router.post(
 				data: {
 					'access-token': accessToken,
 					'refresh-token': refreshTokenInfo.refresh_token,
+					account_id: customer.default_account_id,
 				},
 			})
 		} catch (error) {

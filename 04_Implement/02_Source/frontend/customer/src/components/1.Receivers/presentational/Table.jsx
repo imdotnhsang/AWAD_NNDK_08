@@ -48,7 +48,7 @@ const Table = ({
                     index={index + 1}
                     nickname={item.nickname}
                     cardNumber={item.account_id}
-                    bankName={item.bank_name}
+                    bankName={item.bank_id}
                     lastItem={index === data.length - 1}
                     onEdit={() => onEdit(item)}
                     onRemove={() => onRemove(item)}

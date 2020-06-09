@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
 import {
 	spaceSeparating,
+	commaSeparating,
 	resolveTagFromProps,
 	milisecondToDatetime,
 	aliasFullname,
@@ -64,7 +65,10 @@ const TableItem = ({
 				</InfoWrapper>
 			</StyledCol>
 			<StyledCol md={2}>
-				<Text>{spaceSeparating(amount, 3)} VND</Text>
+				<Text>
+					<sup style={{ fontSize: '11px', paddingRight: '2px' }}>₫</sup>
+					{commaSeparating(amount, 3)}
+				</Text>
 			</StyledCol>
 			<StyledCol md={2}>
 				<Type type={type} />

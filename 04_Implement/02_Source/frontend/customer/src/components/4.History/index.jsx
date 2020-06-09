@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   width: 100%;
   padding: 0px 60px;
   padding-top: 24px;
-  padding-bottom: 67px;
+  // padding-bottom: 67px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

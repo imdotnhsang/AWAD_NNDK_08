@@ -86,16 +86,16 @@ class Table extends Component {
     let sortedData = data
     if (typeFilter) {
       sortedData = sortedData.filter((o) => {
-        const type = getDebtType(o.lenderID)
+        const type = getDebtType(o.from_account_id)
         return type === typeFilter
       })
     }
 
     if (statusFilter) {
-      sortedData = sortedData.filter((o) => o.status === statusFilter)
+      sortedData = sortedData.filter((o) => o.transaction_status === statusFilter)
     }
     if (desc !== null) {
-      sortedData = sortedData.sort((a, b) => (desc ? a.date - b.date : b.date - a.date))
+      sortedData = sortedData.sort((a, b) => (desc ? a.entry_time - b.entry_time : b.entry_time - a.entry_time))
     }
     return (
       <Wrapper>
@@ -126,23 +126,23 @@ class Table extends Component {
                 >
                   {
                     sortedData.map((item, index) => {
-                      const type = getDebtType(item.lenderID)
-                      const accountID = type === DebtType.LOAN ? item.borrowerID : item.lenderID
+                      const type = getDebtType(item.from_account_id)
+                      const accountID = type === DebtType.LOAN ? item.to_account_id : item.from_account_id
                       const accountName = (
                         type === DebtType.LOAN
-                          ? item.borrowerName
-                          : item.lenderName
+                          ? item.to_fullname
+                          : item.from_fullname
                       )
                       return (
                         <Item
-                          key={item.senderID}
+                          key={item._id}
                           index={index + 1}
                           accountID={accountID}
                           accountName={accountName}
-                          amount={item.amount}
-                          status={item.status}
+                          amount={item.transaction_amount}
+                          status={item.transaction_status}
                           type={type}
-                          date={item.date}
+                          date={item.entry_time}
                           lastItem={index === data.length - 1}
                         />
                       )

@@ -49,9 +49,9 @@ const TableItem = ({
   <Wrapper lastItem={lastItem}>
     <Row>
       <Col md={1}><Text>{index}</Text></Col>
-      <Col md={3}><Text>{nickname}</Text></Col>
+      <Col md={4}><Text>{nickname}</Text></Col>
       <Col md={3}><Text>{spaceSeparating(cardNumber, 4)}</Text></Col>
-      <Col md={3}><Text>{bankName}</Text></Col>
+      <Col md={2}><Text>{bankName}</Text></Col>
       <Col md={2}>
         <ActionWrapper>
           <ActionButton type="button" onClick={onEdit}>

@@ -12,7 +12,7 @@ import {
   // setNameToStorage,
   setEmailToStorage,
   // setBankIDToStorage,
-  // setAccountIDToStorage,
+  setAccountIDToStorage,
 } from '../../../utils/utils'
 import api from '../../../api/api'
 
@@ -150,17 +150,17 @@ class SignInModal extends Component {
         })
       }
     } else {
-      // const {
-      //   token,
-      //   name,
-      //   bankID,
-      //   accountID,
-      // } = res
+      const {
+        // token,
+        // name,
+        // bankID,
+        account_id,
+      } = res.data
       // setJwtToStorage(token)
       // setNameToStorage(name)
       setEmailToStorage(email)
       // setBankIDToStorage(bankID)
-      // setAccountIDToStorage(accountID)
+      setAccountIDToStorage(account_id)
       this.setState({
         loading: false,
       })
