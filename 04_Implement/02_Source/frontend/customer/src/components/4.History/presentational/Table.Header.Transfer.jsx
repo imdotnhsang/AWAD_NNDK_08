@@ -25,7 +25,7 @@ const TableHeader = ({
   <Wrapper>
     <Row>
       <Col md={1} />
-      <Col md={3}><Text>Receiver account</Text></Col>
+      <Col md={3}><Text>Receiver</Text></Col>
       <Col md={2}><Text>Amount</Text></Col>
       <Col md={2}><Text>Bank</Text></Col>
       <Col md={2}>

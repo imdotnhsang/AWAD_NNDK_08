@@ -93,8 +93,8 @@ router.get('/all-accounts', auth, async (req, res) => {
 			const response = {
 				msg: 'All cards successfully got.',
 				data: {
-					default_account: defaultAccount,
-					saving_accounts: savingAccounts,
+					defaultAccount,
+					savingAccounts,
 				},
 			}
 			return res.status(200).json(response)
@@ -187,7 +187,7 @@ router.get('/all-receivers', auth, async (req, res) => {
 			{
 				_id: { $in: listReceiveId.map((e) => mongoose.Types.ObjectId(e)) },
 			},
-			{ _id: 0, __v: 0 }
+			{  __v: 0 }
 		)
 
 		const response = {
@@ -594,5 +594,65 @@ router.put(
 		}
 	}
 )
+
+router.get('/all-debt-collections/created-by-you', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer not exists.',
+					},
+				],
+			})
+		}
+
+		const { default_account_id: defaultAccountId } = customer
+
+		const debtCollectionsLoan = await DebtCollection.find(
+			{ lender_default_account: defaultAccountId },
+			{ __v: 0 }
+		)
+		const response = {
+			msg: 'Debt collections successfully got.',
+			data: debtCollectionsLoan,
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
+
+router.get('/all-debt-collections/received-from-others', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer not exists.',
+					},
+				],
+			})
+		}
+
+		const { default_account_id: defaultAccountId } = customer
+
+		const debtCollectionsDebt = await DebtCollection.find(
+			{ borrower_default_account: defaultAccountId },
+			{ __v: 0 }
+		)
+		const response = {
+			msg: 'Debt collections successfully got.',
+			data: debtCollectionsDebt,
+		}
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
 
 module.exports = router

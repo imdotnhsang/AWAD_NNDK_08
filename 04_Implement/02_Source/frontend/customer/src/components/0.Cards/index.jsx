@@ -8,121 +8,133 @@ import CardList from './presentational/List.Card'
 import { selectCard, fetchCardsDataIfNeeded } from '../../actions/cards'
 
 const Wrapper = styled.div`
-  width: 100%;
-  padding: 0px 60px;
-  padding-bottom: 67px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+	width: 100%;
+	padding: 0px 60px;
+	// padding-bottom: 67px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
 `
 const Text = styled.span`
-  font-family: OpenSans-Bold;
-  font-size: 15px;
-  color: #fff;
-  margin-bottom: 45px;
+	font-family: OpenSans-Bold;
+	font-size: 15px;
+	color: #fff;
+	margin-bottom: 45px;
 `
 const CardWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
 `
 const SavingCardSection = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 110px;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-top: 110px;
 `
 
 const CardsPage = ({
-  currentCard,
-  cards,
-  loading,
-  onSelectCard,
-  onFetchData,
+	currentCard,
+	savingCards,
+	defaultCard,
+	loading,
+	onSelectCard,
+	onFetchData,
 }) => {
-  const payingCard = cards.find((card) => card.type === 'DEFAULT') || {
-    accountID: '', type: '', balance: 0, service: 'MASTERCARD',
-  }
-  const savingCard = cards.find((card) => card.accountID === currentCard) || {
-    accountID: '', type: '', balance: 0, service: 'MASTERCARD',
-  }
-  const savingCardList = cards.filter((card) => card.type === 'SAVING')
-  useEffect(() => {
-    onFetchData()
-  }, [])
-  return (
-    <Template
-      currentTab={0}
-      headerName="Cards"
-    >
-      <Wrapper>
-        <CardWrapper style={{ marginTop: '44px' }}>
-          <Text>Paying card</Text>
-          <Card
-            cardNumber={payingCard.accountID}
-            balance={payingCard.balance}
-            service={payingCard.service}
-            loading={loading}
-            empty={cards.length === 0}
-          />
-        </CardWrapper>
-        <SavingCardSection>
-          <CardWrapper>
-            <Text>Saving cards</Text>
-            <Card
-              cardNumber={savingCard.accountID}
-              balance={savingCard.balance}
-              service={savingCard.service}
-              loading={loading}
-              empty={cards.length === 0}
-            />
-          </CardWrapper>
-          {!loading
-            && (
-              <CardList
-                value={currentCard}
-                data={savingCardList}
-                onClick={onSelectCard}
-              />
-            )}
-        </SavingCardSection>
-      </Wrapper>
-    </Template>
-  )
+	// console.log(cards)
+	const payingCard = defaultCard || {
+		accountID: '',
+		type: '',
+		balance: 0,
+		service: 'MASTERCARD',
+	}
+	const savingCard = (savingCards &&
+		savingCards.find((card) => card.account_id === currentCard)) || {
+		accountID: '',
+		type: '',
+		balance: 0,
+		service: 'MASTERCARD',
+	}
+	const savingCardList = savingCards
+	// console.log(savingCardList)
+	useEffect(() => {
+		onFetchData()
+	}, [])
+	return (
+		<Template currentTab={0} headerName='Cards'>
+			<Wrapper>
+				<CardWrapper style={{ marginTop: '44px' }}>
+					<Text>Paying card</Text>
+					<Card
+						cardNumber={payingCard.account_id}
+						balance={payingCard.balance}
+						service={payingCard.account_service}
+						loading={loading}
+						empty={defaultCard === {}}
+					/>
+				</CardWrapper>
+				<SavingCardSection>
+					<CardWrapper>
+						<Text>Saving cards</Text>
+						<Card
+							cardNumber={savingCard.account_id}
+							balance={savingCard.balance}
+							service={savingCard.account_service}
+							loading={loading}
+							empty={savingCards.length === 0}
+						/>
+					</CardWrapper>
+					{!loading && (
+						<CardList
+							value={currentCard}
+							data={savingCardList}
+							onClick={onSelectCard}
+						/>
+					)}
+				</SavingCardSection>
+			</Wrapper>
+		</Template>
+	)
 }
 
 CardsPage.defaultProps = {
-  currentCard: '',
-  cards: [],
-  loading: false,
-  onSelectCard: (f) => f,
-  onFetchData: (f) => f,
+	currentCard: '',
+	defaultCard: {},
+	savingCards: [],
+	loading: false,
+	onSelectCard: (f) => f,
+	onFetchData: (f) => f,
 }
 CardsPage.propTypes = {
-  currentCard: PropTypes.string,
-  cards: PropTypes.arrayOf(PropTypes.shape({
-    service: PropTypes.string,
-    cardNumber: PropTypes.string,
-    balance: PropTypes.number,
-  })),
-  loading: PropTypes.bool,
-  onSelectCard: PropTypes.func,
-  onFetchData: PropTypes.func,
+	currentCard: PropTypes.string,
+	defaultCard: PropTypes.shape({
+		cardNumber: PropTypes.string,
+		service: PropTypes.string,
+		balance: PropTypes.number,
+	}),
+	savingCard: PropTypes.arrayOf(
+		PropTypes.shape({
+			cardNumber: PropTypes.string,
+			service: PropTypes.string,
+			balance: PropTypes.number,
+		})
+	),
+	loading: PropTypes.bool,
+	onSelectCard: PropTypes.func,
+	onFetchData: PropTypes.func,
 }
 const mapStateToProps = (state) => ({
-  currentCard: state.cards.currentCard,
-  cards: state.cards.cards,
-  loading: state.cards.loading,
+	currentCard: state.cards.currentCard,
+	savingCards: state.cards.savingCards,
+	defaultCard: state.cards.defaultCard,
+	loading: state.cards.loading,
 })
 const mapDispatchToProps = (dispatch) => ({
-  onSelectCard: (value) => dispatch(selectCard(value)),
-  onFetchData: () => dispatch(fetchCardsDataIfNeeded()),
+	onSelectCard: (value) => dispatch(selectCard(value)),
+	onFetchData: () => dispatch(fetchCardsDataIfNeeded()),
 })
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(CardsPage)
+export default connect(mapStateToProps, mapDispatchToProps)(CardsPage)

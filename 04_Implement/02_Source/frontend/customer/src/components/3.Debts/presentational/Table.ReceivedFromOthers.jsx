@@ -32,7 +32,7 @@ class Table extends Component {
       filter: '',
     }
     this.ref = createRef()
-    this.hanldeFilter = this.hanldeFilter.bind(this)
+    this.handleFilter = this.handleFilter.bind(this)
   }
 
   componentDidMount() {
@@ -49,7 +49,7 @@ class Table extends Component {
     if (!loading) this.ref.current.scrollArea.scrollTop()
   }
 
-  hanldeFilter(value) {
+  handleFilter(value) {
     this.setState({
       filter: value,
     })
@@ -69,13 +69,14 @@ class Table extends Component {
 
     let filteredData = data
     if (filter) {
-      filteredData = filteredData.filter((o) => o.status === filter)
+      filteredData = filteredData.filter((o) => o.debt_status === filter)
     }
 
     return (
       <Wrapper>
         <Header
-          onFilter={this.hanldeFilter}
+          typeHeader='received_from_others'
+          onFilter={this.handleFilter}
         />
         <Content>
           {
@@ -95,12 +96,12 @@ class Table extends Component {
                 {
                   filteredData.map((item, index) => (
                     <Item
-                      key={item.id}
+                      key={item._id}
                       index={index + 1}
-                      accountID={item.lenderID}
-                      accountName={item.lenderName}
-                      status={item.status}
-                      amount={item.amount}
+                      accountID={item.lender_default_id}
+                      accountName={item.lender_fullname}
+                      status={item.debt_status}
+                      amount={item.debt_amount}
                       lastItem={index === data.length - 1}
                       onPay={() => onPay(item)}
                       onInfo={() => onInfo(item)}

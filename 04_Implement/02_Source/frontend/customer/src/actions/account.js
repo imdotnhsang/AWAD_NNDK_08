@@ -17,7 +17,7 @@ export const failedRequestAccountData = (error) => ({
 
 const fetchAccountData = () => async (dispatch) => {
   dispatch(requestAccountData())
-  const res = await api.get('/account')
+  const res = await api.get('/customers/personal-info')
   if (res.error) {
     const { error } = res
     dispatch(failedRequestAccountData(error))

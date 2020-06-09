@@ -44,11 +44,11 @@ const Table = ({
               {
                 data.map((item, index) => (
                   <Item
-                    key={item.id}
+                    key={item._id}
                     index={index + 1}
                     nickname={item.nickname}
-                    cardNumber={item.accountID}
-                    bankName={item.bankName}
+                    cardNumber={item.account_id}
+                    bankName={item.bank_name}
                     lastItem={index === data.length - 1}
                     onEdit={() => onEdit(item)}
                     onRemove={() => onRemove(item)}

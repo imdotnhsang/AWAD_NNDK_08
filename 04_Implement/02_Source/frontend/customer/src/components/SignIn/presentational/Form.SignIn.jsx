@@ -7,12 +7,12 @@ import PasswordInput from './Input.Password'
 import SubmitButton from '../../common/presentational/Button.Loading'
 import {
   isValidEmail,
-  setJwtToStorage,
+  // setJwtToStorage,
   isAuthenticated,
-  setNameToStorage,
+  // setNameToStorage,
   setEmailToStorage,
-  setBankIDToStorage,
-  setAccountIDToStorage,
+  // setBankIDToStorage,
+  // setAccountIDToStorage,
 } from '../../../utils/utils'
 import api from '../../../api/api'
 
@@ -130,12 +130,12 @@ class SignInModal extends Component {
     const data = {
       email, password, reCaptchaKey,
     }
-    const config = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }
-    const res = await api.post('/login', data, config)
+    // const config = {
+    //   headers: {
+    //     'Content-Type': 'application/x-www-form-urlencoded',
+    //   },
+    // }
+    const res = await api.post('auth/customers/login', data)
     if (res.error) {
       const { status, error } = res
       if (status === 419) {
@@ -150,17 +150,17 @@ class SignInModal extends Component {
         })
       }
     } else {
-      const {
-        token,
-        name,
-        bankID,
-        accountID,
-      } = res
-      setJwtToStorage(token)
-      setNameToStorage(name)
+      // const {
+      //   token,
+      //   name,
+      //   bankID,
+      //   accountID,
+      // } = res
+      // setJwtToStorage(token)
+      // setNameToStorage(name)
       setEmailToStorage(email)
-      setBankIDToStorage(bankID)
-      setAccountIDToStorage(accountID)
+      // setBankIDToStorage(bankID)
+      // setAccountIDToStorage(accountID)
       this.setState({
         loading: false,
       })

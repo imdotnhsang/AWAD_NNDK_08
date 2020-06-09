@@ -17,7 +17,7 @@ import SaveReceiverModal from './container/Modal.SaveReceiver'
 
 const Wrapper = styled.div`
   width: 100%;
-  padding-bottom: 67px;
+  // padding-bottom: 67px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

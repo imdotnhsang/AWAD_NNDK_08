@@ -120,7 +120,7 @@ export const invalidateDebtsData = (category) => ({
 const fecthDebtsData = (category) => async (dispatch) => {
   dispatch(requestDebtsData(category))
 
-  const res = await api.get(`/debts/${getUrlFromCategory(category)}`)
+  const res = await api.get(`/customers/all-debt-collections/${getUrlFromCategory(category)}`)
   if (res.error) {
     dispatch(failedRequestDebtsData(category))
     const { error } = res

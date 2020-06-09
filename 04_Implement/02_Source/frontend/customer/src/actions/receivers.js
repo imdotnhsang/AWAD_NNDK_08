@@ -22,7 +22,7 @@ export const invalidateReceiversData = () => ({
 
 const fetchReceiversData = () => async (dispatch) => {
   dispatch(requestReceiversData())
-  const res = await api.get('/receivers')
+  const res = await api.get('/customers/all-receivers')
   if (res.error) {
     const { error } = res
     dispatch(failedRequestReceiversData())

@@ -207,8 +207,8 @@ class ReceiversPage extends Component {
           {showEditModal
             && (
               <EditModal
-                id={selectedItem.id}
-                bankID={selectedItem.bankID}
+                id={selectedItem._id}
+                bankID={selectedItem.bank}
                 accountID={selectedItem.accountID}
                 nickname={selectedItem.nickname}
                 onClose={this.handleCloseEditModal}

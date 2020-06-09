@@ -18,9 +18,9 @@ const TableHeader = () => (
   <Wrapper>
     <Row>
       <Col md={1} />
-      <Col md={4}><Text>Name</Text></Col>
+      <Col md={3}><Text>Nickname</Text></Col>
       <Col md={3}><Text>Card number</Text></Col>
-      <Col md={2}><Text>Bank</Text></Col>
+      <Col md={3}><Text>Bank</Text></Col>
       <Col md={2}><Text>Actions</Text></Col>
     </Row>
   </Wrapper>

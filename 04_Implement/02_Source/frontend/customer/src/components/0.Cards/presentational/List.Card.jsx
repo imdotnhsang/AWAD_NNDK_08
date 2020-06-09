@@ -54,15 +54,15 @@ const CardList = ({
       <Wrapper>
         {
           data.map((card) => {
-            const { service, accountID, balance } = card
+            const { account_service, account_id, balance } = card
             return (
               <Item
-                key={accountID}
-                service={service}
-                cardNumber={accountID}
+                key={account_id}
+                service={account_service}
+                cardNumber={account_id}
                 balance={balance}
-                active={value === accountID}
-                onClick={() => onClick(accountID)}
+                active={value === account_id}
+                onClick={() => onClick(account_id)}
                 disabled={loading}
               />
             )
