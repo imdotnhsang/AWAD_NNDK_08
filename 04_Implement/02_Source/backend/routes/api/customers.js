@@ -307,7 +307,7 @@ router.get(
 			const data = await Transaction.find(condition, project)
 
 			const response = {
-				msg: 'Transaction successfully got.',
+				msg: 'All transactions successfully got.',
 				data,
 			}
 			return res.status(200).json(response)
@@ -625,19 +625,24 @@ router.get(
 
 			const condition = {}
 			const project = {}
-			if (type_debt_collection === 'created-by-you') {
+			switch (type_debt_collection) {
+			case 'created-by-you':
 				condition.lender_default_account = defaultAccountId
 				project.__v = 0
-			} else if (type_debt_collection === 'received-from-others') {
+				break
+			case 'received-from-others':
 				condition.borrower_default_account = defaultAccountId
 				project.__v = 0
+				break
+			default:
+				break
 			}
 
-			const debtCollections = await DebtCollection.find(condition, project)
+			const data = await DebtCollection.find(condition, project)
 
 			const response = {
 				msg: 'Debt collections successfully got.',
-				data: debtCollections,
+				data,
 			}
 			return res.status(200).json(response)
 		} catch (error) {

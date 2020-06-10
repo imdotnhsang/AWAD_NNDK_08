@@ -271,35 +271,40 @@ router.post(
 // @desc      View transaction history of any customer account
 // @access    Private (employee)
 router.get(
-	'/transaction-history',
+	'/transaction-history/:type_transaction_history',
 	[
 		auth,
 		employee,
 		check('historyAccountId', 'Account id is required').not().notEmpty(),
 	],
 	async (req, res) => {
-		const { historyAccountId } = req.body
+		try {
+			const { historyAccountId } = req.body
 
-		if (historyAccountId.length !== 14) {
-			return res.status(400).json({
-				errors: [{ msg: 'Please include a valid account id.' }],
+			if (historyAccountId.length !== 14) {
+				return res.status(400).json({
+					errors: [{ msg: 'Please include a valid account id.' }],
+				})
+			}
+
+			const customer = await Customer.findOne({
+				default_account_id: historyAccountId,
 			})
-		}
+			if (!customer) {
+				return res
+					.status(400)
+					.json({ errors: [{ msg: 'Customer does not exist.' }] })
+			}
 
-		const customer = await Customer.findOne({
-			default_account_id: historyAccountId,
-		})
-		if (!customer) {
-			return res
-				.status(400)
-				.json({ errors: [{ msg: 'Customer does not exist.' }] })
-		}
+			const { default_account_id: defaultAccountId } = customer
+			const { type_transaction_history } = req.params
 
-		const { default_account_id: defaultAccountId } = customer
+			let condition = {}
+			let project = {}
 
-		Promise.all([
-			Transaction.find(
-				{
+			switch (type_transaction_history) {
+			case 'receive':
+				condition = {
 					$or: [
 						{
 							to_account_id: defaultAccountId,
@@ -310,18 +315,18 @@ router.get(
 							transaction_type: 'RECHARGE',
 						},
 					],
-				},
-				{ _id: 0, __v: 0 }
-			),
-			Transaction.find(
-				{
+				}
+				project = { __v: 0 }
+				break
+			case 'transfer':
+				condition = {
 					from_account_id: defaultAccountId,
 					transaction_type: 'TRANSFER',
-				},
-				{ _id: 0, __v: 0 }
-			),
-			Transaction.find(
-				{
+				}
+				project = { __v: 0 }
+				break
+			case 'debt-paying':
+				(condition = {
 					$or: [
 						{
 							from_account_id: defaultAccountId,
@@ -332,31 +337,23 @@ router.get(
 							transaction_type: 'REPAYMENT',
 						},
 					],
-				},
-				{ _id: 0, __v: 0 }
-			),
-		])
-			.then(
-				([
-					transactionsReceive,
-					transactionsTransfer,
-					transactionsRepayment,
-				]) => {
-					const response = {
-						msg: 'Information page successfully initialized.',
-						data: {
-							receive: transactionsReceive,
-							transfer: transactionsTransfer,
-							debt_repaying: transactionsRepayment,
-						},
-					}
-					return res.status(200).json(response)
-				}
-			)
-			.catch((error) => {
-				console.log(error)
-				return res.status(500).json({ msg: 'Server error...' })
-			})
+				}),
+				(project = { __v: 0 })
+				break
+			default:
+				break
+			}
+
+			const data = await Transaction.find(condition, project)
+			const response = {
+				msg: 'All transactions successfully got.',
+				data,
+			}
+			return res.status(200).json(response)
+		} catch (error) {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		}
 	}
 )
 
