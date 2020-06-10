@@ -1,13 +1,13 @@
 const express = require('express')
 
 const router = express.Router()
-const { customAlphabet } = require('nanoid')
+// const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
 // const NodeRSA = require('node-rsa')
 const auth = require('../../middlewares/auth')
 const crypto = require('crypto')
 const openpgp = require('openpgp')
-const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
+// const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
 
 const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 

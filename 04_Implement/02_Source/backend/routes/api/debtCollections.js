@@ -1,11 +1,11 @@
 const express = require('express')
 
 const router = express.Router()
-const { customAlphabet } = require('nanoid')
+// const { customAlphabet } = require('nanoid')
 const { check, validationResult } = require('express-validator')
 const auth = require('../../middlewares/auth')
 
-const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
+// const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
 
 const DebtCollection = require('../../models/DebtCollection')
 const Customer = require('../../models/Customer')
@@ -131,7 +131,7 @@ router.put(
 )
 
 // @route     POST /debt-collections/repayment
-// @desc      Send OTP to email which supports to confirm repayment
+// @desc      Repay debt collection
 // @access    Public
 router.post(
 	'/repayment',
