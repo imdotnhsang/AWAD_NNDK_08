@@ -164,7 +164,7 @@ router.put(
 			const response = {
 				msg: 'Receiver successfully updated.',
 				data: {
-					receiver_id: responseReceiver._id,
+					_id: responseReceiver._id,
 					nickname: responseReceiver.nickname,
 					full_name: responseReceiver.full_name,
 					account_id: responseReceiver.account_id,

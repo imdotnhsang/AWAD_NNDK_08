@@ -41,12 +41,15 @@ const receivers = (state = initialState, action) => {
     case Receivers.EDIT_A_RECEIVER:
       return {
         ...state,
-        receivers: state.receivers.map((e) => (e.id === action.data.id ? action.data : e)),
+        receivers: state.receivers.map((e) => (e._id === action.data._id ? action.data : e)),
       }
     case Receivers.REMOVE_A_RECEIVER:
       return {
         ...state,
-        receivers: state.receivers.filter((e) => e.id !== action.id),
+        receivers: state.receivers.filter((e) =>{ 
+          console.log(e._id, action.id)
+          return e._id !== action.id
+        }),
       }
     default:
       return state

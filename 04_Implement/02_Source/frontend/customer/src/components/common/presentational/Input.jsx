@@ -66,6 +66,7 @@ const GeneralInput = ({
   pattern,
   onChange,
   onKeyPress,
+  onKeyDown,
   onBlur,
 }) => (
   <div style={{ position: 'relative', width: '100%' }}>
@@ -85,6 +86,7 @@ const GeneralInput = ({
               disabled={disabled}
               onKeyPress={onKeyPress}
               onBlur={onBlur}
+              onKeyDown={onKeyDown}
             />
           </Col>
         </Row>

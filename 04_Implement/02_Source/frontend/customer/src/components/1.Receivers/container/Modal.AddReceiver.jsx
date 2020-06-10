@@ -44,6 +44,7 @@ class AddReceiverModal extends Component {
 		this.handleNickname = this.handleNickname.bind(this)
 		this.handleValidateAccountID = this.handleValidateAccountID.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	handleBankID(value, valueName) {
@@ -75,7 +76,7 @@ class AddReceiverModal extends Component {
 			accountIDValid: false,
 			nickname: '',
 		})
-		const { bankID, accountID } = this.state
+		const { accountID } = this.state
 		// if (accountID.length !== 14) {
 		//   this.setState({
 		//     accountIDError: 'Invalid value',
@@ -155,8 +156,8 @@ class AddReceiverModal extends Component {
 			bankId: bankID,
 			accountId: accountID,
 			nickname,
-    }
-    // console.log(data)
+		}
+		// console.log(data)
 		// const config = {
 		// 	headers: {
 		// 		'Content-Type': 'application/x-www-form-urlencoded',
@@ -187,10 +188,16 @@ class AddReceiverModal extends Component {
 		}
 	}
 
+	handleEnterKey(e) {
+		if (e.key === 'Enter') {
+			this.handleSubmit()
+		}
+	}
+
 	render() {
 		const {
 			bankID,
-			bankName,
+			// bankName,
 			accountID,
 			nickname,
 			error,
@@ -240,6 +247,7 @@ class AddReceiverModal extends Component {
 						error={error}
 						onChange={this.handleNickname}
 						disabled={loading || !accountIDValid}
+						onKeyDown={this.handleEnterKey}
 					/>
 					<ButtonWrapper>
 						<Button

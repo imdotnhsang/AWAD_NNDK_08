@@ -21,8 +21,8 @@ const api = {
 		const options = {
 			headers: {
 				'Content-Type': 'application/json',
-      },
-      withCredentials: true,
+			},
+			withCredentials: true,
 		}
 
 		if (params) {
@@ -89,6 +89,34 @@ const api = {
 
 		try {
 			const response = await instance.delete(`${url}`, options)
+			return response.data
+		} catch (e) {
+			return generateErrorResponse(e.response)
+		}
+	},
+	put: async (url, data, config) => {
+		let options = {
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			withCredentials: true,
+		}
+
+		if (config) {
+			options = { ...options, ...config }
+		}
+
+		// const jwt = getJwtFromStorage()
+		// if (jwt) {
+		// 	options.headers.Authorization = `${authType} ${jwt}`
+		// }
+
+		try {
+			const response = await instance.put(
+				`${url}`,
+				JSON.stringify(data),
+				options
+			)
 			return response.data
 		} catch (e) {
 			return generateErrorResponse(e.response)
