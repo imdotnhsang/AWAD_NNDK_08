@@ -40,6 +40,7 @@ const ActionButton = styled.button`
 const TableItem = ({
   index,
   nickname,
+  // fullName,
   cardNumber,
   bankName,
   lastItem,

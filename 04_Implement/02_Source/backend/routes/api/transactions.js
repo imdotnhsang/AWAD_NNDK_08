@@ -141,8 +141,8 @@ router.post(
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
 				to_fullname: toFullName,
-				from_bank_id: 'EIGHT',
-				to_bank_id: 'EIGHT',
+				from_bank_id: 'Eight',
+				to_bank_id: 'Eight',
 				transaction_type: 'TRANSFER',
 				transaction_payer: transactionPayer,
 				transaction_amount: transactionAmount,
@@ -155,8 +155,8 @@ router.post(
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
 				to_fullname: toFullName,
-				from_bank_id: 'EIGHT',
-				to_bank_id: 'EIGHT',
+				from_bank_id: 'Eight',
+				to_bank_id: 'Eight',
 				transaction_type: 'RECEIVE',
 				transaction_payer: transactionPayer,
 				transaction_amount: transactionAmount,
@@ -345,14 +345,14 @@ router.post(
 // @route     GET /transactions/receiver-receiver-internal-banking
 // @desc      Get full name from account id internal banking
 // @access    Public
-router.get('/receiver-internal-banking/', auth, async (req, res) => {
+router.get('/receiver-internal-banking', auth, async (req, res) => {
 	const errors = validationResult(req)
 	if (!errors.isEmpty()) {
 		return res.status(400).send(errors)
 	}
 
 	try {
-		const { accountId } = req.body
+		const { accountId } = req.query
 
 		const customer = await Customer.findOne({ default_account_id: accountId })
 
@@ -707,7 +707,7 @@ router.post(
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
 				to_fullname: toFullName,
-				from_bank_id: 'EIGHT',
+				from_bank_id: 'Eight',
 				to_bank_id: toBankId,
 				transaction_type: 'TRANSFER',
 				transaction_amount: transactionAmount,
@@ -950,7 +950,7 @@ router.post(
 				to_account_id: dataDecryptedObject.toAccountId,
 				to_fullname: dataDecryptedObject.toFullName,
 				from_bank_id: dataDecryptedObject.fromBankId,
-				to_bank_id: 'EIGHT',
+				to_bank_id: 'Eight',
 				transaction_type: 'RECEIVE',
 				transaction_amount: dataDecryptedObject.transactionAmount,
 				transaction_balance_before: account.balance,

@@ -6,7 +6,7 @@ const { check, validationResult } = require('express-validator')
 const auth = require('../../middlewares/auth')
 
 const Customer = require('../../models/Customer')
-const Receiver =require('../../models/Receiver')
+const Receiver = require('../../models/Receiver')
 const LinkedBank = require('../../models/LinkedBank')
 
 // @route     POST /receives/add-receiver
@@ -48,7 +48,7 @@ router.post(
 
 			const linkedBank = await LinkedBank.findOne({ bank_id: bankId })
 
-			if (bankId !== 'EIGHT' && !linkedBank) {
+			if (bankId !== 'Eight' && !linkedBank) {
 				return res.status(400).json({
 					errors: [{ msg: 'Bank does not exist.' }],
 				})
@@ -98,11 +98,12 @@ router.post(
 			const response = {
 				msg: 'Receiver successfully added.',
 				data: {
-					receiver_id: responseReceiver._id,
+					_id: responseReceiver._id,
 					nickname: responseReceiver.nickname,
 					full_name: responseReceiver.full_name,
 					account_id: responseReceiver.account_id,
 					bank_name: responseReceiver.bank_name,
+					bank_id: responseReceiver.bank_id,
 				},
 			}
 			return res.status(200).json(response)
@@ -168,6 +169,7 @@ router.put(
 					full_name: responseReceiver.full_name,
 					account_id: responseReceiver.account_id,
 					bank_name: responseReceiver.bank_name,
+					bank_id: responseReceiver.bank_id,
 				},
 			}
 			return res.status(200).json(response)
@@ -192,7 +194,7 @@ router.delete(
 			}
 		}
 
-		const { receiverId } = req.body
+		const { receiverId } = req.query
 
 		try {
 			const customer = await Customer.findById(req.user.id)
@@ -217,7 +219,7 @@ router.delete(
 
 			const response = {
 				msg: 'Receiver successfully deleted.',
-				data: { receiver_id: receiverId },
+				data: { _id: receiverId },
 			}
 			return res.status(200).json(response)
 		} catch (error) {

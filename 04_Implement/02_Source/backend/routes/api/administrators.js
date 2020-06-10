@@ -329,13 +329,13 @@ router.get(
 					$or: [
 						{
 							transaction_type: 'TRANSFER',
-							to_bank_id: { $ne: 'EIGHT' },
-							from_bank_id: 'EIGHT',
+							to_bank_id: { $ne: 'Eight' },
+							from_bank_id: 'Eight',
 						},
 						{
 							transaction_type: 'RECEIVE',
-							to_bank_id: 'EIGHT',
-							from_bank_id: { $ne: 'EIGHT' },
+							to_bank_id: 'Eight',
+							from_bank_id: { $ne: 'Eight' },
 						},
 					],
 				},

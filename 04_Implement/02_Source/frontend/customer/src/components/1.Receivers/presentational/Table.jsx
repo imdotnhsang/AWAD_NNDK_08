@@ -7,75 +7,78 @@ import Item from './Table.Item'
 import Loading from '../../common/presentational/Loading.Table'
 
 const Wrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
 `
 const Content = styled.div`
-  width: 100%;
-  height: 590px;
-  position: relative;
+	width: 100%;
+	height: 590px;
+	position: relative;
 `
 
-const Table = ({
-  data,
-  loading,
-  onEdit,
-  onRemove,
-}) => (
-  <Wrapper>
-    <Header />
-    <Content>
-      {
-        loading ? <Loading />
-          : (
-            <ScrollArea
-              speed={0.5}
-              horizontal={false}
-              style={{ maxHeight: '590px' }}
-              verticalScrollbarStyle={{ width: '5px', backgroundColor: '#7C7F87', borderRadius: '10px' }}
-              verticalContainerStyle={{
-                width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',
-              }}
-              smoothScrolling
-            >
-              {
-                data.map((item, index) => (
-                  <Item
-                    key={item._id}
-                    index={index + 1}
-                    nickname={item.nickname}
-                    cardNumber={item.account_id}
-                    bankName={item.bank_id}
-                    lastItem={index === data.length - 1}
-                    onEdit={() => onEdit(item)}
-                    onRemove={() => onRemove(item)}
-                  />
-                ))
-              }
-            </ScrollArea>
-          )
-      }
-    </Content>
-  </Wrapper>
+const Table = ({ data, loading, onEdit, onRemove }) => (
+	<Wrapper>
+		<Header />
+		<Content>
+			{loading ? (
+				<Loading />
+			) : (
+				<ScrollArea
+					speed={0.5}
+					horizontal={false}
+					style={{ maxHeight: '590px' }}
+					verticalScrollbarStyle={{
+						width: '5px',
+						backgroundColor: '#7C7F87',
+						borderRadius: '10px',
+					}}
+					verticalContainerStyle={{
+						width: '5px',
+						backgroundImage:
+							'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
+						borderRadius: '10px',
+						right: '0px',
+					}}
+					smoothScrolling
+				>
+					{data.map((item, index) => (
+						<Item
+							key={item._id}
+							index={index + 1}
+							nickname={item.nickname}
+							fullName={item.full_name}
+							cardNumber={item.account_id}
+							bankName={item.bank_id}
+							lastItem={index === data.length - 1}
+							onEdit={() => onEdit(item)}
+							onRemove={() => onRemove(item)}
+						/>
+					))}
+				</ScrollArea>
+			)}
+		</Content>
+	</Wrapper>
 )
 Table.defaultProps = {
-  data: [],
-  loading: false,
-  onEdit: (f) => f,
-  onRemove: (f) => f,
+	data: [],
+	loading: false,
+	onEdit: (f) => f,
+	onRemove: (f) => f,
 }
 Table.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    nickname: PropTypes.string,
-    accountID: PropTypes.string,
-    bankName: PropTypes.string,
-  })),
-  loading: PropTypes.bool,
-  onEdit: PropTypes.func,
-  onRemove: PropTypes.func,
+	data: PropTypes.arrayOf(
+		PropTypes.shape({
+			id: PropTypes.string,
+			nickname: PropTypes.string,
+			accountID: PropTypes.string,
+			bankName: PropTypes.string,
+		})
+	),
+	loading: PropTypes.bool,
+	onEdit: PropTypes.func,
+	onRemove: PropTypes.func,
 }
 export default Table

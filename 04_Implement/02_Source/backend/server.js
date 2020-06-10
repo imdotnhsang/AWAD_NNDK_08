@@ -58,6 +58,7 @@ app.use('/debt-collections', require('./routes/api/debtCollections'))
 app.use('/auth', require('./routes/api/auth'))
 app.use('/accounts', require('./routes/api/accounts'))
 app.use('/transactions', require('./routes/api/transactions'))
+app.use('/linked-banks', require('./routes/api/linkedBanks'))
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {

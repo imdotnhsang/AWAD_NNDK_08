@@ -88,7 +88,10 @@ export function aliasFullname(value) {
 	result = result.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
 	result = result.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
 	result = result.replace(/đ/g, 'd')
-	result = result.replace(/!|@|%|\^|\*|\(|\)|\+|\[|\]|~|\$|_|`|-|{|}|\||\\/g,' ')
+	result = result.replace(
+		/!|@|%|\^|\*|\(|\)|\+|\[|\]|~|\$|_|`|-|{|}|\||\\/g,
+		' '
+	)
 	result = result.replace(/ + /g, ' ')
 	result = result.trim().toUpperCase()
 	return result
@@ -116,7 +119,18 @@ export function fourDigit(cardNumber) {
 
 export function generateErrorResponse(res) {
 	const { status } = res
-	const error = res.data.error || 'Something wrong happended ...'
+	let error = ''
+	switch (status) {
+		case 500:
+			error = res.data.msg || 'Something wrong happened ...'
+			break
+		default:
+			error =
+				(res.data.errors && res.data.errors[0].msg) ||
+				'Something wrong happened ...'
+			break
+	}
+
 	return { status, error }
 }
 

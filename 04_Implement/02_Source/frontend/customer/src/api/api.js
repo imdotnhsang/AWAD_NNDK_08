@@ -29,10 +29,10 @@ const api = {
 			// eslint-disable-next-line no-param-reassign
 			url += `?${objectToQueryString(params)}`
 		}
-		const jwt = getJwtFromStorage()
-		if (jwt) {
-			options.headers.Authorization = `${authType} ${jwt}`
-		}
+		// const jwt = getJwtFromStorage()
+		// if (jwt) {
+		// 	options.headers.Authorization = `${authType} ${jwt}`
+		// }
 
 		try {
 			const response = await instance.get(`${url}`, options)
@@ -53,10 +53,10 @@ const api = {
 			options = { ...options, ...config }
 		}
 
-		const jwt = getJwtFromStorage()
-		if (jwt) {
-			options.headers.Authorization = `${authType} ${jwt}`
-		}
+		// const jwt = getJwtFromStorage()
+		// if (jwt) {
+		// 	options.headers.Authorization = `${authType} ${jwt}`
+		// }
 
 		try {
 			const response = await instance.post(
@@ -74,6 +74,7 @@ const api = {
 			headers: {
 				'Content-Type': 'application/json',
 			},
+			withCredentials: true,
 		}
 
 		if (params) {
@@ -81,10 +82,10 @@ const api = {
 			url += `?${objectToQueryString(params)}`
 		}
 
-		const jwt = getJwtFromStorage()
-		if (jwt) {
-			options.headers.Authorization = `${authType} ${jwt}`
-		}
+		// const jwt = getJwtFromStorage()
+		// if (jwt) {
+		// 	options.headers.Authorization = `${authType} ${jwt}`
+		// }
 
 		try {
 			const response = await instance.delete(`${url}`, options)
