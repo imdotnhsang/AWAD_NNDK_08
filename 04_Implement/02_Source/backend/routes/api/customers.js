@@ -425,7 +425,6 @@ router.post(
 
 		try {
 			const customer = await Customer.findOne({ email })
-
 			if (!customer) {
 				return res.status(400).json({
 					errors: [
@@ -455,7 +454,41 @@ router.post(
 	}
 )
 
-// @route     POST /customers/send-password-otp
+// @route     POST /transactions/send-transferring-otp
+// @desc      Send OTP to email which supports to confirm transaction
+// @access    Public
+router.post('/send-transferring-otp', auth, async (req, res) => {
+	try {
+		const customer = await Customer.findById(req.user.id)
+		if (!customer) {
+			return res.status(400).json({
+				errors: [
+					{
+						msg: 'Customer does not exist.',
+					},
+				],
+			})
+		}
+
+		const nanoidPassword = await customAlphabet('1234567890', 6)
+		const otpCode = nanoidPassword()
+
+		await sendOTPCode(customer.email, customer.full_name, otpCode, 'transfer')
+
+		customer.OTP.code = otpCode
+		customer.OTP.expired_at = Date.now() + 300000
+		customer.OTP.is_confirmed = false
+		customer.OTP.is_used = false
+		await customer.save()
+
+		const response = { msg: 'OTP successfully sent.' }
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
+
+// @route     POST /customers/validate-password-otp
 // @desc      Check OTP for resetting password
 // @access    Public
 router.post(
