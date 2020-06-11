@@ -42,10 +42,11 @@ const tab = (state, action) => {
     case Debts.CANCEL_A_DEBT:
       return {
         ...state,
-        data: state.data.map((debt) => (debt.id === action.id
+        data: state.data.map((debt) => (debt._id === action.id
           ? ({
             ...debt,
-            status: DebtStatus.CANCELLED,
+            debt_status: DebtStatus.CANCELLED,
+            debt_reason_cancel: action.reason
           })
           : debt)),
       }

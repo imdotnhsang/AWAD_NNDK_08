@@ -150,8 +150,9 @@ export const addADebt = (data) => ({
   data,
 })
 
-export const cancelADebt = (category, id) => ({
+export const cancelADebt = (category, id, reason) => ({
   type: Debts.CANCEL_A_DEBT,
   category,
   id,
+  reason
 })

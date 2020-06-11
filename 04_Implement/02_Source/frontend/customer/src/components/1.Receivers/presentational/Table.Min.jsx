@@ -43,10 +43,10 @@ const Table = ({
               {
                 data.map((item, index) => (
                   <Item
-                    key={item.id}
+                    key={item._id}
                     nickname={item.nickname}
-                    cardNumber={item.accountID}
-                    bankName={item.bankName}
+                    cardNumber={item.account_id}
+                    bankName={item.bank_id}
                     lastItem={index === data.length - 1}
                   />
                 ))

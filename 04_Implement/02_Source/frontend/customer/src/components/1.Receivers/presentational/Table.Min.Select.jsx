@@ -46,8 +46,8 @@ const Table = ({
               {
                 data.map((item, index) => (
                   <Item
-                    key={item.accountID}
-                    nickname={item.accountName}
+                    key={item.id}
+                    nickname={item.accountNickname}
                     cardNumber={item.accountID}
                     bankName={item.bankName}
                     lastItem={index === data.length - 1}

@@ -71,6 +71,7 @@ const TableItem = ({
 	lastItem,
 	onInfo,
 	onRemove,
+	onScrollTop,
 }) => (
 	<Wrapper lastItem={lastItem}>
 		<Row>
@@ -80,7 +81,7 @@ const TableItem = ({
 			<StyledCol md={3}>
 				<InfoWrapper>
 					<Text>{aliasFullname(accountName)}</Text>
-					<Text>{spaceSeparating(accountID, 4)}</Text>
+					<Text>{accountID && spaceSeparating(accountID, 4)}</Text>
 				</InfoWrapper>
 			</StyledCol>
 			<StyledCol md={3}>
@@ -114,7 +115,9 @@ const TableItem = ({
 						</svg>
 					</ActionButton>
 					<ActionButton
-						onClick={onRemove}
+						onClick={() => {
+							onRemove()
+						}}
 						type='button'
 						disabled={status !== DebtStatus.UNPAID}
 					>

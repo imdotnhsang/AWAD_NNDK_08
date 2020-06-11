@@ -63,6 +63,7 @@ router.post(
 			const response = {
 				msg: 'Debt collection successfully added.',
 				data: {
+					_id:debtCollectionResponse._id,
 					debt_collection_id: debtCollectionResponse._id,
 					borrower_default_account:
 						debtCollectionResponse.borrower_default_account,
