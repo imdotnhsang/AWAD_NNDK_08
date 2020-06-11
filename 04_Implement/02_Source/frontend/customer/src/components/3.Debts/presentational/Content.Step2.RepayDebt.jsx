@@ -9,200 +9,214 @@ import api from '../../../api/api'
 import Banner from '../../common/presentational/Banner.Step'
 
 const Text = styled.span`
-  font-family: OpenSans-Regular;
-  font-size: 12px;
-  color: #fff;
+	font-family: OpenSans-Regular;
+	font-size: 12px;
+	color: #fff;
 `
 const StyledRow = styled(Row)`
-  width: 100%;
-  margin: 0;
+	width: 100%;
+	margin: 0;
 `
 const StyledCol = styled(Col)`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-start;
-  word-wrap: break-word;
-  text-align: justify;
-  padding: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: flex-start;
+	word-wrap: break-word;
+	text-align: justify;
+	padding: 0;
 `
 const Wrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  &> * {
-    margin-top: 32px;
-  }
-  &> *:last-child {
-    margin-top: 32px;
-  }
-  &> *:first-child {
-    margin-top: 0px;
-  }
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	& > * {
+		margin-top: 32px;
+	}
+	& > *:last-child {
+		margin-top: 32px;
+	}
+	& > *:first-child {
+		margin-top: 0px;
+	}
 `
 const Instruction = styled.span`
-  margin: 30px 0;
-  font-family: OpenSans-Regular;
-  font-size: 12px;
-  color: #fff;
-  line-height: 16px;
+	margin: 30px 0;
+	font-family: OpenSans-Regular;
+	font-size: 12px;
+	color: #fff;
+	line-height: 16px;
 `
 const ButtonWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 36px;
-  & > *:first-child {
-    margin-right: 10px;
-  }
-  & > *:last-child {
-    margin-left: 10px;
-  }
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 36px;
+	& > *:first-child {
+		margin-right: 10px;
+	}
+	& > *:last-child {
+		margin-left: 10px;
+	}
 `
 const Error = styled.span`
-  font-family: OpenSans-Regular;
-  font-size: 12px;
-  color: ${(props) => props.theme.yellow};
-  margin-top: 30px;
-  line-height: 16px;
+	font-family: OpenSans-Regular;
+	font-size: 12px;
+	color: ${(props) => props.theme.yellow};
+	margin-top: 30px;
+	line-height: 16px;
 `
 class Step2RepayDebt extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      loading: '',
-      error: '',
-    }
-    this.handleSendOTP = this.handleSendOTP.bind(this)
-  }
+	constructor(props) {
+		super(props)
+		this.state = {
+			loading: '',
+			error: '',
+		}
+		this.handleSendOTP = this.handleSendOTP.bind(this)
+	}
 
-  async handleSendOTP() {
-    this.setState({
-      error: '',
-      loading: true,
-    })
-    const {
-      onNext,
-    } = this.props
-    const data = {
-      email: getEmailFromStorage(),
-    }
-    const config = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }
-    const res = await api.post('/otp/send', data, config)
-    if (res.error) {
-      const { error } = res
-      this.setState({
-        loading: false,
-        error,
-      })
-    } else {
-      this.setState({
-        loading: false,
-      })
-      onNext()
-    }
-  }
+	async handleSendOTP() {
+		this.setState({
+			error: '',
+			loading: true,
+		})
+		const { onNext } = this.props
+		// const data = {
+		// 	email: getEmailFromStorage(),
+		// }
+		// const config = {
+		// 	headers: {
+		// 		'Content-Type': 'application/x-www-form-urlencoded',
+		// 	},
+		// }
+		const res = await api.post('/customers/send-transferring-otp')
+		if (res.error) {
+			const { error } = res
+			this.setState({
+				loading: false,
+				error,
+			})
+		} else {
+			this.setState({
+				loading: false,
+			})
+			onNext()
+		}
+	}
 
-  render() {
-    const {
-      loading,
-      error,
-    } = this.state
+	render() {
+		const { loading, error } = this.state
 
-    const {
-      data,
-      onBack,
-    } = this.props
+		const { data, onBack } = this.props
 
-    const {
-      lenderName,
-      lenderID,
-      borrowerName,
-      borrowerID,
-      amount,
-      message,
-    } = data
-
-    return (
-      <>
-        <Banner
-          // index={2}
-          index={1}
-          name="Confirm"
-          description="Re-check the debt details"
-        />
-        <Instruction>Are you sure you want to repay this debt?</Instruction>
-        <Wrapper>
-          <StyledRow>
-            <StyledCol md={2}><Text>Lender:</Text></StyledCol>
-            <StyledCol md={10}><Text>{`${lenderName} / ${spaceSeparating(lenderID, 4)} / EIGHT.Bank`}</Text></StyledCol>
-          </StyledRow>
-          <StyledRow>
-            <StyledCol md={2}><Text>Borrower:</Text></StyledCol>
-            <StyledCol md={10}><Text>{`${borrowerName} / ${spaceSeparating(borrowerID, 4)} / EIGHT.Bank`}</Text></StyledCol>
-          </StyledRow>
-          <StyledRow>
-            <StyledCol md={2}><Text>Amount:</Text></StyledCol>
-            <StyledCol md={10}><Text>{`${spaceSeparating(amount, 3)} VND`}</Text></StyledCol>
-          </StyledRow>
-          <StyledRow>
-            <StyledCol md={2}><Text>Description:</Text></StyledCol>
-            <StyledCol md={10}><Text>{message}</Text></StyledCol>
-          </StyledRow>
-        </Wrapper>
-        {error && <Error>{error}</Error>}
-        <ButtonWrapper>
-          <CancelButton
-            // name="Back"
-            name="Cancel"
-            secondary
-            fluid
-            onClick={onBack}
-          />
-          <RepayButton
-            name="Confirm"
-            fluid
-            onClick={this.handleSendOTP}
-            loading={loading}
-            disabled={loading}
-          />
-        </ButtonWrapper>
-      </>
-    )
-  }
+		const {
+			lender_fullname: lenderName,
+			lender_default_account: lenderID,
+			borrower_fullname: borrowerName,
+			borrower_default_account: borrowerID,
+			debt_amount: amount,
+			debt_message: message,
+		} = data
+		console.log(data)
+		return (
+			<>
+				<Banner
+					// index={2}
+					index={1}
+					name='Confirm'
+					description='Re-check the debt details'
+				/>
+				<Instruction>Are you sure you want to repay this debt?</Instruction>
+				<Wrapper>
+					<StyledRow>
+						<StyledCol md={2}>
+							<Text>Lender:</Text>
+						</StyledCol>
+						<StyledCol md={10}>
+							<Text>{`${lenderName} / ${spaceSeparating(
+								lenderID,
+								4
+							)} / EIGHT.Bank`}</Text>
+						</StyledCol>
+					</StyledRow>
+					<StyledRow>
+						<StyledCol md={2}>
+							<Text>Borrower:</Text>
+						</StyledCol>
+						<StyledCol md={10}>
+							<Text>{`${borrowerName} / ${spaceSeparating(
+								borrowerID,
+								4
+							)} / EIGHT.Bank`}</Text>
+						</StyledCol>
+					</StyledRow>
+					<StyledRow>
+						<StyledCol md={2}>
+							<Text>Amount:</Text>
+						</StyledCol>
+						<StyledCol md={10}>
+							<Text>{`${spaceSeparating(amount, 3)} VND`}</Text>
+						</StyledCol>
+					</StyledRow>
+					<StyledRow>
+						<StyledCol md={2}>
+							<Text>Description:</Text>
+						</StyledCol>
+						<StyledCol md={10}>
+							<Text>{message}</Text>
+						</StyledCol>
+					</StyledRow>
+				</Wrapper>
+				{error && <Error>{error}</Error>}
+				<ButtonWrapper>
+					<CancelButton
+						// name="Back"
+						name='Cancel'
+						secondary
+						fluid
+						onClick={onBack}
+					/>
+					<RepayButton
+						name='Confirm'
+						fluid
+						onClick={this.handleSendOTP}
+						// loading={loading}
+						// disabled={loading}
+					/>
+				</ButtonWrapper>
+			</>
+		)
+	}
 }
 Step2RepayDebt.defaultProps = {
-  data: {
-    id: '',
-    lenderName: '',
-    lenderID: '',
-    borrowerName: '',
-    borrowerID: '',
-    amount: 0,
-    message: '',
-  },
-  onBack: (f) => f,
-  onNext: (f) => f,
+	data: {
+		id: '',
+		lenderName: '',
+		lenderID: '',
+		borrowerName: '',
+		borrowerID: '',
+		amount: 0,
+		message: '',
+	},
+	onBack: (f) => f,
+	onNext: (f) => f,
 }
 Step2RepayDebt.propTypes = {
-  data: PropTypes.shape({
-    id: PropTypes.string,
-    lenderName: PropTypes.string,
-    lenderID: PropTypes.string,
-    borrowerName: PropTypes.string,
-    borrowerID: PropTypes.string,
-    amount: PropTypes.number,
-    message: PropTypes.string,
-  }),
-  onBack: PropTypes.func,
-  onNext: PropTypes.func,
+	data: PropTypes.shape({
+		id: PropTypes.string,
+		lenderName: PropTypes.string,
+		lenderID: PropTypes.string,
+		borrowerName: PropTypes.string,
+		borrowerID: PropTypes.string,
+		amount: PropTypes.number,
+		message: PropTypes.string,
+	}),
+	onBack: PropTypes.func,
+	onNext: PropTypes.func,
 }
 export default Step2RepayDebt

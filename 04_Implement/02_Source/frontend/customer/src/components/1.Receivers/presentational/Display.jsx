@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
 import Loading from '../../common/presentational/Loading.Table.Min'
-import { resolveTagFromProps, spaceSeparating } from '../../../utils/utils'
+import { resolveTagFromProps, spaceSeparating,aliasFullname } from '../../../utils/utils'
 
 const styleModifiers = ['loading']
 
@@ -27,7 +27,7 @@ const Display = ({ name, bankName, cardNumber, loading }) => (
 					<Text>Name:</Text>
 				</Col>
 				<Col lg={4}>
-					<Text>{name}</Text>
+					<Text>{aliasFullname(name)}</Text>
 				</Col>
 				<Col lg={2}>
 					<Text>Bank:</Text>
