@@ -134,8 +134,8 @@ class Step3Content extends Component {
 				</InputWrapper>
 				<TextAreaWrapper>
 					<TextArea
-						label='Detail:'
-						placeholder='Enter some details of the payment'
+						label='Message:'
+						placeholder='Enter some messages of the payment'
 						value={detail}
 						onChange={this.handleDetail}
 					/>

@@ -281,7 +281,7 @@ class Step2AddDebtContent extends Component {
 						</SearchWrapper>
 						<Display
 							name={newReceiver.accountName}
-							bankName={newReceiver.bankName}
+							bankName={newReceiver.bankID}
 							cardNumber={newReceiver.accountID}
 							loading={loading}
 						/>

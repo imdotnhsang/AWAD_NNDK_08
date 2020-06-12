@@ -65,7 +65,7 @@ class RemoveDebtModal extends Component {
 			onSuccess,
 			onFailure,
 			//
-			onCancelDebt,
+			// onCancelDebt,
 		} = this.props
 
 		const data = {
@@ -94,11 +94,11 @@ class RemoveDebtModal extends Component {
 				'You have successfully removed this debt reminder',
 				createdByYouRemove
 			)
-			onCancelDebt(
-				createdByYouRemove ? 'createdByYou' : 'receivedFromOthers',
-				_id,
-				reasonOfCancel
-			)
+			// onCancelDebt(
+			// 	createdByYouRemove ? 'createdByYou' : 'receivedFromOthers',
+			// 	_id,
+			// 	reasonOfCancel
+			// )
 		}
 	}
 

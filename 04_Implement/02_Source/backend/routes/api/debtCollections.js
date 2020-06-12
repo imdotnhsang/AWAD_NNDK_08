@@ -63,7 +63,7 @@ router.post(
 			const response = {
 				msg: 'Debt collection successfully added.',
 				data: {
-					_id:debtCollectionResponse._id,
+					_id: debtCollectionResponse._id,
 					debt_collection_id: debtCollectionResponse._id,
 					borrower_default_account:
 						debtCollectionResponse.borrower_default_account,
@@ -241,6 +241,7 @@ router.post(
 				from_bank_id: 'EIGHT.Bank',
 				to_bank_id: 'EIGHT.Bank',
 				transaction_type: 'REPAYMENT',
+				transaction_message: debtCollection.debt_message,
 				transaction_amount: debtCollection.debt_amount,
 				transaction_balance_before: accountBorrower.balance,
 			}
@@ -254,6 +255,7 @@ router.post(
 				from_bank_id: 'EIGHT.Bank',
 				to_bank_id: 'EIGHT.Bank',
 				transaction_type: 'RECEIVE',
+				transaction_message: debtCollection.debt_message,
 				transaction_amount: debtCollection.debt_amount,
 				transaction_balance_before: accountLender.balance,
 			})

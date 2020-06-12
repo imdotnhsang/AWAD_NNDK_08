@@ -19,11 +19,11 @@ export function getJwtFromStorage() {
 }
 
 export function setNameToStorage(name) {
-	sessionStorage.setItem('name', name)
+	sessionStorage.setItem('fullName', name)
 }
 
 export function getNameFromStorage() {
-	const data = sessionStorage.getItem('name')
+	const data = sessionStorage.getItem('fullName')
 	return data
 }
 

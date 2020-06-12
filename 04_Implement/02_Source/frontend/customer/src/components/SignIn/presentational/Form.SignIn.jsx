@@ -9,7 +9,7 @@ import {
   isValidEmail,
   // setJwtToStorage,
   isAuthenticated,
-  // setNameToStorage,
+  setNameToStorage,
   setEmailToStorage,
   // setBankIDToStorage,
   setAccountIDToStorage,
@@ -152,12 +152,13 @@ class SignInModal extends Component {
     } else {
       const {
         // token,
-        // name,
+        full_name,
         // bankID,
         account_id,
       } = res.data
+      console.log(res.data)
       // setJwtToStorage(token)
-      // setNameToStorage(name)
+      setNameToStorage(full_name)
       setEmailToStorage(email)
       // setBankIDToStorage(bankID)
       setAccountIDToStorage(account_id)

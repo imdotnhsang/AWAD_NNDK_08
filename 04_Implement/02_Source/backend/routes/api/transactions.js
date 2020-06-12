@@ -49,6 +49,7 @@ router.post(
 			toFullName,
 			transactionAmount,
 			transactionPayer,
+			transactionMessage,
 		} = req.body
 
 		const checkErrorsMongoose = {
@@ -145,6 +146,7 @@ router.post(
 				to_bank_id: 'EIGHT.Bank',
 				transaction_type: 'TRANSFER',
 				transaction_payer: transactionPayer,
+				transaction_message: transactionMessage || '',
 				transaction_amount: transactionAmount,
 				transaction_balance_before: accountTransferer.balance,
 			}
@@ -159,6 +161,7 @@ router.post(
 				to_bank_id: 'EIGHT.Bank',
 				transaction_type: 'RECEIVE',
 				transaction_payer: transactionPayer,
+				transaction_message: transactionMessage || '',
 				transaction_amount: transactionAmount,
 				transaction_balance_before: accountReceiver.balance,
 			})

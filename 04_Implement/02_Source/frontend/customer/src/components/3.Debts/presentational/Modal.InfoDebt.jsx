@@ -6,7 +6,11 @@ import Template from '../../common/presentational/Template.Modal'
 import Button from '../../common/presentational/Button'
 import Status from './Status.Debt'
 import { DebtStatus } from '../../../constants/constants'
-import { commaSeparating,spaceSeparating,aliasFullname } from '../../../utils/utils'
+import {
+	commaSeparating,
+	spaceSeparating,
+	aliasFullname,
+} from '../../../utils/utils'
 
 const Text = styled.span`
 	font-family: OpenSans-Regular;
@@ -59,6 +63,8 @@ const InfoModal = ({ show, data, onClose }) => {
 		debt_amount: amount,
 		debt_message: message,
 		debt_reason_cancel: reasonOfCancel,
+		cancelled_by_fullname: cancelledByFullname,
+		cancelled_by_id: cancelledById,
 	} = data
 	return (
 		<Template show={show} name='Debt details' onClose={onClose} width={610}>
@@ -110,14 +116,27 @@ const InfoModal = ({ show, data, onClose }) => {
 					</StyledCol>
 				</StyledRow>
 				{status === DebtStatus.CANCELLED && (
-					<StyledRow>
-						<ReasonTitle>
-							<Text>Reason of cancellation:</Text>
-						</ReasonTitle>
-						<StyledCol md={12}>
-							<Text>{reasonOfCancel || '(empty)'}</Text>
-						</StyledCol>
-					</StyledRow>
+					<>
+						<StyledRow>
+							<ReasonTitle>
+								<Text>Reason of cancellation:</Text>
+							</ReasonTitle>
+							<StyledCol md={12}>
+								<Text>{reasonOfCancel || '(empty)'}</Text>
+							</StyledCol>
+						</StyledRow>
+						<StyledRow>
+							<StyledCol md={2}>
+								<Text>Cancelled by:</Text>
+							</StyledCol>
+							<StyledCol md={10}>
+								<Text>
+									{aliasFullname(cancelledByFullname)}{' '}
+									{cancelledById === lenderID ? '(Lender)' : '(Borrower)'}
+								</Text>
+							</StyledCol>
+						</StyledRow>
+					</>
 				)}
 				<Button name='OK' fluid onClick={onClose} />
 			</Wrapper>

@@ -74,7 +74,7 @@ router.post(
 
 			if (list_accountReceivers_id.indexOf(accountId) !== -1) {
 				return res.status(400).json({
-					errors: [{ msg: 'Account exists.' }],
+					errors: [{ msg: 'Receiver exists.' }],
 				})
 			}
 
