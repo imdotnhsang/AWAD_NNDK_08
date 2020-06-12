@@ -65,7 +65,7 @@ const mapStateToProps = (state, ownProps) => {
 		text: bank.bank_name,
     value: bank.bank_id,
 	}))
-	if (ownProps.associated) data = data.filter((e) => e.text !== 'EIGHT.Bank')
+	// if (ownProps.associated) data = data.filter((e) => e.text !== 'EIGHT.Bank')
 	return {
 		loading,
 		data,

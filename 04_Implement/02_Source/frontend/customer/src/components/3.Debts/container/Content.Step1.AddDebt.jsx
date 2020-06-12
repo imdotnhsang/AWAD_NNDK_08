@@ -165,7 +165,7 @@ class Step2AddDebtContent extends Component {
 					newReceiver: {
 						accountID: tab2Input,
 						accountName: res.full_name,
-						bankID: 'Eight',
+						bankID: 'EIGHT.Bank',
 						bankName: 'Eight Bank',
 					},
 				})
@@ -239,6 +239,7 @@ class Step2AddDebtContent extends Component {
 			//
 			receiversData,
 		} = this.props
+		console.log(receiversData)
 		return (
 			<>
 				<Banner
@@ -343,10 +344,10 @@ Step2AddDebtContent.propTypes = {
 
 const mapStateToProps = (state) => ({
 	receiversData: state.receivers.receivers
-		.filter((receiver) => receiver.bank_id === getBankIDFromStorage())
+		.filter((receiver) => receiver.bank_id === 'EIGHT.Bank')
 		.map((receiver) => ({
-      id: receiver._id,
-      accountNickname:receiver.nickname,
+			id: receiver._id,
+			accountNickname: receiver.nickname,
 			accountName: receiver.full_name,
 			accountID: receiver.account_id,
 			bankID: receiver.bank_id,

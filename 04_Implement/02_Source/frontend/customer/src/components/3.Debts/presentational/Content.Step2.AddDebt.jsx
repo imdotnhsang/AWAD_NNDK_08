@@ -44,6 +44,7 @@ class Step2AddDebtContent extends Component {
 		this.handleAmount = this.handleAmount.bind(this)
 		this.handleMessage = this.handleMessage.bind(this)
 		this.handleAdd = this.handleAdd.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	componentDidMount() {
@@ -119,9 +120,15 @@ class Step2AddDebtContent extends Component {
 			} else {
 				onClose()
 				onSuccess('You have successfully created a new debt!', true)
-				onAddADebt(res.data)
+				// onAddADebt(res.data)
 			}
 			// onDisabled(false)
+		}
+	}
+
+	handleEnterKey(e) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			this.handleAdd()
 		}
 	}
 
@@ -153,6 +160,7 @@ class Step2AddDebtContent extends Component {
 						value={message}
 						disabled={loading}
 						onChange={this.handleMessage}
+						onKeyPress={this.handleEnterKey}
 					/>
 				</TextAreaWrapper>
 				<ButtonWrapper>

@@ -92,7 +92,7 @@ class RepayDebtModal extends Component {
 		} else {
 			onSuccess('You have successfully repay this debt', false)
 			// onInvalidateData()
-			onUpdateBalance(res.data.transaction_info.transaction_balance_after)
+			// onUpdateBalance(res.data.transaction_info.transaction_balance_after)
 		}
 	}
 

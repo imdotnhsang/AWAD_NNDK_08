@@ -27,7 +27,7 @@ const fetchBanksData = () => async (dispatch) => {
 			receiveBanksData([
 				{
 					bank_name: 'Eight Bank',
-					bank_id: 'Eight',
+					bank_id: 'EIGHT.Bank',
 				},
 				...data,
 			])

@@ -101,6 +101,16 @@ const OuterWrapper = styled.div`
 const BankLogo = styled(resolveTagFromProps(styleModifiers, 'svg'))`
 	opacity: ${(props) => (props.loading || props.empty) && '0'};
 `
+const NoCard = styled.p`
+	font-family: OpenSans-Regular;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	margin: 0;
+	font-size: 15px;
+`
+
 const Card = ({ service, balance, cardNumber, date, loading, empty }) => (
 	<OuterWrapper>
 		<Wrapper service={service} loading={loading} empty={empty}>
@@ -139,6 +149,7 @@ const Card = ({ service, balance, cardNumber, date, loading, empty }) => (
 					</defs>
 				</Loading>
 			)}
+			{!loading && empty && <NoCard>No card</NoCard>}
 			<BankLogo
 				loading={loading}
 				empty={empty}

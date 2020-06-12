@@ -48,7 +48,7 @@ router.post(
 
 			const linkedBank = await LinkedBank.findOne({ bank_id: bankId })
 
-			if (bankId !== 'Eight' && !linkedBank) {
+			if (bankId !== 'EIGHT.Bank' && !linkedBank) {
 				return res.status(400).json({
 					errors: [{ msg: 'Bank does not exist.' }],
 				})

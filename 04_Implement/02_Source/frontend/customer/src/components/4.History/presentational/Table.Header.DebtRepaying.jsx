@@ -27,19 +27,19 @@ const TableHeader = ({
   <Wrapper>
     <Row>
       <Col md={1} />
-      <Col md={3}><Text>Borrower/ Lender</Text></Col>
-      <Col md={2}><Text>Amount</Text></Col>
-      <Col md={2}>
+      <Col md={3}><Text>Borrower</Text></Col>
+      <Col md={3}><Text>Amount</Text></Col>
+      {/* <Col md={2}>
         <TypeFilter
           onChange={onTypeFilter}
         />
-      </Col>
+      </Col> */}
       <Col md={2}>
         <StatusFilter
           onChange={onStatusFilter}
         />
       </Col>
-      <Col md={2}>
+      <Col md={3}>
         <ButtonSort
           name="Date"
           desc={desc}

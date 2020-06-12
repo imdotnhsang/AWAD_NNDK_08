@@ -18,6 +18,14 @@ const Content = styled.div`
 	height: 590px;
 	position: relative;
 `
+const NoList = styled.p`
+	font-family: OpenSans-Regular;
+	font-size: 15px;
+	color: #fff;
+	line-height: 16px;
+	text-align: center;
+	width: 100%;
+`
 
 const Table = ({ data, loading, onEdit, onRemove }) => (
 	<Wrapper>
@@ -44,19 +52,23 @@ const Table = ({ data, loading, onEdit, onRemove }) => (
 					}}
 					smoothScrolling
 				>
-					{data.map((item, index) => (
-						<Item
-							key={item._id}
-							index={index + 1}
-							nickname={item.nickname}
-							fullName={item.full_name}
-							cardNumber={item.account_id}
-							bankName={item.bank_id}
-							lastItem={index === data.length - 1}
-							onEdit={() => onEdit(item)}
-							onRemove={() => onRemove(item)}
-						/>
-					))}
+					{data.length === 0 ? (
+						<NoList>No receiver list</NoList>
+					) : (
+						data.map((item, index) => (
+							<Item
+								key={item._id}
+								index={index + 1}
+								nickname={item.nickname}
+								fullName={item.full_name}
+								cardNumber={item.account_id}
+								bankName={item.bank_id}
+								lastItem={index === data.length - 1}
+								onEdit={() => onEdit(item)}
+								onRemove={() => onRemove(item)}
+							/>
+						))
+					)}
 				</ScrollArea>
 			)}
 		</Content>

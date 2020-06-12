@@ -82,7 +82,7 @@ class EditReceiverModal extends Component {
 			})
 			onClose()
 			onSuccess("You have successfully updated your receiver's information!")
-			onEditReceiver(res.data)
+			// onEditReceiver(res.data)
 		}
 	}
 

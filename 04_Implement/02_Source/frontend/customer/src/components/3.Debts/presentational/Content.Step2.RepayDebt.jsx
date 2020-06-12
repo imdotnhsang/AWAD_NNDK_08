@@ -4,7 +4,11 @@ import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
 import CancelButton from '../../common/presentational/Button'
 import RepayButton from '../../common/presentational/Button.Loading'
-import { spaceSeparating, getEmailFromStorage } from '../../../utils/utils'
+import {
+	spaceSeparating,
+	getEmailFromStorage,
+	aliasFullname,
+} from '../../../utils/utils'
 import api from '../../../api/api'
 import Banner from '../../common/presentational/Banner.Step'
 
@@ -138,7 +142,7 @@ class Step2RepayDebt extends Component {
 							<Text>Lender:</Text>
 						</StyledCol>
 						<StyledCol md={10}>
-							<Text>{`${lenderName} / ${spaceSeparating(
+							<Text>{`${aliasFullname(lenderName)} / ${spaceSeparating(
 								lenderID,
 								4
 							)} / EIGHT.Bank`}</Text>
@@ -149,7 +153,7 @@ class Step2RepayDebt extends Component {
 							<Text>Borrower:</Text>
 						</StyledCol>
 						<StyledCol md={10}>
-							<Text>{`${borrowerName} / ${spaceSeparating(
+							<Text>{`${aliasFullname(borrowerName)} / ${spaceSeparating(
 								borrowerID,
 								4
 							)} / EIGHT.Bank`}</Text>
@@ -168,7 +172,7 @@ class Step2RepayDebt extends Component {
 							<Text>Description:</Text>
 						</StyledCol>
 						<StyledCol md={10}>
-							<Text>{message}</Text>
+							<Text>{message || '(empty)'}</Text>
 						</StyledCol>
 					</StyledRow>
 				</Wrapper>

@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer')
 const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
-		// host: 'smtp.gmail.com',
+		host: 'smtp.gmail.com',
 		auth: {
 			user: 'eightbank2406@gmail.com',
 			pass: 'EIGHTbank2406',

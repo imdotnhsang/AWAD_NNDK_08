@@ -71,7 +71,7 @@ const InfoModal = ({ show, data, onClose }) => {
 						<Text>{`${aliasFullname(lenderName)} / ${spaceSeparating(
 							lenderID,
 							4
-						)}/ Eight Bank`}</Text>
+						)} / Eight Bank`}</Text>
 					</StyledCol>
 				</StyledRow>
 				<StyledRow>
@@ -82,7 +82,7 @@ const InfoModal = ({ show, data, onClose }) => {
 						<Text>{`${aliasFullname(borrowerName)} / ${spaceSeparating(
 							borrowerID,
 							4
-						)}/ Eight Bank`}</Text>
+						)} / Eight Bank`}</Text>
 					</StyledCol>
 				</StyledRow>
 				<StyledRow>

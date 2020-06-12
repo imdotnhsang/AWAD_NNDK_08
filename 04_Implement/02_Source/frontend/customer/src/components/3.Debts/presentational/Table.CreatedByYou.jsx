@@ -24,6 +24,14 @@ const Content = styled.div`
 	height: 590px;
 	position: relative;
 `
+const NoList = styled.p`
+	font-family: OpenSans-Regular;
+	font-size: 15px;
+	color: #fff;
+	line-height: 16px;
+	text-align: center;
+	width: 100%;
+`
 
 class Table extends Component {
 	constructor(props) {
@@ -93,22 +101,27 @@ class Table extends Component {
 							smoothScrolling
 							ref={this.ref}
 						>
-							{filteredData.map((item, index) => (
-								<Item
-									key={item._id}
-									index={index + 1}
-									accountID={item.borrower_default_id}
-									accountName={item.borrower_fullname}
-									status={item.debt_status}
-									amount={item.debt_amount}
-									lastItem={index === data.length - 1}
-									onInfo={() => onInfo(item)}
-									onRemove={() => onRemove(item, true)}
-								/>
-							))}
+							{filteredData.length === 0 ? (
+								<NoList>No debt collection list</NoList>
+							) : (
+								filteredData.map((item, index) => (
+									<Item
+										key={item._id}
+										index={index + 1}
+										accountID={item.borrower_default_id}
+										accountName={item.borrower_fullname}
+										status={item.debt_status}
+										amount={item.debt_amount}
+										lastItem={index === data.length - 1}
+										onInfo={() => onInfo(item)}
+										onRemove={() => onRemove(item, true)}
+									/>
+								))
+							)}
 						</ScrollArea>
 					)}
 				</Content>
+				)
 			</Wrapper>
 		)
 	}

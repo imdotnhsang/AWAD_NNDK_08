@@ -43,6 +43,7 @@ class RemoveDebtModal extends Component {
 		}
 		this.handleReason = this.handleReason.bind(this)
 		this.handleDelete = this.handleDelete.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	handleReason(event) {
@@ -64,7 +65,7 @@ class RemoveDebtModal extends Component {
 			onSuccess,
 			onFailure,
 			//
-      onCancelDebt,
+			onCancelDebt,
 		} = this.props
 
 		const data = {
@@ -97,7 +98,13 @@ class RemoveDebtModal extends Component {
 				createdByYouRemove ? 'createdByYou' : 'receivedFromOthers',
 				_id,
 				reasonOfCancel
-      )
+			)
+		}
+	}
+
+	handleEnterKey(e) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			this.handleDelete()
 		}
 	}
 
@@ -125,6 +132,7 @@ class RemoveDebtModal extends Component {
 							placeholder="Enter the reason of this debt's cancellation"
 							onChange={this.handleReason}
 							disabled={loading}
+							onKeyPress={this.handleEnterKey}
 						/>
 					</TextAreaWrapper>
 					<ButtonWrapper>
@@ -141,8 +149,8 @@ class RemoveDebtModal extends Component {
 							disabled={loading}
 							loading={loading}
 							onClick={() => {
-                this.handleDelete()
-                onScrollTop(false)
+								this.handleDelete()
+								onScrollTop(false)
 							}}
 						/>
 					</ButtonWrapper>

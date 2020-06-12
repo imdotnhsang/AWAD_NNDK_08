@@ -64,19 +64,19 @@ const TableItem = ({
 					<Text>{spaceSeparating(accountID, 4)}</Text>
 				</InfoWrapper>
 			</StyledCol>
-			<StyledCol md={2}>
+			<StyledCol md={3}>
 				<Text>
 					<sup style={{ fontSize: '11px', paddingRight: '2px' }}>₫</sup>
 					{commaSeparating(amount, 3)}
 				</Text>
 			</StyledCol>
-			<StyledCol md={2}>
+			{/* <StyledCol md={2}>
 				<Type type={type} />
-			</StyledCol>
-			<StyledCol>
+			</StyledCol> */}
+			<StyledCol md={2}>
 				<Status status={status} />
 			</StyledCol>
-			<StyledCol md={2} style={{ wordWrap: 'break-word' }}>
+			<StyledCol md={3} style={{ wordWrap: 'break-word' }}>
 				<Text>{milisecondToDatetime(date)}</Text>
 			</StyledCol>
 		</Row>

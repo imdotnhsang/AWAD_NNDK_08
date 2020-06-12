@@ -38,6 +38,7 @@ const Description = styled.span`
 	color: #fff;
 	line-height: 16px;
 `
+
 class ReceiversPage extends Component {
 	constructor(props) {
 		super(props)

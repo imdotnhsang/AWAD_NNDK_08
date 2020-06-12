@@ -183,12 +183,12 @@ router.get('/all-receivers', auth, async (req, res) => {
 	const { list_receiver_id: listReceiveId } = customer
 
 	try {
-		const listReceive = await Receiver.find(
+		const listReceive = (await Receiver.find(
 			{
 				_id: { $in: listReceiveId.map((e) => mongoose.Types.ObjectId(e)) },
 			},
 			{ __v: 0 }
-		)
+		)).reverse()
 
 		const response = {
 			msg: 'All receivers successfully got.',
@@ -671,7 +671,7 @@ router.get(
 				break
 			}
 
-			const data = await DebtCollection.find(condition, project)
+			const data = (await DebtCollection.find(condition, project)).reverse()
 
 			const response = {
 				msg: 'Debt collections successfully got.',

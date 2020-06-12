@@ -17,7 +17,7 @@ import FailureModal from '../common/presentational/Modal.Failure'
 const Wrapper = styled.div`
 	width: 100%;
 	padding: 0px 60px;
-	padding-bottom: 67px;
+	// padding-bottom: 67px;
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
@@ -97,11 +97,11 @@ class ReceiversPage extends Component {
 		this.setState({
 			selectedItem: {
 				...item,
-      },
- 
+			},
+
 			showEditModal: true,
-    })
-    // console.log(item)
+		})
+		// console.log(item)
 	}
 
 	handleCloseEditModal() {

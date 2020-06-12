@@ -47,7 +47,6 @@ const receivers = (state = initialState, action) => {
       return {
         ...state,
         receivers: state.receivers.filter((e) =>{ 
-          console.log(e._id, action.id)
           return e._id !== action.id
         }),
       }

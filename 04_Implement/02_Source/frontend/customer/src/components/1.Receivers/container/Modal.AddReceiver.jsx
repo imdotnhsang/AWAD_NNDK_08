@@ -183,8 +183,8 @@ class AddReceiverModal extends Component {
 			})
 			onClose()
 			onSuccess('You have successfully added a new receiver!')
-			const { data: newData } = res
-			onAddAReceiver(newData)
+			// const { data: newData } = res
+			// onAddAReceiver(newData)
 		}
 	}
 

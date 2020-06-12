@@ -49,7 +49,7 @@ const Table = ({
                     key={item.id}
                     nickname={item.accountNickname}
                     cardNumber={item.accountID}
-                    bankName={item.bankName}
+                    bankName={item.bankID}
                     lastItem={index === data.length - 1}
                     active={item.accountID === value.accountID && item.bankID === value.bankID}
                     onClick={() => onChange(item)}
