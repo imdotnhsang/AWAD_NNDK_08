@@ -195,7 +195,7 @@ ModalTemplate.propTypes = {
   name: PropTypes.string,
   loading: PropTypes.bool,
   disabled: PropTypes.bool,
-  children: PropTypes.element,
+  // children: PropTypes.array,
   onClose: PropTypes.func,
 }
 export default ModalTemplate

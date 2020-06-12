@@ -517,21 +517,21 @@ router.post(
 				})
 			}
 
-			if (customer.OTP.is_used !== false) {
-				return res.status(400).json({
-					errors: [
-						{
-							msg: 'OTP is only used once.',
-						},
-					],
-				})
-			}
-
 			if (otp !== customer.OTP.code) {
 				return res.status(400).json({
 					errors: [
 						{
 							msg: 'OTP code is invalid.',
+						},
+					],
+				})
+			}
+
+			if (customer.OTP.is_used !== false) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'OTP is only used once.',
 						},
 					],
 				})
