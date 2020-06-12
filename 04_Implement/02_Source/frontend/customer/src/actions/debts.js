@@ -49,7 +49,6 @@ import { getUrlFromCategory } from '../utils/utils'
 //   return Promise.resolve()
 // }
 
-
 // export const requestDebtsDataReceivedFromOthers = () => ({
 //   type: Debts.REQUEST_DEBTS_DATA_RECEIVED_FROM_OTHERS,
 // })
@@ -97,62 +96,64 @@ import { getUrlFromCategory } from '../utils/utils'
 // }
 
 export const requestDebtsData = (category) => ({
-  type: Debts.REQUEST_DEBTS_DATA,
-  category,
+	type: Debts.REQUEST_DEBTS_DATA,
+	category,
 })
 
 export const receiverDebtsData = (category, data) => ({
-  type: Debts.RECEIVE_DEBTS_DATA,
-  category,
-  data,
+	type: Debts.RECEIVE_DEBTS_DATA,
+	category,
+	data,
 })
 
 export const failedRequestDebtsData = (category) => ({
-  type: Debts.FAILED_REQUEST_DEBTS_DATA,
-  category,
+	type: Debts.FAILED_REQUEST_DEBTS_DATA,
+	category,
 })
 
 export const invalidateDebtsData = (category) => ({
-  type: Debts.INVALIDATE_DEBTS_DATA,
-  category,
+	type: Debts.INVALIDATE_DEBTS_DATA,
+	category,
 })
 
 const fecthDebtsData = (category) => async (dispatch) => {
-  dispatch(requestDebtsData(category))
+	dispatch(requestDebtsData(category))
 
-  const res = await api.get(`/customers/all-debt-collections/${getUrlFromCategory(category)}`)
-  if (res.error) {
-    dispatch(failedRequestDebtsData(category))
-    const { error } = res
-    showError(error)
-  } else {
-    const { data } = res
-    dispatch(receiverDebtsData(category, data))
-  }
+	const res = await api.get(
+		`/customers/all-debt-collections/${getUrlFromCategory(category)}`
+	)
+	if (res.error) {
+		dispatch(failedRequestDebtsData(category))
+		const { error } = res
+		showError(error)
+	} else {
+		const { data } = res
+		dispatch(receiverDebtsData(category, data))
+	}
 }
 
 const shouldFetchDebtsData = (category, state) => {
   const { data, didInvalidate } = state[category]
-  if (!data.length) return true
-  if (didInvalidate) return true
-  return false
+	if (!data.length) return true
+	if (didInvalidate) return true
+	return false
 }
 
 export const fecthDebtsDataIfNeeded = (category) => (dispatch, getState) => {
-  if (shouldFetchDebtsData(category, getState().debts)) {
-    return dispatch(fecthDebtsData(category))
-  }
-  return Promise.resolve()
+	if (shouldFetchDebtsData(category, getState().debts)) {
+		return dispatch(fecthDebtsData(category))
+	}
+	return Promise.resolve()
 }
 
 export const addADebt = (data) => ({
-  type: Debts.ADD_A_DEBT,
-  data,
+	type: Debts.ADD_A_DEBT,
+	data,
 })
 
 export const cancelADebt = (category, id, reason) => ({
-  type: Debts.CANCEL_A_DEBT,
-  category,
-  id,
-  reason
+	type: Debts.CANCEL_A_DEBT,
+	category,
+	id,
+	reason,
 })

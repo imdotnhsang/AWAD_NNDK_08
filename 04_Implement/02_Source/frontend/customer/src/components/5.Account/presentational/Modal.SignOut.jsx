@@ -59,4 +59,5 @@ SignOutModal.propTypes = {
   onClose: PropTypes.func,
   onSignOut: PropTypes.func,
 }
+
 export default SignOutModal

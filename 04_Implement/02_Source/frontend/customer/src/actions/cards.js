@@ -43,7 +43,7 @@ const shouldFetchCardsData = (state) => {
 		defaultCard: defaultData,
 		didInvalidate,
 	} = state
-	if (!savingData.length || !defaultData) return true
+	if ((savingData && !savingData.length) || !defaultData) return true
 	if (didInvalidate) return true
 	return false
 }

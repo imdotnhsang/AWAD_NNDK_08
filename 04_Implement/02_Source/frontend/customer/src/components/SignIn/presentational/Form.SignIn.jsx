@@ -156,7 +156,6 @@ class SignInModal extends Component {
         // bankID,
         account_id,
       } = res.data
-      console.log(res.data)
       // setJwtToStorage(token)
       setNameToStorage(full_name)
       setEmailToStorage(email)

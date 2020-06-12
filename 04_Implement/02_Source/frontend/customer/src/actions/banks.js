@@ -17,7 +17,7 @@ export const failedRequestBanksData = (error) => ({
 
 const fetchBanksData = () => async (dispatch) => {
 	dispatch(requestBanksData())
-  const res = await api.get('/linked-banks/all-linked-banks')
+	const res = await api.get('/linked-banks/all-linked-banks')
 	if (res.errors) {
 		const { errors } = res
 		dispatch(failedRequestBanksData(errors))
@@ -37,7 +37,7 @@ const fetchBanksData = () => async (dispatch) => {
 
 const shouldFetchBanksData = (state) => {
 	const data = state.banks
-	if (!data.length) return true
+	if (data && !data.length) return true
 	return false
 }
 

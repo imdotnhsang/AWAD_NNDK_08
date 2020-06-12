@@ -46,8 +46,6 @@ const cards = (state = initialState, action) => {
 				didInvalidate: false,
 			}
 		case Cards.UPDATE_DEFAULT_CARD_BALANCE:
-			console.log(state)
-			console.log(action)
 			return {
 				...state,
 				defaultCard: {
