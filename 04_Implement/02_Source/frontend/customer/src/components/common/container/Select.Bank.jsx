@@ -33,7 +33,7 @@ const BankSelect = ({
 }
 BankSelect.defaultProps = {
 	loading: false,
-  value: '',
+	value: '',
 	disabled: false,
 	data: [],
 	error: '',
@@ -44,7 +44,7 @@ BankSelect.defaultProps = {
 }
 BankSelect.propTypes = {
 	loading: PropTypes.bool,
-  value: PropTypes.string,
+	value: PropTypes.string,
 	disabled: PropTypes.bool,
 	data: PropTypes.arrayOf(
 		PropTypes.shape({
@@ -63,9 +63,9 @@ const mapStateToProps = (state, ownProps) => {
 	const { loading, banks, error } = state.banks
 	let data = banks.map((bank) => ({
 		text: bank.bank_name,
-    value: bank.bank_id,
+		value: bank.bank_id,
 	}))
-	// if (ownProps.associated) data = data.filter((e) => e.text !== 'EIGHT.Bank')
+	if (ownProps.associated) data = data.filter((e) => e.value !== 'EIGHT.Bank')
 	return {
 		loading,
 		data,

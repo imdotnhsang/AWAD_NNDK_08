@@ -104,12 +104,19 @@ class Step2Content extends Component {
 	}
 
 	handleOnChange(value) {
-		const { onChange, onNewReceiver } = this.props
+		const { onChange, onNewReceiver, receiversData } = this.props
 		const { tab } = this.state
 		onChange({
 			receiver: value,
 		})
-		if (tab === 2) {
+		console.log(
+			value,
+			receiversData.map((e) => e.accountID)
+		)
+		if (
+			tab === 2 &&
+			receiversData.map((e) => e.accountID).indexOf(value.accountID) === -1
+		) {
 			onNewReceiver(value)
 		} else {
 			onNewReceiver({

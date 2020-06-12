@@ -29,7 +29,7 @@ class InternalModal extends Component {
     this.handleDisabled = this.handleDisabled.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
     this.handleNext = this.handleNext.bind(this)
-    // this.handleBack = this.handleBack.bind(this)
+    this.handleBack = this.handleBack.bind(this)
     this.handleTransfer = this.handleTransfer.bind(this)
   }
 
@@ -51,11 +51,11 @@ class InternalModal extends Component {
     }))
   }
 
-  // handleBack() {
-  //   this.setState((prevState) => ({
-  //     step: prevState.step - 1,
-  //   }))
-  // }
+  handleBack() {
+    this.setState((prevState) => ({
+      step: prevState.step - 1,
+    }))
+  }
 
   async handleTransfer() {
     const {

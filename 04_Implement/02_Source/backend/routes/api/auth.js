@@ -116,8 +116,8 @@ router.post(
 			return res.status(200).json({
 				msg: 'Signed in successfully.',
 				data: {
-					'access-token': accessToken,
-					'refresh-token': refreshTokenInfo.refresh_token,
+					// 'access-token': accessToken,
+					// 'refresh-token': refreshTokenInfo.refresh_token,
 					account_id: customer.default_account_id,
 					full_name: customer.full_name,
 				},
