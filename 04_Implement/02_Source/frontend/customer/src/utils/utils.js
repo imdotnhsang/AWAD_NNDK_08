@@ -69,7 +69,9 @@ export function isNumber(value) {
 }
 
 export function isAuthenticated() {
-	return getEmailFromStorage()
+	return (
+		getEmailFromStorage() && getNameFromStorage() && getAccountIDFromStorage()
+	)
 }
 
 export function milisecondToDatetime(time) {
