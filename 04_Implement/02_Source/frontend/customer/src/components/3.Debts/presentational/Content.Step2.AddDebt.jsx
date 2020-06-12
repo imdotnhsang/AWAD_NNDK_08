@@ -90,7 +90,7 @@ class Step2AddDebtContent extends Component {
 			onFailure,
 			// onDisabled,
 			//
-			onAddADebt,
+			// onAddADebt,
 		} = this.props
 		if (!error) {
 			this.setState({

@@ -6,7 +6,7 @@ import CancelButton from '../../common/presentational/Button'
 import RepayButton from '../../common/presentational/Button.Loading'
 import {
 	spaceSeparating,
-	getEmailFromStorage,
+	// getEmailFromStorage,
 	aliasFullname,
 } from '../../../utils/utils'
 import api from '../../../api/api'
@@ -114,7 +114,8 @@ class Step2RepayDebt extends Component {
 	}
 
 	render() {
-		const { loading, error } = this.state
+		// const { loading, error } = this.state
+		const { error } = this.state
 
 		const { data, onBack } = this.props
 

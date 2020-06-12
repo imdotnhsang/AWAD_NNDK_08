@@ -66,7 +66,7 @@ class InternalModal extends Component {
       onClose,
       onProcessing,
       //
-      onUpdateBalance,
+      // onUpdateBalance,
     } = this.props
     onClose()
     const {
@@ -96,7 +96,7 @@ class InternalModal extends Component {
       onFailure(error)
     } else {
       onSuccess()
-      onUpdateBalance(res.balance)
+      // onUpdateBalance(res.balance)
     }
   }
 

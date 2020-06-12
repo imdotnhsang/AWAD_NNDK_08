@@ -1,5 +1,5 @@
 import { Cards } from '../constants/actionTypes'
-import { getAccountIDFromStorage } from '../utils/utils'
+// import { getAccountIDFromStorage } from '../utils/utils'
 
 const initialState = {
 	currentCard: '',

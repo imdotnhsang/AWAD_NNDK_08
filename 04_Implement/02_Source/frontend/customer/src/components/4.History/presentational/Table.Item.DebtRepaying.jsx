@@ -10,7 +10,7 @@ import {
 	aliasFullname,
 } from '../../../utils/utils'
 import Status from './Status.Transaction'
-import Type from './Type.Transaction'
+// import Type from './Type.Transaction'
 import { TransactionStatus, DebtType } from '../../../constants/constants'
 const styleModifiers = ['lastItem']
 

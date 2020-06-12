@@ -10,7 +10,7 @@ import Table from '../../1.Receivers/presentational/Table.Min.Select'
 import SearchButton from '../../common/presentational/Button.Search'
 import Display from '../../1.Receivers/presentational/Display'
 import api from '../../../api/api'
-import { getBankIDFromStorage } from '../../../utils/utils'
+// import { getBankIDFromStorage } from '../../../utils/utils'
 
 const FormWrapper = styled.div`
   width: 100%;
@@ -137,9 +137,9 @@ class Step2Content extends Component {
 
   async handleSearch() {
     const { tab2Input } = this.state
-    const {
-      banksData,
-    } = this.props
+    // const {
+    //   banksData,
+    // } = this.props
     // eslint-disable-next-line no-restricted-globals
     if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
       this.setState({
@@ -151,10 +151,10 @@ class Step2Content extends Component {
       loading: true,
       error: '',
     })
-    const bankID = banksData.find((bank) => bank.name === 'EIGHT.Bank').id
+    // const bankID = banksData.find((bank) => bank.name === 'EIGHT.Bank').id
     const data = {
       accountID: tab2Input,
-      bankID,
+      // bankID,
     }
     const res = await api.get('/banks/account', data)
     if (res.error) {
@@ -358,12 +358,14 @@ Step2Content.propTypes = {
 
 const mapStateToProps = (state) => ({
   receiversData: state.receivers.receivers.filter(
-    (receiver) => receiver.bankID === getBankIDFromStorage(),
+    (receiver) => receiver.bank_id === 'EIGHT.Bank',
   ).map((receiver) => ({
-    accountName: receiver.nickname,
-    accountID: receiver.accountID,
-    bankID: receiver.bankID,
-    bankName: receiver.bankName,
+    id: receiver._id,
+    accountNickname: receiver.nickname,
+    accountName: receiver.full_name,
+    accountID: receiver.account_id,
+    bankID: receiver.bank_id,
+    bankName: receiver.bank_name,
   })),
   banksData: state.banks.banks,
 })

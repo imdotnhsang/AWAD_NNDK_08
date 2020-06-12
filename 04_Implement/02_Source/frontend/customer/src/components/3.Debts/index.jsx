@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { connect } from 'react-redux'
+// import { connect } from 'react-redux'
 import Template from '../common/presentational/Template.Customer'
 import MenuTab from '../common/presentational/Menu.Tab'
 import TableCreatedByYou from './presentational/Table.CreatedByYou'
 import TableReceivedFromOthers from './presentational/Table.ReceivedFromOthers'
-import {
-	fecthDebtsDataIfNeeded,
-	invalidateDebtsData,
-} from '../../actions/debts'
+// import {
+// 	fecthDebtsDataIfNeeded,
+// 	invalidateDebtsData,
+// } from '../../actions/debts'
 // import {
 //   fetchCardsDataIfNeeded,
 // } from '../../actions/cards'

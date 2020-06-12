@@ -1,7 +1,7 @@
 import axios from 'axios'
-import querystring from 'querystring'
+// import querystring from 'querystring'
 import {
-	getJwtFromStorage,
+	// getJwtFromStorage,
 	objectToQueryString,
 	generateErrorResponse,
 } from '../utils/utils'
@@ -10,7 +10,7 @@ import {
 
 export const host = 'http://localhost:5000'
 export const apiHost = `${host}/`
-const authType = 'Bearer'
+// const authType = 'Bearer'
 
 const instance = axios.create({
 	baseURL: apiHost,

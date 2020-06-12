@@ -6,7 +6,7 @@ import Template from '../common/presentational/Template.Customer'
 import Table from './presentational/Table'
 import {
 	fetchReceiversDataIfNeeded,
-	invalidateReceiversData,
+	// invalidateReceiversData,
 } from '../../actions/receivers'
 import AddModal from './container/Modal.AddReceiver'
 import EditModal from './container/Modal.EditReceiver'

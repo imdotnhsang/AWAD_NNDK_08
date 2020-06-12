@@ -4,8 +4,8 @@ import styled from 'styled-components'
 import Banner from '../../common/presentational/Banner.Step'
 import VerifyButton from '../../common/presentational/Button.Loading'
 import Input from '../../common/presentational/Input'
-import { getEmailFromStorage } from '../../../utils/utils'
-import api from '../../../api/api'
+// import { getEmailFromStorage } from '../../../utils/utils'
+// import api from '../../../api/api'
 
 const Instruction = styled.span`
 	font-family: OpenSans-Regular;

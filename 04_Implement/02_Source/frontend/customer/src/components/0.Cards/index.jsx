@@ -36,12 +36,12 @@ const SavingCardSection = styled.div`
 	align-items: flex-start;
 	margin-top: 110px;
 `
-const NoSavingCard = styled.span`
-	font-family: OpenSans-Regular;
-	font-size: 15px;
-	color: #fff;
-	line-height: 16px;
-`
+// const NoSavingCard = styled.span`
+// 	font-family: OpenSans-Regular;
+// 	font-size: 15px;
+// 	color: #fff;
+// 	line-height: 16px;
+// `
 
 const CardsPage = ({
 	currentCard,
@@ -69,7 +69,7 @@ const CardsPage = ({
 	// console.log(savingCardList)
 	useEffect(() => {
 		onFetchData()
-	}, [])
+	}, [onFetchData])
 	return (
 		<Template currentTab={0} headerName='Cards'>
 			<Wrapper>

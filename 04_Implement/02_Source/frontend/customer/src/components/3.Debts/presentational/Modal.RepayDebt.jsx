@@ -64,7 +64,7 @@ class RepayDebtModal extends Component {
 			onProcessing,
 			//
 			// onInvalidateData,
-			onUpdateBalance,
+			// onUpdateBalance,
 		} = this.props
 		onClose()
 

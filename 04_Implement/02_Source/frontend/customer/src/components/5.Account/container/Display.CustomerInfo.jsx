@@ -26,7 +26,7 @@ const StyledRow = styled(Row)`
 const Display = ({ account, loading, onFetchData }) => {
 	useEffect(() => {
 		onFetchData()
-	}, [])
+	}, [onFetchData])
 	return (
 		<Wrapper>
 			{loading ? (

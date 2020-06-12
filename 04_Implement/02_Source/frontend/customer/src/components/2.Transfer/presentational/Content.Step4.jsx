@@ -157,17 +157,17 @@ Step4Content.defaultProps = {
   onBack: (f) => f,
 }
 Step4Content.propTypes = {
-  value: PropTypes.shape({
-    // senderAccountID: PropTypes.string,
-    receiver: {
-      accountName: PropTypes.string,
-      accountID: PropTypes.string,
-      bankID: PropTypes.string,
-      bankName: PropTypes.string,
-    },
-    amount: PropTypes.number,
-    chargedBySender: PropTypes.bool,
-  }),
+  // value: PropTypes.shape({
+  //   // senderAccountID: PropTypes.string,
+  //   receiver: {
+  //     accountName: PropTypes.string,
+  //     accountID: PropTypes.string,
+  //     bankID: PropTypes.string,
+  //     bankName: PropTypes.string,
+  //   },
+  //   amount: PropTypes.number,
+  //   chargedBySender: PropTypes.bool,
+  // }),
   onNext: PropTypes.func,
   onBack: PropTypes.func,
 }

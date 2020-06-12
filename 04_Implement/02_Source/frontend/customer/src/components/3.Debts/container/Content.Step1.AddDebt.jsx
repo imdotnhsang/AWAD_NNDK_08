@@ -10,7 +10,7 @@ import Table from '../../1.Receivers/presentational/Table.Min.Select'
 import SearchButton from '../../common/presentational/Button.Search'
 import Display from '../../1.Receivers/presentational/Display'
 import api from '../../../api/api'
-import { getBankIDFromStorage } from '../../../utils/utils'
+// import { getBankIDFromStorage } from '../../../utils/utils'
 
 const FormWrapper = styled.div`
 	width: 100%;

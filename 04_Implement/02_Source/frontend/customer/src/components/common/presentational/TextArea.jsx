@@ -23,13 +23,13 @@ const Col = styled.div`
   align-items: flex-start;
   width: 100%; 
 `
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-`
+// const Row = styled.div`
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: flex-start;
+//   align-items: center;
+//   width: 100%;
+// `
 const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
   background-color: ${(props) => props.theme.blackDark};
   width: 100%;

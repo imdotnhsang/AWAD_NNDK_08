@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { Row, Col } from 'react-bootstrap'
 import ButtonSort from '../../common/presentational/Button.Sort'
 import StatusFilter from './Filter.Status.Transaction'
-import TypeFilter from './Filter.Type.Transaction'
+// import TypeFilter from './Filter.Type.Transaction'
 
 const Wrapper = styled.div`
   width: 100%;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { Redirect } from 'react-router-dom'
-import { Row, Col } from 'react-bootstrap'
+// import { Row, Col } from 'react-bootstrap'
 import Template from '../common/presentational/Template.Customer'
 import { clearStorage } from '../../utils/utils'
 import Button from '../common/presentational/Button'

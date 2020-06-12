@@ -17,7 +17,7 @@ const BankSelect = ({
 }) => {
 	useEffect(() => {
 		onFetchData()
-	}, [])
+	}, [onFetchData])
 	return (
 		<Select
 			label='Bank'
