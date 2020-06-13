@@ -92,7 +92,6 @@ class Step4Content extends Component {
 			amount,
 			chargedBySender,
 		} = value
-		console.log(receiver)
 		const from = `${spaceSeparating(
 			getAccountIDFromStorage(),
 			4

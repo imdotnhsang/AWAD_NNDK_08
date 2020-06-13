@@ -219,46 +219,6 @@ router.get('/all-receivers', auth, async (req, res) => {
 	}
 })
 
-// router.get('/all-debt-collections', auth, async (req, res) => {
-// 	const customer = await Customer.findById(req.user.id)
-// 	if (!customer) {
-// 		return res.status(400).json({
-// 			errors: [
-// 				{
-// 					msg: 'Customer not exists.',
-// 				},
-// 			],
-// 		})
-// 	}
-
-// 	const { default_account_id: defaultAccountId } = customer
-
-// 	Promise.all([
-// 		DebtCollection.find(
-// 			{ lender_default_account: defaultAccountId },
-// 			{ __v: 0 }
-// 		),
-// 		DebtCollection.find(
-// 			{ borrower_default_account: defaultAccountId },
-// 			{ __v: 0 }
-// 		),
-// 	])
-// 		.then(([debtCollectionsLoan, debtCollectionsDebt]) => {
-// 			const response = {
-// 				msg: 'Debt collections successfully got.',
-// 				data: {
-// 					loan: debtCollectionsLoan,
-// 					debt: debtCollectionsDebt,
-// 				},
-// 			}
-// 			return res.status(200).json(response)
-// 		})
-// 		.catch((error) => {
-// 			console.log(error)
-// 			return res.status(500).json({ msg: 'Server error...' })
-// 		})
-// })
-
 // @route     GET /customers/transaction-history
 // @desc      View transaction history of customer account
 // @access    Private (customer)
@@ -266,73 +226,87 @@ router.get(
 	'/transaction-history/:type_transaction_history',
 	auth,
 	async (req, res) => {
-		try {
-			const customer = await Customer.findById(req.user.id)
-			if (!customer) {
-				return res
-					.status(400)
-					.json({ errors: [{ msg: 'Customer does not exist.' }] })
-			}
-
-			const { default_account_id: defaultAccountId } = customer
-			const { type_transaction_history } = req.params
-
-			let condition = {}
-			let project = {}
-
-			switch (type_transaction_history) {
-			case 'receive':
-				condition = {
-					$or: [
-						{
-							to_account_id: defaultAccountId,
-							transaction_type: 'RECEIVE',
-						},
-						{
-							to_account_id: defaultAccountId,
-							transaction_type: 'RECHARGE',
-						},
-					],
+		let loop = 0
+		const fn = async () => {
+			try {
+				const customer = await Customer.findById(req.user.id)
+				if (!customer) {
+					return res
+						.status(400)
+						.json({ errors: [{ msg: 'Customer does not exist.' }] })
 				}
-				project = { __v: 0 }
-				break
-			case 'transfer':
-				condition = {
-					from_account_id: defaultAccountId,
-					transaction_type: 'TRANSFER',
-				}
-				project = { __v: 0 }
-				break
-			case 'debt-repaying':
-				condition = {
-					$or: [
-						{
-							from_account_id: defaultAccountId,
-							transaction_type: 'REPAYMENT',
-						},
-						{
-							to_account_id: defaultAccountId,
-							transaction_type: 'REPAYMENT',
-						},
-					],
-				}
-				project = { __v: 0 }
-				break
-			default:
-				break
-			}
 
-			const data = await Transaction.find(condition, project)
+				const { default_account_id: defaultAccountId } = customer
+				const { type_transaction_history } = req.params
+				const { currentSizeHistory } = req.query
 
-			const response = {
-				msg: 'All transactions successfully got.',
-				data,
+				let condition = {}
+				let project = {}
+
+				switch (type_transaction_history) {
+				case 'receive':
+					condition = {
+						$or: [
+							{
+								to_account_id: defaultAccountId,
+								transaction_type: 'RECEIVE',
+							},
+							{
+								to_account_id: defaultAccountId,
+								transaction_type: 'RECHARGE',
+							},
+						],
+					}
+					project = { __v: 0 }
+					break
+				case 'transfer':
+					condition = {
+						from_account_id: defaultAccountId,
+						transaction_type: 'TRANSFER',
+					}
+					project = { __v: 0 }
+					break
+				case 'debt-repaying':
+					condition = {
+						$or: [
+							{
+								from_account_id: defaultAccountId,
+								transaction_type: 'REPAYMENT',
+							},
+							{
+								to_account_id: defaultAccountId,
+								transaction_type: 'REPAYMENT',
+							},
+						],
+					}
+					project = { __v: 0 }
+					break
+				default:
+					break
+				}
+
+				const data = (await Transaction.find(condition, project)).reverse()
+
+				if (data.length != currentSizeHistory) {
+					const response = {
+						msg: 'All transactions successfully got.',
+						data,
+					}
+					return res.status(200).json(response)
+				} else {
+					loop++
+					if (loop < 4) {
+						setTimeout(fn, 2500)
+					} else {
+						return res.status(204).json({ msg: 'No content...' })
+					}
+				}
+			} catch (error) {
+				console.log(error)
+				return res.status(500).json({ msg: 'Server error...' })
 			}
-			return res.status(200).json(response)
-		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
 		}
+		fn()
 	}
 )
 

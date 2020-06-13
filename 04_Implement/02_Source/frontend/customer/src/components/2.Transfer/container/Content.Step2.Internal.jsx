@@ -109,10 +109,6 @@ class Step2Content extends Component {
 		onChange({
 			receiver: value,
 		})
-		console.log(
-			value,
-			receiversData.map((e) => e.accountID)
-		)
 		if (
 			tab === 2 &&
 			receiversData.map((e) => e.accountID).indexOf(value.accountID) === -1

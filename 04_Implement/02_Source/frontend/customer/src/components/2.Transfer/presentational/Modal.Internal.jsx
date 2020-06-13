@@ -75,7 +75,6 @@ class InternalModal extends Component {
 			detail,
 			chargedBySender,
 		} = this.state
-		console.log(this.state)
 		const data = {
 			// senderAccountID,
 			otp,

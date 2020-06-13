@@ -24,20 +24,51 @@ export const invalidateHistoryData = (category) => ({
 	category,
 })
 
-const fecthHistoryData = (category) => async (dispatch) => {
+const fecthHistoryData = (category) => async (dispatch, getState) => {
 	dispatch(requestHistoryData(category))
-
-	const res = await api.get(
-		`/customers/transaction-history/${getUrlFromCategory(category)}`
-	)
-	if (res.error) {
-		dispatch(failedRequestHistoryData(category))
-		const { error } = res
-		showError(error)
-	} else {
-		const { data } = res
-		dispatch(receiverHistoryData(category, data))
+	const fetchData = async (category) => {
+		let currentSizeHistory = 0
+		const { history: historyData } = getState()
+		switch (category) {
+			case 'receive':
+				currentSizeHistory = historyData.receive.data.length || 0
+				break
+			case 'transfer':
+				currentSizeHistory = historyData.transfer.data.length || 0
+				break
+			case 'debt-repaying':
+				currentSizeHistory = historyData.debtRepaying.data.length || 0
+				break
+			default:
+				break
+		}
+		const params = { currentSizeHistory }
+		const res = await api.get(
+			`/customers/transaction-history/${getUrlFromCategory(category)}`,
+			params
+		)
+		if (res.data) {
+			const { data } = res
+			dispatch(receiverHistoryData(category, data))
+		} else {
+			const { status, error } = res
+			if (status !== 204) {
+				dispatch(failedRequestHistoryData(category))
+				showError(error)
+			}
+		}
+		setTimeout(await fetchData(category), 15000)
 	}
+
+	await fetchData(category)
+	// if (res.error) {
+	// 	dispatch(failedRequestHistoryData(category))
+	// 	const { error } = res
+	// 	showError(error)
+	// } else {
+	// 	const { data } = res
+	// 	dispatch(receiverHistoryData(category, data))
+	// }
 }
 
 const shouldFetchHistoryData = (category, state) => {
@@ -49,7 +80,7 @@ const shouldFetchHistoryData = (category, state) => {
 
 export const fecthHistoryDataIfNeeded = (category) => (dispatch, getState) => {
 	if (shouldFetchHistoryData(category, getState().history)) {
-		return dispatch(fecthHistoryData(category))
+		return dispatch(fecthHistoryData(category, getState().history))
 	}
 	return Promise.resolve()
 }
