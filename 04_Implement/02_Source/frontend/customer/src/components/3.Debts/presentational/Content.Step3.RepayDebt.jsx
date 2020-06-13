@@ -29,6 +29,7 @@ class Step3RepayContent extends Component {
 		}
 		this.handleOTP = this.handleOTP.bind(this)
 		this.handleFinish = this.handleFinish.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	handleOTP(event) {
@@ -49,6 +50,7 @@ class Step3RepayContent extends Component {
 		// eslint-disable-next-line no-restricted-globals
 		if (otp.length !== 6 || isNaN(otp)) {
 			this.setState({
+				loading: false,
 				error: 'Invalid value',
 			})
 			return
@@ -76,16 +78,22 @@ class Step3RepayContent extends Component {
 		// 		this.setState({
 		// 			loading: false,
 		// 		})
-				const { onRepay } = this.props
-				onRepay(otp)
+		const { onRepay } = this.props
+		onRepay(otp)
 		// 	} else {
-		// 		this.setState({
-		// 			loading: false,
-		// 			error: 'Invalid OTP code',
-		// 		})
+				// this.setState({
+				// 	loading: false,
+				// 	error: 'Invalid OTP code',
+				// })
 		// 	}
 		// }
 		onDisabled(false)
+	}
+
+	handleEnterKey(e) {
+		if (e.key === 'Enter') {
+			this.handleFinish()
+		}
 	}
 
 	render() {
@@ -109,6 +117,7 @@ class Step3RepayContent extends Component {
 					value={otp}
 					error={error}
 					onChange={this.handleOTP}
+					onKeyDown={this.handleEnterKey}
 				/>
 				<ButtonWrapper>
 					<VerifyButton
