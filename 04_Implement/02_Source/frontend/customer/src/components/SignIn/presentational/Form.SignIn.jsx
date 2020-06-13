@@ -197,7 +197,7 @@ class SignInModal extends Component {
         <ForgotPassword to="/forgot-password">Forgot password?</ForgotPassword>
         <ReCaptchaWrapper>
           <ReCAPTCHA
-            sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+            sitekey="6LeS8qMZAAAAANLvS7eVqFbVbnRvz-unYXpzaX90"
             onChange={this.handleCaptchaChange}
           />
           {errorReCaptcha && <ErrorReCaptcha>{errorReCaptcha}</ErrorReCaptcha>}

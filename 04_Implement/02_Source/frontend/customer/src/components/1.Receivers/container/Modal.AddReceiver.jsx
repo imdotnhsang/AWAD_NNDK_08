@@ -136,8 +136,8 @@ class AddReceiverModal extends Component {
 			nickname,
 			accountIDValid,
 		} = this.state
-		// const { onClose, onSuccess, onFailure, onAddAReceiver } = this.props
-		const { onClose, onSuccess, onFailure } = this.props
+		const { onClose, onSuccess, onFailure, onAddAReceiver } = this.props
+		// const { onClose, onSuccess, onFailure } = this.props
 		if (!bankID || !accountID || !nickname) {
 			this.setState({
 				error: 'Required field',
@@ -184,8 +184,8 @@ class AddReceiverModal extends Component {
 			})
 			onClose()
 			onSuccess('You have successfully added a new receiver!')
-			// const { data: newData } = res
-			// onAddAReceiver(newData)
+			const { data: newData } = res
+			onAddAReceiver(newData)
 		}
 	}
 

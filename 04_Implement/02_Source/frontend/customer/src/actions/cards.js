@@ -24,33 +24,40 @@ export const failedRequestCardsData = () => ({
 	type: Cards.FAILED_REQUEST_CARDS_DATA,
 })
 
-const fetchCardsData = () => async (dispatch) => {
+const fetchCardsData = (cards) => async (dispatch, getState) => {
 	dispatch(requestCardsData())
-	const res = await api.get('/customers/all-accounts')
-	if (res.error) {
-		const { error } = res
-		dispatch(failedRequestCardsData())
-		showError(error)
-	} else {
-		const { data } = res
-		dispatch(receiveCardsData(data))
+	const fetchData = async (cards) => {
+		const { balance: currentBalance } = cards.defaultCard && cards.defaultCard
+		const params = {
+			currentBalance: currentBalance || 0,
+		}
+		const res = await api.get('/customers/all-accounts', params)
+		if (res.data) {
+			const { data } = res
+			dispatch(receiveCardsData(data))
+		} else {
+			const { status, error } = res
+			if (status !== 204) {
+				dispatch(failedRequestCardsData())
+				showError(error)
+			}
+		}
+		setTimeout(await fetchData(getState().cards), 15000)
 	}
+
+	await fetchData(cards)
 }
 
 const shouldFetchCardsData = (state) => {
-	const {
-		savingCards: savingData,
-		defaultCard: defaultData,
-		didInvalidate,
-	} = state
-	if ((savingData && !savingData.length) || !defaultData) return true
+	const { defaultCard: defaultData, didInvalidate } = state
+	if (JSON.stringify(defaultData) === '{}') return true
 	if (didInvalidate) return true
 	return false
 }
 
 export const fetchCardsDataIfNeeded = () => (dispatch, getState) => {
-	// console.log(getState())
-	if (shouldFetchCardsData(getState().cards)) return dispatch(fetchCardsData())
+	if (shouldFetchCardsData(getState().cards))
+		return dispatch(fetchCardsData(getState().cards))
 	return Promise.resolve()
 }
 

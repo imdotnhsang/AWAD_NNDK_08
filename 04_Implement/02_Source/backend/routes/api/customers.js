@@ -57,6 +57,8 @@ router.get('/default-account', auth, async (req, res) => {
 // @desc      Get all accounts of customer
 // @access    Private (customer)
 router.get('/all-accounts', auth, async (req, res) => {
+	const { currentBalance } = req.query
+	// console.log(currentBalance)
 	const customer = await Customer.findById(req.user.id)
 	if (!customer) {
 		return res.status(400).json({
@@ -73,36 +75,50 @@ router.get('/all-accounts', auth, async (req, res) => {
 		saving_accounts_id: savingAccountsId,
 	} = customer
 
-	Promise.all([
-		Account.find(
-			{
-				account_id: {
-					$in: savingAccountsId.map((e) => e),
+	let loop = 0
+
+	const fn = () => {
+		Promise.all([
+			Account.find(
+				{
+					account_id: {
+						$in: savingAccountsId.map((e) => e),
+					},
 				},
-			},
-			{ _id: 0, __v: 0 }
-		),
-		Account.findOne(
-			{
-				account_id: defaultAccountId,
-			},
-			{ _id: 0, __v: 0 }
-		),
-	])
-		.then(([savingAccounts, defaultAccount]) => {
-			const response = {
-				msg: 'All cards successfully got.',
-				data: {
-					defaultAccount,
-					savingAccounts,
+				{ _id: 0, __v: 0 }
+			),
+			Account.findOne(
+				{
+					account_id: defaultAccountId,
 				},
-			}
-			return res.status(200).json(response)
-		})
-		.catch((error) => {
-			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
-		})
+				{ _id: 0, __v: 0 }
+			),
+		])
+			.then(([savingAccounts, defaultAccount]) => {
+				if (defaultAccount.balance != currentBalance) {
+					const response = {
+						msg: 'All cards successfully got.',
+						data: {
+							defaultAccount,
+							savingAccounts,
+						},
+					}
+					return res.status(200).json(response)
+				} else {
+					loop++
+					if (loop < 4) {
+						setTimeout(fn, 2500)
+					} else {
+						return res.status(204).json({ msg: 'No content...' })
+					}
+				}
+			})
+			.catch((error) => {
+				console.log(error)
+				return res.status(500).json({ msg: 'Server error...' })
+			})
+	}
+	fn()
 })
 
 // @route     POST /add-saving-account
@@ -183,12 +199,14 @@ router.get('/all-receivers', auth, async (req, res) => {
 	const { list_receiver_id: listReceiveId } = customer
 
 	try {
-		const listReceive = (await Receiver.find(
-			{
-				_id: { $in: listReceiveId.map((e) => mongoose.Types.ObjectId(e)) },
-			},
-			{ __v: 0 }
-		)).reverse()
+		const listReceive = (
+			await Receiver.find(
+				{
+					_id: { $in: listReceiveId.map((e) => mongoose.Types.ObjectId(e)) },
+				},
+				{ __v: 0 }
+			)
+		).reverse()
 
 		const response = {
 			msg: 'All receivers successfully got.',

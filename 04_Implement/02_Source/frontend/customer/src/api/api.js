@@ -14,6 +14,7 @@ export const apiHost = `${host}/`
 
 const instance = axios.create({
 	baseURL: apiHost,
+	timeout: 15000,
 })
 
 const api = {
@@ -29,14 +30,13 @@ const api = {
 			// eslint-disable-next-line no-param-reassign
 			url += `?${objectToQueryString(params)}`
 		}
-		// const jwt = getJwtFromStorage()
-		// if (jwt) {
-		// 	options.headers.Authorization = `${authType} ${jwt}`
-		// }
 
 		try {
 			const response = await instance.get(`${url}`, options)
-			return response.data
+			if (response.status === 200) {
+				return response.data
+			}
+			return generateErrorResponse(response)
 		} catch (e) {
 			return generateErrorResponse(e.response)
 		}
@@ -52,11 +52,6 @@ const api = {
 		if (config) {
 			options = { ...options, ...config }
 		}
-
-		// const jwt = getJwtFromStorage()
-		// if (jwt) {
-		// 	options.headers.Authorization = `${authType} ${jwt}`
-		// }
 
 		try {
 			const response = await instance.post(
@@ -82,11 +77,6 @@ const api = {
 			url += `?${objectToQueryString(params)}`
 		}
 
-		// const jwt = getJwtFromStorage()
-		// if (jwt) {
-		// 	options.headers.Authorization = `${authType} ${jwt}`
-		// }
-
 		try {
 			const response = await instance.delete(`${url}`, options)
 			return response.data
@@ -105,11 +95,6 @@ const api = {
 		if (config) {
 			options = { ...options, ...config }
 		}
-
-		// const jwt = getJwtFromStorage()
-		// if (jwt) {
-		// 	options.headers.Authorization = `${authType} ${jwt}`
-		// }
 
 		try {
 			const response = await instance.put(
