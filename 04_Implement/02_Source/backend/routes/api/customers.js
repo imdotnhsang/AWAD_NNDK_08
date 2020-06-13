@@ -633,47 +633,79 @@ router.get(
 	'/all-debt-collections/:type_debt_collection',
 	auth,
 	async (req, res) => {
-		try {
-			const customer = await Customer.findById(req.user.id)
-			if (!customer) {
-				return res.status(400).json({
-					errors: [
-						{
-							msg: 'Customer not exists.',
-						},
-					],
-				})
+		let loop = 0
+		const fn = async () => {
+			try {
+				const customer = await Customer.findById(req.user.id)
+				if (!customer) {
+					return res.status(400).json({
+						errors: [
+							{
+								msg: 'Customer not exists.',
+							},
+						],
+					})
+				}
+
+				const { default_account_id: defaultAccountId } = customer
+				const { type_debt_collection } = req.params
+				const {
+					currentSizeCancelled,
+					currentSizePaid,
+					currentSizeUnpaid,
+				} = req.query
+
+				const condition = {}
+				const project = {}
+				switch (type_debt_collection) {
+				case 'created-by-you':
+					condition.lender_default_account = defaultAccountId
+					project.__v = 0
+					break
+				case 'received-from-others':
+					condition.borrower_default_account = defaultAccountId
+					project.__v = 0
+					break
+				default:
+					break
+				}
+
+				const data = (await DebtCollection.find(condition, project)).reverse()
+
+				const sizes = data.reduce((object, key) => {
+					object[key.debt_status] = object[key.debt_status]
+						? object[key.debt_status] + 1
+						: 1
+					return object
+				}, {})
+
+				const sizeCancelled = sizes.CANCELLED || 0
+				const sizePaid = sizes.PAID || 0
+				const sizeUnpaid = sizes.UNPAID || 0
+				if (
+					currentSizeCancelled != sizeCancelled ||
+					currentSizePaid != sizePaid ||
+					currentSizeUnpaid != sizeUnpaid
+				) {
+					const response = {
+						msg: 'Debt collections successfully got.',
+						data,
+					}
+					return res.status(200).json(response)
+				} else {
+					loop++
+					if (loop < 4) {
+						setTimeout(fn, 2500)
+					} else {
+						return res.status(204).json({ msg: 'No content...' })
+					}
+				}
+			} catch (error) {
+				console.log(error)
+				return res.status(500).json({ msg: 'Server error...' })
 			}
-
-			const { default_account_id: defaultAccountId } = customer
-			const { type_debt_collection } = req.params
-
-			const condition = {}
-			const project = {}
-			switch (type_debt_collection) {
-			case 'created-by-you':
-				condition.lender_default_account = defaultAccountId
-				project.__v = 0
-				break
-			case 'received-from-others':
-				condition.borrower_default_account = defaultAccountId
-				project.__v = 0
-				break
-			default:
-				break
-			}
-
-			const data = (await DebtCollection.find(condition, project)).reverse()
-
-			const response = {
-				msg: 'Debt collections successfully got.',
-				data,
-			}
-			return res.status(200).json(response)
-		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ msg: 'Server error...' })
 		}
+		fn()
 	}
 )
 

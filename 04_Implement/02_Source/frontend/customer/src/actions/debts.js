@@ -116,24 +116,70 @@ export const invalidateDebtsData = (category) => ({
 	category,
 })
 
-const fecthDebtsData = (category) => async (dispatch) => {
+const fecthDebtsData = (category) => async (dispatch, getState) => {
 	dispatch(requestDebtsData(category))
-
-	const res = await api.get(
-		`/customers/all-debt-collections/${getUrlFromCategory(category)}`
-	)
-	if (res.error) {
-		dispatch(failedRequestDebtsData(category))
-		const { error } = res
-		showError(error)
-	} else {
-		const { data } = res
-		dispatch(receiverDebtsData(category, data))
+	const fetchData = async (category) => {
+		let currentSizeCancelled = 0
+		let currentSizePaid = 0
+		let currentSizeUnpaid = 0
+		const { debts: debtsData } = getState()
+		let currentSizes = {}
+		switch (category) {
+			case 'createdByYou':
+				currentSizes = debtsData.createdByYou.data.reduce((object, key) => {
+					object[key.debt_status] = object[key.debt_status]
+						? object[key.debt_status] + 1
+						: 1
+					return object
+				}, {})
+				currentSizePaid = currentSizes.PAID || 0
+				currentSizeUnpaid = currentSizes.UNPAID || 0
+				currentSizeCancelled = currentSizes.CANCELLED || 0
+				break
+			case 'receivedFromOthers':
+				currentSizes = debtsData.receivedFromOthers.data.reduce(
+					(object, key) => {
+						object[key.debt_status] = object[key.debt_status]
+							? object[key.debt_status] + 1
+							: 1
+						return object
+					},
+					{}
+				)
+				currentSizePaid = currentSizes.PAID || 0
+				currentSizeUnpaid = currentSizes.UNPAID || 0
+				currentSizeCancelled = currentSizes.CANCELLED || 0
+				break
+			default:
+				break
+		}
+		const params = {
+			currentSizeCancelled,
+			currentSizePaid,
+			currentSizeUnpaid,
+		}
+		const res = await api.get(
+			`/customers/all-debt-collections/${getUrlFromCategory(category)}`,
+			params
+		)
+		if (res.data) {
+			const { data } = res
+			dispatch(receiverDebtsData(category, data))
+		} else {
+			const { status, error } = res
+			if (status !== 204) {
+				dispatch(failedRequestDebtsData(category))
+				showError(error)
+			}
+		}
+		setTimeout(await fetchData(category), 15000)
 	}
+
+	await fetchData(category)
 }
 
 const shouldFetchDebtsData = (category, state) => {
-  const { data, didInvalidate } = state[category]
+	const { data, didInvalidate } = state[category]
 	if (!data.length) return true
 	if (didInvalidate) return true
 	return false
