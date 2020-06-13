@@ -13,6 +13,12 @@ export default [
         }
       },
       {
+        _name: 'CSidebarNavItem',
+        name: 'Accounts',
+        to: '/employee/accounts',
+        icon: 'cil-cursor'
+      },
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Theme']
       },
