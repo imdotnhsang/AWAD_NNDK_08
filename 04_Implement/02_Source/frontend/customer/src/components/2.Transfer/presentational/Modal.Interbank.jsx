@@ -72,21 +72,16 @@ class InternalModal extends Component {
       detail,
       chargedBySender,
     } = this.state
+    // API interbank transfer
     const data = {
-      // senderAccountID,
       receiverAccountID: receiver.accountID,
       receiverBankID: receiver.bankID,
       amount,
       detail,
       chargedBySender,
     }
-    const config = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }
     onProcessing()
-    const res = await api.post('/transfer', data, config)
+    const res = await api.post('...', data)
     if (res.error) {
       const { error } = res
       onFailure(error)
@@ -94,7 +89,6 @@ class InternalModal extends Component {
       onSuccess()
     }
   }
-
   render() {
     const {
       step,

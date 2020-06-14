@@ -38,7 +38,14 @@ const api = {
 			}
 			return generateErrorResponse(response)
 		} catch (e) {
-			return generateErrorResponse(e.response)
+			if (e.code !== 'ECONNABORTED') {
+				return generateErrorResponse(e.response)
+			} else {
+				return generateErrorResponse({
+					status: 0,
+					data: { errors: [{ msg: 'Connection Aborted' }] },
+				})
+			}
 		}
 	},
 	post: async (url, data, config) => {

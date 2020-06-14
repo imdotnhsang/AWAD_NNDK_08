@@ -107,7 +107,7 @@ router.get('/all-accounts', auth, async (req, res) => {
 				} else {
 					loop++
 					if (loop < 4) {
-						setTimeout(fn, 2500)
+						setTimeout(fn, 2000)
 					} else {
 						return res.status(204).json({ msg: 'No content...' })
 					}
@@ -296,7 +296,7 @@ router.get(
 				} else {
 					loop++
 					if (loop < 4) {
-						setTimeout(fn, 2500)
+						setTimeout(fn, 2000)
 					} else {
 						return res.status(204).json({ msg: 'No content...' })
 					}
@@ -695,7 +695,7 @@ router.get(
 				} else {
 					loop++
 					if (loop < 4) {
-						setTimeout(fn, 2500)
+						setTimeout(fn, 2000)
 					} else {
 						return res.status(204).json({ msg: 'No content...' })
 					}

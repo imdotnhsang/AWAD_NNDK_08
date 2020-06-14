@@ -1,7 +1,7 @@
 import { History } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
-import { getUrlFromCategory } from '../utils/utils'
+import { getUrlFromCategory, isAuthenticated } from '../utils/utils'
 
 export const requestHistoryData = (category) => ({
 	type: History.REQUEST_HISTORY_DATA,
@@ -57,18 +57,10 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 				showError(error)
 			}
 		}
-		setTimeout(await fetchData(category), 15000)
+		isAuthenticated() && setTimeout(await fetchData(category), 15000)
 	}
 
-	await fetchData(category)
-	// if (res.error) {
-	// 	dispatch(failedRequestHistoryData(category))
-	// 	const { error } = res
-	// 	showError(error)
-	// } else {
-	// 	const { data } = res
-	// 	dispatch(receiverHistoryData(category, data))
-	// }
+	isAuthenticated() && (await fetchData(category))
 }
 
 const shouldFetchHistoryData = (category, state) => {

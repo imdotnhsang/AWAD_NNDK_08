@@ -118,16 +118,21 @@ class AccountPage extends Component {
 				full_name: '',
 				phone_number: '',
 			})
+
 			onReceiveCardsData({
-				defaultCard: {},
-				savingCards: [],
+				defaultAccount: {},
+				savingAccounts: [],
 			})
+
 			onReceiveBanksData([])
+
 			onReceiveDebtsData('createdByYou', [])
 			onReceiveDebtsData('receivedFromOthers', [])
+
 			onReceiveHistoryData('receive', [])
 			onReceiveHistoryData('transfer', [])
 			onReceiveHistoryData('debtRepaying', [])
+
 			onReceiveReceiversData([])
 			this.setState({
 				didSignOut: true,

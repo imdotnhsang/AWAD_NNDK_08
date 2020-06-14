@@ -159,12 +159,12 @@ class Step2Content extends Component {
 		const { tab2Input, newReceiver } = this.state
 		const { bankID } = newReceiver
 		// eslint-disable-next-line no-restricted-globals
-		if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
-			this.setState({
-				error: 'Invalid value',
-			})
-			return
-		}
+		// if (tab2Input.length !== 16 && !isNaN(tab2Input)) {
+		// 	this.setState({
+		// 		error: 'Invalid value',
+		// 	})
+		// 	return
+		// }
 		if (!bankID) {
 			this.setState({
 				errorSelect: 'Please choose a bank',
@@ -175,11 +175,12 @@ class Step2Content extends Component {
 			loading: true,
 			error: '',
 		})
+		// API get full name interbank
 		const data = {
 			accountID: tab2Input,
 			bankID,
 		}
-		const res = await api.get('/banks/account', data)
+		const res = await api.get('...', data)
 		if (res.error) {
 			const { error } = res
 			this.setState({

@@ -1,6 +1,7 @@
 import { Cards } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
+import { isAuthenticated } from '../utils/utils'
 
 export const selectCard = (value) => ({
 	type: Cards.SELECT_CARD,
@@ -42,10 +43,10 @@ const fetchCardsData = (cards) => async (dispatch, getState) => {
 				showError(error)
 			}
 		}
-		setTimeout(await fetchData(getState().cards), 15000)
+		isAuthenticated() && setTimeout(await fetchData(getState().cards), 15000)
 	}
 
-	await fetchData(cards)
+	isAuthenticated() && (await fetchData(cards))
 }
 
 const shouldFetchCardsData = (state) => {

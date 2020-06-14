@@ -76,31 +76,22 @@ class AddReceiverModal extends Component {
 			accountIDValid: false,
 			nickname: '',
 		})
-		const { accountID } = this.state
-		// if (accountID.length !== 14) {
-		//   this.setState({
-		//     accountIDError: 'Invalid value',
-		//   })
-		//   return
-		// }
-		// Create new receiver
-		// const data = {
-		//   bankID, accountID,
-		// }
+		const { accountID, bankID } = this.state
 		const data = {
 			accountId: accountID,
 		}
-		// const config = {
-		// 	headers: {
-		// 		'Content-Type': 'application/x-www-form-urlencoded',
-		// 	},
-		// }
-		// console.log(data)
 		this.setState({
 			accountIDLoading: true,
 			accountIDError: '',
 		})
-		const res = await api.get('/transactions/receiver-internal-banking', data)
+		let res = {}
+		if (bankID === 'EIGHT.Bank') {
+			res = await api.get('/transactions/receiver-internal-banking', data)
+		} else {
+			//  API get full name interbank
+			// data.bankID= ...
+			// res = await api.get('...', data)
+		}
 		if (res.error) {
 			const { error } = res
 			this.setState({

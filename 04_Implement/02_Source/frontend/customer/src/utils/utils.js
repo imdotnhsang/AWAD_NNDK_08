@@ -70,7 +70,7 @@ export function isNumber(value) {
 
 export function isAuthenticated() {
 	return (
-		getEmailFromStorage() && getNameFromStorage() && getAccountIDFromStorage()
+		getAccountIDFromStorage()
 	)
 }
 
