@@ -19,20 +19,20 @@ export function getJwtFromStorage() {
 }
 
 export function setNameToStorage(name) {
-	sessionStorage.setItem('fullName', name)
+	localStorage.setItem('fullName', name)
 }
 
 export function getNameFromStorage() {
-	const data = sessionStorage.getItem('fullName')
+	const data = localStorage.getItem('fullName')
 	return data
 }
 
 export function setEmailToStorage(email) {
-	sessionStorage.setItem('email', email)
+	localStorage.setItem('email', email)
 }
 
 export function getEmailFromStorage() {
-	const data = sessionStorage.getItem('email')
+	const data = localStorage.getItem('email')
 	return data
 }
 
@@ -46,16 +46,16 @@ export function getBankIDFromStorage() {
 }
 
 export function setAccountIDToStorage(id) {
-	sessionStorage.setItem('accountID', id)
+	localStorage.setItem('accountID', id)
 }
 
 export function getAccountIDFromStorage() {
-	const data = sessionStorage.getItem('accountID')
+	const data = localStorage.getItem('accountID')
 	return data
 }
 
 export function clearStorage() {
-	sessionStorage.clear()
+	localStorage.clear()
 }
 
 export function objectToQueryString(obj) {
@@ -69,9 +69,7 @@ export function isNumber(value) {
 }
 
 export function isAuthenticated() {
-	return (
-		getAccountIDFromStorage()
-	)
+	return getAccountIDFromStorage()
 }
 
 export function milisecondToDatetime(time) {

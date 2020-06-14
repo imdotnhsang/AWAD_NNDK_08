@@ -71,7 +71,13 @@ const CardsPage = ({
 		onFetchData()
 	}, [onFetchData])
 	return (
-		<Template currentTab={0} headerName='Cards'>
+		<Template
+			currentTab={0}
+			headerName='Cards'
+			headerButton
+			headerButtonName='New Deposit'
+			// onHeaderButtonClick={this.handleOpenAddModal}
+		>
 			<Wrapper>
 				<CardWrapper style={{ marginTop: '44px' }}>
 					<Text>Paying card</Text>
