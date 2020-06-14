@@ -144,8 +144,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary"  v-if="step==1" @click="hideModal">Cancel</button>
-                    <button type="button" class="btn btn-secondary" v-else @click="step--">Back</button>
-                    <button type="button" class="btn btn-success" @click="step++">Next</button>
+                    <button type="button" class="btn btn-secondary" v-else-if="step!=4" @click="step--">Back</button>
+                    <button type="button" class="btn btn-success" v-if="step!=4" @click="step++">Next</button>
+                     <button type="button" class="btn btn-success" v-else @click="hideModal">OK</button>
                 </div>
                 </div>
             </div>
