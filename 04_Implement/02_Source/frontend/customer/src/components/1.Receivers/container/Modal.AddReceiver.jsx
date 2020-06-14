@@ -8,6 +8,7 @@ import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
 import api from '../../../api/api'
 import { addAReceiver } from '../../../actions/receivers'
+import { spaceSeparating } from '../../../utils/utils'
 
 const InputWrapper = styled.div`
 	width: 100%;
@@ -57,8 +58,9 @@ class AddReceiverModal extends Component {
 	}
 
 	handleAccountID(event) {
+		const value = event.target.value.replace(/\D/g, '')
 		this.setState({
-			accountID: event.target.value,
+			accountID: value,
 			error: '',
 			accountIDError: '',
 		})
@@ -224,7 +226,7 @@ class AddReceiverModal extends Component {
 						<Input
 							label='Card number'
 							placeholder="Enter the receiver's card number"
-							value={accountID}
+							value={spaceSeparating(accountID, 4)}
 							onChange={this.handleAccountID}
 							disabled={loading || bankID === ''}
 							error={error || accountIDError}

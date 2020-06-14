@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
 import Loading from '../../common/presentational/Loading.Table.Min'
-import { resolveTagFromProps } from '../../../utils/utils'
+import { resolveTagFromProps, commaSeparating } from '../../../utils/utils'
 
 const styleModifiers = ['loading']
 
@@ -49,7 +49,7 @@ const Display = ({ from, to, amount, chargedBySender, loading, detail }) => (
 					<Text>Total amount:</Text>
 				</Col>
 				<Col lg={9}>
-					<Text>{amount}</Text>
+					<Text>{commaSeparating(amount, 3)} VND</Text>
 				</Col>
 			</StyledRow>
 			<StyledRow>
