@@ -70,7 +70,6 @@ class AddDebtModal extends Component {
 			receiversLoading,
 			onScrollTop,
 		} = this.props
-
 		return (
 			<Template
 				onClose={onClose}

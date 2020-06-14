@@ -40,11 +40,11 @@ const CardList = ({
   loading,
   onClick,
 }) => (
-  <div style={{ position: 'relative', height: '410px' }}>
+  <div style={{ position: 'relative', height: '390px' }}>
     <ScrollArea
       speed={0.5}
       horizontal={false}
-      style={{ maxHeight: '410px' }}
+      style={{ maxHeight: '390px' }}
       verticalScrollbarStyle={{ width: '5px', backgroundColor: '#7C7F87', borderRadius: '10px' }}
       verticalContainerStyle={{
         width: '5px', backgroundImage: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)', borderRadius: '10px', right: '0px',

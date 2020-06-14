@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
@@ -6,6 +6,7 @@ import Template from '../common/presentational/Template.Customer'
 import Card from './presentational/Card'
 import CardList from './presentational/List.Card'
 import { selectCard, fetchCardsDataIfNeeded } from '../../actions/cards'
+import AddModal from './container/Modal.AddSavingCard'
 
 const Wrapper = styled.div`
 	width: 100%;
@@ -51,7 +52,7 @@ const CardsPage = ({
 	onSelectCard,
 	onFetchData,
 }) => {
-	// console.log(cards)
+	const [showAddModal, setShowAddModal] = useState(false)
 	const payingCard = defaultCard || {
 		accountID: '',
 		type: '',
@@ -65,13 +66,26 @@ const CardsPage = ({
 		balance: 0,
 		service: 'MASTERCARD',
 	}
+	const handleOpenAddModal = () => {
+		setShowAddModal(true)
+	}
+	const handleCloseAddModal = () => {
+		setShowAddModal(false)
+	}
 	const savingCardList = savingCards
-	// console.log(savingCardList)
+
 	useEffect(() => {
 		onFetchData()
 	}, [onFetchData])
+
 	return (
-		<Template currentTab={0} headerName='Cards'>
+		<Template
+			currentTab={0}
+			headerName='Cards'
+			headerButton
+			headerButtonName='New deposit'
+			onHeaderButtonClick={handleOpenAddModal}
+		>
 			<Wrapper>
 				<CardWrapper style={{ marginTop: '44px' }}>
 					<Text>Paying card</Text>
@@ -103,6 +117,13 @@ const CardsPage = ({
 					)}
 				</SavingCardSection>
 			</Wrapper>
+			{showAddModal && (
+				<AddModal
+					onClose={handleCloseAddModal}
+					// onSuccess={this.handleOpenSuccessModal}
+					// onFailure={this.handleOpenFailureModal}
+				/>
+			)}
 		</Template>
 	)
 }

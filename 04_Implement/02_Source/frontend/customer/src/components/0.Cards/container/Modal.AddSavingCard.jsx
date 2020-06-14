@@ -3,11 +3,12 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
-import Select from '../../common/container/Select.Bank'
+// import Select from '../../common/container/Select.Term'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
 import api from '../../../api/api'
 import { addAReceiver } from '../../../actions/receivers'
+import { MINIMUM_BALANCE } from '../../../constants/constants'
 
 const InputWrapper = styled.div`
 	width: 100%;
@@ -23,44 +24,26 @@ const Text = styled.span`
 	color: #fff;
 	margin-bottom: 24px;
 `
-class AddReceiverModal extends Component {
+class AddDepositModal extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			fullName: '',
-			bankID: '',
-			bankName: '',
-			accountID: '',
-			nickname: '',
+			depositAmount: 10000000,
 			error: '',
 			loading: false,
-			//
-			accountIDValid: false,
-			accountIDLoading: false,
-			accountIDError: '',
 		}
-		this.handleBankID = this.handleBankID.bind(this)
-		this.handleAccountID = this.handleAccountID.bind(this)
+		this.handleDepositAmount = this.handleDepositAmount.bind(this)
 		this.handleNickname = this.handleNickname.bind(this)
 		this.handleValidateAccountID = this.handleValidateAccountID.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
-	handleBankID(value, valueName) {
-		// console.log(valueName)
+	handleDepositAmount(event) {
+		const value = parseInt(event.target.value.replace(/\D/g, '') || 0, 10)
 		this.setState({
-			bankID: value,
-			bankName: valueName,
 			error: '',
-		})
-	}
-
-	handleAccountID(event) {
-		this.setState({
-			accountID: event.target.value,
-			error: '',
-			accountIDError: '',
+			depositAmount: value,
 		})
 	}
 
@@ -187,67 +170,43 @@ class AddReceiverModal extends Component {
 	}
 
 	render() {
-		const {
-			bankID,
-			// bankName,
-			accountID,
-			nickname,
-			error,
-			loading,
-			accountIDValid,
-			accountIDLoading,
-			accountIDError,
-		} = this.state
+		const { loading, depositAmount } = this.state
 		const {
 			onClose,
-			//
-			bankLoading,
+			// bankLoading,
 		} = this.props
 		return (
 			<Template
-				name='Add receiver'
+				name='Add deposit'
 				onClose={onClose}
-				loading={bankLoading}
+				loading={false}
 				disabled={loading}
 			>
 				<>
-					<Text>Enter the information for your new contact</Text>
-					<InputWrapper>
+					<Text>Enter the information for your new deposit</Text>
+					{/* <InputWrapper>
 						<Select
 							error={error}
 							value={bankID}
 							onChange={this.handleBankID}
 							disabled={loading || accountIDLoading}
 						/>
-					</InputWrapper>
+					</InputWrapper> */}
 					<InputWrapper>
 						<Input
-							label='Card number'
-							placeholder="Enter the receiver's card number"
-							value={accountID}
-							onChange={this.handleAccountID}
-							disabled={loading || bankID === ''}
-							error={error || accountIDError}
-							loading={accountIDLoading}
-							onBlur={this.handleValidateAccountID}
+							label='Deposit amount'
+							placeholder='Enter the deposit amount'
+							value={depositAmount}
+							onChange={this.handleDepositAmount}
 						/>
 					</InputWrapper>
-					<Input
-						label='Nickname'
-						placeholder="Enter the receiver's nickname"
-						value={nickname}
-						error={error}
-						onChange={this.handleNickname}
-						disabled={loading || !accountIDValid}
-						onKeyDown={this.handleEnterKey}
-					/>
 					<ButtonWrapper>
 						<Button
-							name='Create new receiver'
+							name='Create new deposit'
 							fluid
 							onClick={this.handleSubmit}
 							loading={loading}
-							disabled={loading || accountIDLoading}
+							disabled={loading}
 						/>
 					</ButtonWrapper>
 				</>
@@ -256,7 +215,7 @@ class AddReceiverModal extends Component {
 	}
 }
 
-AddReceiverModal.defaultProps = {
+AddDepositModal.defaultProps = {
 	onClose: (f) => f,
 	onSuccess: (f) => f,
 	onFailure: (f) => f,
@@ -264,7 +223,7 @@ AddReceiverModal.defaultProps = {
 	bankLoading: false,
 	onAddAReceiver: (f) => f,
 }
-AddReceiverModal.propTypes = {
+AddDepositModal.propTypes = {
 	onClose: PropTypes.func,
 	onSuccess: PropTypes.func,
 	onFailure: PropTypes.func,
@@ -278,4 +237,4 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
 	onAddAReceiver: (data) => dispatch(addAReceiver(data)),
 })
-export default connect(mapStateToProps, mapDispatchToProps)(AddReceiverModal)
+export default connect(mapStateToProps, mapDispatchToProps)(AddDepositModal)

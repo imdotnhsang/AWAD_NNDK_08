@@ -239,7 +239,6 @@ class Step2AddDebtContent extends Component {
 			//
 			receiversData,
 		} = this.props
-		console.log(receiversData)
 		return (
 			<>
 				<Banner

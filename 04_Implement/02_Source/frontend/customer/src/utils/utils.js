@@ -126,9 +126,6 @@ export function generateErrorResponse(res) {
 		case 500:
 			error = res.data.msg || 'Something wrong happened ...'
 			break
-		case 204:
-			error = 'No content...'
-			break
 		default:
 			error =
 				(res.data.errors && res.data.errors[0].msg) ||
