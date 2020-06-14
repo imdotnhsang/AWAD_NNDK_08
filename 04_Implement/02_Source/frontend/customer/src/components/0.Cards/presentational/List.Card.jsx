@@ -36,7 +36,6 @@ const Loading = styled.svg`
 const CardList = ({ value, data, loading, onClick, scrollTop }) => {
 	const ref = React.createRef()
 	useEffect(() => {
-		console.log(scrollTop)
 		if (!loading && scrollTop === true) ref.current.scrollArea.scrollTop()
 	})
 	return (
