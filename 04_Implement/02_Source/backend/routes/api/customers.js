@@ -57,7 +57,7 @@ router.get('/default-account', auth, async (req, res) => {
 // @desc      Get all accounts of customer
 // @access    Private (customer)
 router.get('/all-accounts', auth, async (req, res) => {
-	const { currentBalance } = req.query
+	const { currentBalance, currentSizeSavingAccount } = req.query
 	// console.log(currentBalance)
 	const customer = await Customer.findById(req.user.id)
 	if (!customer) {
@@ -76,13 +76,12 @@ router.get('/all-accounts', auth, async (req, res) => {
 	} = customer
 
 	let loop = 0
-
 	const fn = () => {
 		Promise.all([
 			Account.find(
 				{
-					account_id: {
-						$in: savingAccountsId.map((e) => e),
+					_id: {
+						$in: savingAccountsId.map((e) => mongoose.Types.ObjectId(e)),
 					},
 				},
 				{ _id: 0, __v: 0 }
@@ -95,12 +94,15 @@ router.get('/all-accounts', auth, async (req, res) => {
 			),
 		])
 			.then(([savingAccounts, defaultAccount]) => {
-				if (defaultAccount.balance != currentBalance) {
+				if (
+					currentBalance != defaultAccount.balance ||
+					currentSizeSavingAccount != savingAccounts.length
+				) {
 					const response = {
 						msg: 'All cards successfully got.',
 						data: {
 							defaultAccount,
-							savingAccounts,
+							savingAccounts: savingAccounts.reverse(),
 						},
 					}
 					return res.status(200).json(response)
@@ -128,9 +130,11 @@ router.post(
 	'/add-saving-account',
 	[
 		auth,
-		check('balance', 'Please enter a balance with 50000 or more').isInt({
-			min: 50000,
-		}),
+		check('depositAmount', 'Please enter a balance with 1000000 or more').isInt(
+			{
+				min: 1000000,
+			}
+		),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -138,14 +142,26 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { balance } = req.body
+		const { depositAmount } = req.body
 		const service = Date.now() % 2 === 1 ? 'MASTERCARD' : 'VISA'
 
 		try {
 			const customer = await Customer.findById(req.user.id)
 			if (!customer) {
 				return res.status(400).json({
-					errors: [{ msg: 'Customer not exists' }],
+					errors: [{ msg: 'Customer not exists.' }],
+				})
+			}
+
+			const { default_account_id: defaultAccountId } = customer
+
+			const defaultAccount = await Account.findOne({
+				account_id: defaultAccountId,
+			})
+
+			if (depositAmount > defaultAccount.balance - 500000) {
+				return res.status(400).json({
+					errors: [{ msg: 'Insufficient funds.' }],
 				})
 			}
 
@@ -155,18 +171,23 @@ router.post(
 			const account = new Account({
 				account_id: accountId,
 				account_type: 'SAVING',
-				balance,
+				balance: depositAmount,
 				account_service: service,
 			})
 
 			const responseAccount = await account.save()
 
-			customer.saving_accounts_id.push(responseAccount.account_id)
+			defaultAccount.balance =
+				Number(defaultAccount.balance) - Number(depositAmount)
+			await defaultAccount.save()
+
+			customer.saving_accounts_id.push(responseAccount._id)
 			await customer.save()
 
 			const response = {
 				msg: 'Saving account successfully created',
 				data: {
+					_id: responseAccount._id,
 					account_id: responseAccount.account_id,
 					account_type: responseAccount.account_type,
 					balance: responseAccount.balance,

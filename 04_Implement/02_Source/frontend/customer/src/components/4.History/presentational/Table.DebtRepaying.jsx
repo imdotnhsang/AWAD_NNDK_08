@@ -156,7 +156,7 @@ class Table extends Component {
 											index={index + 1}
 											accountID={accountID}
 											accountName={accountName}
-											amount={item.transaction_amount}
+											amount={item.transaction_amount + 1100}
 											status={item.transaction_status}
 											type={type}
 											date={item.entry_time}

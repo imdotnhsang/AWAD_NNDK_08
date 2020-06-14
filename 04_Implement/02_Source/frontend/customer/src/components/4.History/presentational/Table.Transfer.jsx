@@ -11,6 +11,7 @@ import {
 	invalidateHistoryData,
 	fecthHistoryDataIfNeeded,
 } from '../../../actions/history'
+import { getAmountFactTransaction } from '../../../utils/utils'
 
 const Wrapper = styled.div`
 	width: 100%;
@@ -127,7 +128,12 @@ class Table extends Component {
 										index={index + 1}
 										accountID={item.to_account_id}
 										accountName={item.to_fullname}
-										amount={item.transaction_amount}
+										amount={getAmountFactTransaction(
+											'transfer',
+											item.transaction_amount,
+											item.transaction_payer,
+											item.to_bank_id
+										)}
 										bankName={item.to_bank_id}
 										status={item.transaction_status}
 										date={item.entry_time}

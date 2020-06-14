@@ -7,6 +7,8 @@ import Card from './presentational/Card'
 import CardList from './presentational/List.Card'
 import { selectCard, fetchCardsDataIfNeeded } from '../../actions/cards'
 import AddModal from './container/Modal.AddDeposit'
+import SuccessModal from '../common/presentational/Modal.Success'
+import FailureModal from '../common/presentational/Modal.Failure'
 
 const Wrapper = styled.div`
 	width: 100%;
@@ -37,12 +39,12 @@ const SavingCardSection = styled.div`
 	align-items: flex-start;
 	margin-top: 110px;
 `
-// const NoSavingCard = styled.span`
-// 	font-family: OpenSans-Regular;
-// 	font-size: 15px;
-// 	color: #fff;
-// 	line-height: 16px;
-// `
+const Description = styled.span`
+	font-family: OpenSans-Regular;
+	font-size: 12px;
+	color: #fff;
+	line-height: 16px;
+`
 
 const CardsPage = ({
 	currentCard,
@@ -53,13 +55,36 @@ const CardsPage = ({
 	onFetchData,
 }) => {
 	const [showAddModal, setShowAddModal] = useState(false)
+	const [showSuccessModal, setShowSuccessModal] = useState(false)
+	const [showFailureModal, setShowFailureModal] = useState(false)
+	const [successMessage, setSuccessMessage] = useState('')
+	const [failureMessage, setFailureMessage] = useState('')
 
 	const handleOpenAddModal = () => {
 		setShowAddModal(true)
 	}
-
 	const handleCloseAddModal = () => {
 		setShowAddModal(false)
+	}
+
+	const handleOpenSuccessModal = (message) => {
+		setTimeout(() => {
+			setShowSuccessModal(true)
+			setSuccessMessage(message)
+		}, 1000)
+	}
+	const handleCloseSuccessModal = () => {
+		setShowSuccessModal(false)
+	}
+
+	const handleOpenFailureModal = () => {
+		setShowFailureModal(true)
+	}
+	const handleCloseFailureModal = (message) => {
+		setTimeout(() => {
+			setShowFailureModal(false)
+			setFailureMessage(message)
+		}, 1000)
 	}
 
 	const payingCard = defaultCard || {
@@ -76,7 +101,6 @@ const CardsPage = ({
 		service: 'MASTERCARD',
 	}
 	const savingCardList = savingCards
-	// console.log(savingCardList)
 	useEffect(() => {
 		onFetchData()
 	}, [onFetchData])
@@ -122,9 +146,23 @@ const CardsPage = ({
 			{showAddModal && (
 				<AddModal
 					onClose={handleCloseAddModal}
-					// onSuccess={this.handleOpenSuccessModal}
-					// onFailure={this.handleOpenFailureModal}
+					onSuccess={handleOpenSuccessModal}
+					onFailure={handleOpenFailureModal}
 				/>
+			)}
+			{showSuccessModal && (
+				<SuccessModal onClose={handleCloseSuccessModal}>
+					<Description>{successMessage}</Description>
+				</SuccessModal>
+			)}
+			{showFailureModal && (
+				<FailureModal onClose={handleCloseFailureModal}>
+					<Description>
+						Something wrong has happened that your action was cancelded
+						<br />
+						Error message: {failureMessage}
+					</Description>
+				</FailureModal>
 			)}
 		</Template>
 	)

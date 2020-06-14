@@ -6,10 +6,10 @@ import Template from '../../common/presentational/Template.Modal'
 // import Select from '../../common/container/Select.Bank'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
-// import api from '../../../api/api'
+import api from '../../../api/api'
 // import { addAReceiver } from '../../../actions/receivers'
 import { commaSeparating } from '../../../utils/utils'
-// import { MINIMUM_BALANCE } from '../../../constants/constants'
+import { MINIMUM_BALANCE } from '../../../constants/constants'
 
 const InputWrapper = styled.div`
 	width: 100%;
@@ -31,8 +31,10 @@ class AddDepositModal extends Component {
 		this.state = {
 			depositAmount: 1000000,
 			error: '',
+			loading: false,
 		}
 		this.handleAmount = this.handleAmount.bind(this)
+		this.handleSubmit = this.handleSubmit.bind(this)
 	}
 
 	handleAmount(event) {
@@ -43,15 +45,53 @@ class AddDepositModal extends Component {
 				error: 'Value must be bigger than 1,000,000',
 			})
 		} else {
+			const { balance } = this.props
+			if (value > balance - MINIMUM_BALANCE) {
+				this.setState({
+					error: 'Unaffordable amount',
+					depositAmount: value,
+				})
+			} else {
+				this.setState({
+					depositAmount: value,
+					error: '',
+				})
+			}
+		}
+	}
+
+	async handleSubmit() {
+		const { depositAmount } = this.state
+		const { onClose, onSuccess, onFailure } = this.props
+		const data = {
+			depositAmount,
+		}
+		this.setState({
+			loading: true,
+			error: '',
+		})
+		const res = await api.post('/customers/add-saving-account', data)
+		if (res.error) {
+			const { error } = res
 			this.setState({
-				depositAmount: value,
-				error: '',
+				loading: false,
 			})
+			onClose()
+			onFailure(error)
+		} else {
+			this.setState({
+				error: '',
+				loading: false,
+			})
+			onClose()
+			onSuccess('A new deposit successfully added!')
+			// const { data: newData } = res
+			// onAddAReceiver(newData)
 		}
 	}
 
 	render() {
-		const { depositAmount, error } = this.state
+		const { depositAmount, error, loading } = this.state
 		const { onClose } = this.props
 		return (
 			<Template name='Add deposit' onClose={onClose}>
@@ -75,7 +115,12 @@ class AddDepositModal extends Component {
 						/>
 					</InputWrapper>
 					<ButtonWrapper>
-						<Button name='Create new deposit' fluid />
+						<Button
+							name='Create new deposit'
+							fluid
+							loading={loading}
+							onClick={this.handleSubmit}
+						/>
 					</ButtonWrapper>
 				</>
 			</Template>

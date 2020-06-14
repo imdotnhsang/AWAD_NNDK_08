@@ -156,3 +156,39 @@ export function getDebtType(lenderID) {
 	if (lenderID === yourID) return DebtType.LOAN
 	return DebtType.DEBT
 }
+
+export function getAmountFactTransaction(
+	typeHistory,
+	amount,
+	feePayer,
+	bankID
+) {
+	let amountFact = amount
+	switch (typeHistory) {
+		case 'receive':
+			if (bankID === 'EIGHT.Bank') {
+				if (feePayer === 'RECEIVER') {
+					amountFact = amount - 1100
+				}
+			} else {
+				if (feePayer === 'RECEIVER') {
+					amountFact = amount - 3300
+				}
+			}
+			break
+		case 'transfer':
+			if (bankID === 'EIGHT.Bank') {
+				if (feePayer === 'TRANSFERER') {
+					amountFact = amount + 1100
+				}
+			} else {
+				if (feePayer === 'TRANSFERER') {
+					amountFact = amount + 3300
+				}
+			}
+			break
+		default:
+			break
+	}
+	return amountFact
+}

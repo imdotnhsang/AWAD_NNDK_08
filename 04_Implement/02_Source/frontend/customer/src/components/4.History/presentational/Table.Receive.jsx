@@ -11,6 +11,7 @@ import {
 	invalidateHistoryData,
 	fecthHistoryDataIfNeeded,
 } from '../../../actions/history'
+import { getAmountFactTransaction } from '../../../utils/utils'
 
 const Wrapper = styled.div`
 	width: 100%;
@@ -104,6 +105,7 @@ class Table extends Component {
 							smoothScrolling
 							ref={this.ref}
 						>
+							{console.log(sortedData)}
 							{sortedData.length === 0 ? (
 								<NoList>No transaction list</NoList>
 							) : (
@@ -113,7 +115,12 @@ class Table extends Component {
 										index={index + 1}
 										accountID={item.from_account_id}
 										accountName={item.from_fullname}
-										amount={item.transaction_amount}
+										amount={getAmountFactTransaction(
+											'receive',
+											item.transaction_amount,
+											item.transaction_payer,
+											item.from_bank_id
+										)}
 										bankName={item.from_bank_id}
 										date={item.entry_time}
 										lastItem={index === data.length - 1}

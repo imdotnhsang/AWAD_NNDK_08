@@ -28,9 +28,12 @@ export const failedRequestCardsData = () => ({
 const fetchCardsData = (cards) => async (dispatch, getState) => {
 	dispatch(requestCardsData())
 	const fetchData = async (cards) => {
-		const { balance: currentBalance } = cards.defaultCard && cards.defaultCard
+		console.log(cards)
+		const { balance: currentBalance } = cards.defaultCard
+		const { savingCards: savingAccounts } = cards
 		const params = {
 			currentBalance: currentBalance || 0,
+			currentSizeSavingAccount: (savingAccounts && savingAccounts.length) || 0,
 		}
 		const res = await api.get('/customers/all-accounts', params)
 		if (res.data) {
