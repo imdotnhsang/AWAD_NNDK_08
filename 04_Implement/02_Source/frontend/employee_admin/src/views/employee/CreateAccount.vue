@@ -5,7 +5,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Add an account</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">{{title}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -36,7 +36,7 @@
                         />
                     </div>
                     <div v-else-if="step==2">
-                        <div style="padding-top: 10px; padding-bottom: 10px;padding-left: 20px; padding-right: 20px;background-color:#2eb85c;height: 75px;">
+                        <div class="step2-background">
                             <table>
                                 <tbody class="tbody-table">
                                     <tr>
@@ -45,8 +45,8 @@
                                         
                                         </td>
                                         <td style="padding-left:15px;">
-                                            <span style="font-size:18px;">Personal information</span><br>
-                                            <span>Provide the personal information of the account</span>
+                                            <span class="step2-title">Personal information</span><br>
+                                            <span class="step2-info">Provide the personal information of the account</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -99,20 +99,47 @@
                         <label style="margin-top:5px;">Or select an amount of money below:</label><br>
                         <CRow>
                             <CCol lg="3" sm="12">
-                                 <Money :value="500000" :mr="0" :isChosen="isChosen500k" @click="chooseValue"/>
+                                <Money :value="500000" :mr="0" :isChosen="isChosen500k" @click="chooseValue"/>
                             </CCol>
                             <CCol lg="3" sm="12">
-                                  <Money :value="1000000" :mr="0" :isChosen="isChosen1000k" @click="chooseValue"/>
-                      
+                                <Money :value="1000000" :mr="0" :isChosen="isChosen1000k" @click="chooseValue"/>
                             </CCol>
                             <CCol lg="3" sm="12">
-                                  <Money :value="5000000" :mr="0" :isChosen="isChosen5000k" @click="chooseValue"/>
-                      
+                                <Money :value="5000000" :mr="0" :isChosen="isChosen5000k" @click="chooseValue"/>
                             </CCol>
                             <CCol lg="3" sm="12">
-                                  <Money :value="10000000" :mr="0" :isChosen="isChosen10000k" @click="chooseValue"/>
+                                <Money :value="10000000" :mr="0" :isChosen="isChosen10000k" @click="chooseValue"/>
                             </CCol>
                         </CRow>
+                    </div>
+                    <div v-else-if="step==4">
+                        <div>
+                            <CRow>
+                                <CCol lg="12" md="12" sm="12">
+                                    <label>An account has successfully been created! The account's details below</label>
+
+                                    <label style="margin-top:5px;margin-bottom:5px;">Sign-in information</label>
+                                    <div style="background-color:#ddd;height:73px;padding:10px;">
+                                        <label><span>Email:</span><span style="margin-left:73px;">{{email}}</span></label><br>
+                                        <label><span>Password:</span><span style="margin-left:46px;">{{password}}</span></label>
+                                    </div>
+
+                                    <label style="margin-top:15px;margin-bottom:5px;">Card information</label>
+                                    <div style="background-color:#ddd;height:100px;padding:10px;">
+                                        <label><span>Card number:</span><span style="margin-left:25px;">{{cardNumber}}</span></label><br>
+                                        <label><span>Balance:</span><span style="margin-left:58px;">{{balance}}</span></label><br>
+                                        <label><span>Created at:</span><span style="margin-left:40px">{{createdAt}}</span></label>
+                                    </div>
+
+                                    <label style="margin-top:5px;margin-bottom:5px;">Personal information</label>
+                                    <div style="background-color:#ddd;height:73px;padding:10px;">
+                                        <label><span>Name:</span><span style="margin-left:70px;">{{name}}</span></label><br>
+                                        <label><span>Phone:</span><span style="margin-left:68px;">{{phone}}</span></label>
+                                    </div>
+
+                                </CCol>
+                            </CRow>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -176,7 +203,20 @@ export default {
             isChosen500k: false,
             isChosen1000k: false,
             isChosen5000k:false,
-            isChosen10000k: false
+            isChosen10000k: false,
+            title: "Add an account",
+            password: '123456',
+            cardNumber: '5670 1234 6578 9182',
+            createdAt: '13:00 23/05/2020'
+        }
+    },
+    watch: {
+        step: function(val) {
+            if (val != 4) {
+                this.title = "Add an account"
+            } else {
+                this.title = "Success!"
+            }
         }
     }
 }
@@ -193,4 +233,30 @@ export default {
         width: 3px;
         color: #fff;
     }
+
+    .step2-background {
+        padding-top: 10px; 
+        padding-bottom: 10px;
+        padding-left: 20px; 
+        padding-right: 20px;
+        background-color:#2eb85c;
+        height: 75px;
+    }
+
+    .step2-title {
+        font-size: 18px;
+    }
+
+    @media screen and (max-width: 456px){
+        .step2-title {
+            font-size: 15px;
+        }
+        .step2-info {
+            font-size: 10px;
+        }
+        .step2-background {
+            padding-top:15px;
+        }
+    }
+
 </style>
