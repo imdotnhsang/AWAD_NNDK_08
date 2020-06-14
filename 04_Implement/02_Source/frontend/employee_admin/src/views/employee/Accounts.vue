@@ -18,7 +18,7 @@
                                 </CInput>
                             </CCol>
                             <CCol col="12" lg="3" xl="3">
-                                 <CButton class="add-account" pressed block color="danger" aria-pressed="true">New account</CButton>
+                                 <CButton class="add-account" pressed block color="danger" aria-pressed="true" @click="showModalCreateAccount">New account</CButton>
                             </CCol>
                         </CRow>
                     </CCardHeader>
@@ -194,6 +194,7 @@
                 </CCard>
             </CCol>
         </CRow>
+        <CreateAccount ref="modalCreateAccount"/>
     </div>
 </template>
 
@@ -203,6 +204,14 @@ export default {
     data() {
         return {
             emailOrCardNumber: ""
+        }
+    },
+    components: {
+        CreateAccount: () => import("@/views/employee/CreateAccount.vue")
+    },
+    methods: {
+        showModalCreateAccount() {
+            this.$refs.modalCreateAccount.showModal()
         }
     }
 }
