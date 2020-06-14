@@ -11,7 +11,7 @@ import SearchButton from '../../common/presentational/Button.Search'
 import Display from '../../1.Receivers/presentational/Display'
 import Select from '../../common/container/Select.Bank'
 import api from '../../../api/api'
-// import { getBankIDFromStorage } from '../../../utils/utils'
+import { spaceSeparating } from '../../../utils/utils'
 
 const FormWrapper = styled.div`
 	width: 100%;
@@ -299,7 +299,7 @@ class Step2Content extends Component {
 							<Input
 								label='Card number'
 								placeholder="Enter the receiver's card number"
-								value={tab2Input || newReceiver.accountID}
+								value={spaceSeparating(tab2Input || newReceiver.accountID, 4)}
 								error={error}
 								disabled={loading}
 								onChange={this.handleTab2Input}

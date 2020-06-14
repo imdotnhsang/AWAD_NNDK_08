@@ -8,7 +8,7 @@ import FormRadio from '../../common/presentational/Form.Radio'
 import Button from '../../common/presentational/Button'
 import Banner from '../../common/presentational/Banner.Step'
 import { MINIMUM_BALANCE } from '../../../constants/constants'
-// import { getAccountIDFromStorage } from '../../../utils/utils'
+import { commaSeparating } from '../../../utils/utils'
 
 const Instruction = styled.span`
 	font-family: OpenSans-Regular;
@@ -127,7 +127,7 @@ class Step3Content extends Component {
 					<Input
 						label='Total amount:'
 						placeholder='Enter the total amount of money'
-						value={amount}
+						value={commaSeparating(amount, 3)}
 						onChange={this.handleAmount}
 						error={error}
 					/>

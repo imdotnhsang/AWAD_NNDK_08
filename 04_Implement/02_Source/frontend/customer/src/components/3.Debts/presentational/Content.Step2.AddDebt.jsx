@@ -9,6 +9,7 @@ import AddButton from '../../common/presentational/Button.Loading'
 import BackButton from '../../common/presentational/Button'
 import Banner from '../../common/presentational/Banner.Step'
 import { addADebt } from '../../../actions/debts'
+import { commaSeparating } from '../../../utils/utils'
 
 const InputWrapper = styled.div`
 	width: 100%;
@@ -147,7 +148,7 @@ class Step2AddDebtContent extends Component {
 					<Input
 						label='Total amount:'
 						placeholder='Enter the total amount of money'
-						value={amount}
+						value={commaSeparating(amount, 3)}
 						onChange={this.handleAmount}
 						error={error}
 						disabled={loading}

@@ -208,7 +208,7 @@ const Card = ({ service, balance, cardNumber, date, loading, empty }) => (
 				{commaSeparating(balance, 3)}
 			</Money>
 			<CardNumber loading={loading} empty={empty}>
-				{spaceSeparating(cardNumber, 3)}
+				{spaceSeparating(cardNumber, 4)}
 			</CardNumber>
 			<Date loading={loading} empty={empty}>
 				{getMonthYear(date)}
