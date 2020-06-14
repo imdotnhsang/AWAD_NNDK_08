@@ -75,16 +75,18 @@ const CardsPage = ({
 	}
 	const handleCloseSuccessModal = () => {
 		setShowSuccessModal(false)
+		setSuccessMessage('')
 	}
 
-	const handleOpenFailureModal = () => {
-		setShowFailureModal(true)
-	}
-	const handleCloseFailureModal = (message) => {
+	const handleOpenFailureModal = (message) => {
 		setTimeout(() => {
-			setShowFailureModal(false)
+			setShowFailureModal(true)
 			setFailureMessage(message)
 		}, 1000)
+	}
+	const handleCloseFailureModal = () => {
+		setShowFailureModal(false)
+		setFailureMessage('')
 	}
 
 	const payingCard = defaultCard || {

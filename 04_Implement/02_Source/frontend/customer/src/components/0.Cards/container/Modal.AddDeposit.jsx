@@ -35,6 +35,7 @@ class AddDepositModal extends Component {
 		}
 		this.handleAmount = this.handleAmount.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	handleAmount(event) {
@@ -70,7 +71,7 @@ class AddDepositModal extends Component {
 			loading: true,
 			error: '',
 		})
-		const res = await api.post('/customers/add-saving-account', data)
+		const res = await api.post('/accounts/add-saving-account', data)
 		if (res.error) {
 			const { error } = res
 			this.setState({
@@ -87,6 +88,12 @@ class AddDepositModal extends Component {
 			onSuccess('A new deposit successfully added!')
 			// const { data: newData } = res
 			// onAddAReceiver(newData)
+		}
+	}
+
+	handleEnterKey(e) {
+		if (e.key === 'Enter') {
+			this.handleSubmit()
 		}
 	}
 
@@ -112,6 +119,7 @@ class AddDepositModal extends Component {
 							value={commaSeparating(depositAmount, 3)}
 							onChange={this.handleAmount}
 							error={error}
+							onKeyDown={this.handleEnterKey}
 						/>
 					</InputWrapper>
 					<ButtonWrapper>

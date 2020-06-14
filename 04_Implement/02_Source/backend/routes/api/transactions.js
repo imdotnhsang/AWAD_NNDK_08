@@ -287,56 +287,11 @@ router.post(
 			}
 
 			if (checkErrorsMongoose.createTransfererTransaction !== false) {
-				const transfererTransactionRefund = await new Transaction(
+				await new Transaction(
 					checkErrorsMongoose.createTransfererTransaction
 				).save()
 				return res.status(500).json({
 					msg: 'Server error...',
-					data: {
-						transaction_failed: {
-							entry_time:
-								checkErrorsMongoose.transfererTransactionFailed.entry_time,
-							from_account_id:
-								checkErrorsMongoose.transfererTransactionFailed.from_account_id,
-							from_fullname:
-								checkErrorsMongoose.transfererTransactionFailed.from_fullname,
-							to_account_id:
-								checkErrorsMongoose.transfererTransactionFailed.to_account_id,
-							to_fullname:
-								checkErrorsMongoose.transfererTransactionFailed.to_fullname,
-							transaction_type:
-								checkErrorsMongoose.transfererTransactionFailed
-									.transaction_type,
-							transaction_amount:
-								checkErrorsMongoose.transfererTransactionFailed
-									.transaction_amount,
-							transaction_balance_before:
-								checkErrorsMongoose.transfererTransactionFailed
-									.transaction_balance_before,
-							transaction_balance_after:
-								checkErrorsMongoose.transfererTransactionFailed
-									.transaction_balance_after,
-							transaction_status:
-								checkErrorsMongoose.transfererTransactionFailed
-									.transaction_status,
-						},
-						transaction_refund: {
-							entry_time: transfererTransactionRefund.entry_time,
-							from_account_id: transfererTransactionRefund.from_account_id,
-							from_fullname: transfererTransactionRefund.from_fullname,
-							to_account_id: transfererTransactionRefund.to_account_id,
-							to_fullname: transfererTransactionRefund.to_fullname,
-							transaction_type: transfererTransactionRefund.transaction_type,
-							transaction_amount:
-								transfererTransactionRefund.transaction_amount,
-							transaction_balance_before:
-								transfererTransactionRefund.transaction_balance_before,
-							transaction_balance_after:
-								transfererTransactionRefund.transaction_balance_after,
-							transaction_status:
-								transfererTransactionRefund.transaction_status,
-						},
-					},
 				})
 			}
 
