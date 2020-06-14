@@ -74,8 +74,8 @@ const CardsPage = ({
 		<Template
 			currentTab={0}
 			headerName='Cards'
-			headerButton
-			headerButtonName='New Deposit'
+			// headerButton
+			// headerButtonName='New deposit'
 			// onHeaderButtonClick={this.handleOpenAddModal}
 		>
 			<Wrapper>
