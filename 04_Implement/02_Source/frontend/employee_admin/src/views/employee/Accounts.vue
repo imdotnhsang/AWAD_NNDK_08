@@ -59,7 +59,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -76,7 +76,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -93,7 +93,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -110,7 +110,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -127,7 +127,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -144,7 +144,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -161,7 +161,7 @@
                                         </td>
                                         <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -196,6 +196,7 @@
         </CRow>
         <CreateAccount ref="modalCreateAccount"/>
         <RechargeAccount ref="rechargeAccount"/>
+        <AccountDetail ref="accountDetail"/>
     </div>
 </template>
 
@@ -209,7 +210,8 @@ export default {
     },
     components: {
         CreateAccount: () => import("@/views/employee/CreateAccount.vue"),
-        RechargeAccount: () => import("@/views/employee/RechargeAccount.vue")
+        RechargeAccount: () => import("@/views/employee/RechargeAccount.vue"),
+        AccountDetail: () => import("@/views/employee/AccountDetail.vue")
     },
     methods: {
         showModalCreateAccount() {
@@ -222,6 +224,17 @@ export default {
                 balance: "500 000 VND"
             }
             this.$refs.rechargeAccount.showModal(props)
+        },
+        showModalAccountDetail() {
+            const props = {
+                name: "Lê Hoàng Sang",
+                cardNumber: "1234 1234 1234 1234",
+                balance: "500 000 VND",
+                email: "lhsanghcmus@gmail.com",
+                createdAt: "13:05 23/05/2020",
+                phone: "0979279932"
+            }
+            this.$refs.accountDetail.showModal(props)
         }
     }
 }
