@@ -64,7 +64,7 @@ class Step3Content extends Component {
 		if (value < 50000) {
 			this.setState({
 				amount: value,
-				error: 'Value must be bigger than 50000',
+				error: 'Value must be bigger than 50,000',
 			})
 		} else {
 			const { balance, onChange } = this.props

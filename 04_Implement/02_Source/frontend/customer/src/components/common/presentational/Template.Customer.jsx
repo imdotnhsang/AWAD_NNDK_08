@@ -62,6 +62,6 @@ CustomerTemplate.propTypes = {
   headerButton: PropTypes.bool,
   headerButtonName: PropTypes.string,
   onHeaderButtonClick: PropTypes.func,
-  children: PropTypes.element,
+  // children: PropTypes.element,
 }
 export default CustomerTemplate
