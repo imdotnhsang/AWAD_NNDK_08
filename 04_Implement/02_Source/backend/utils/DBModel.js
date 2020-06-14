@@ -60,7 +60,7 @@ class DBModel {
 						message: err,
 					}))
 				}
-				if (docs.length == 0) {
+				if (!docs || docs.length == 0) {
 					resolve(new APIResponse({
 						status: APIStatus.NotFound,
 						message: `Not found any matched ${modelName}`
