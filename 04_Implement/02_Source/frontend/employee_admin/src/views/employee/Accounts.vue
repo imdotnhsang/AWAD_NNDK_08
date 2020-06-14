@@ -58,7 +58,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -75,7 +75,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -92,7 +92,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -109,7 +109,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -126,7 +126,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -143,7 +143,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -160,7 +160,7 @@
                                             email@gmail.com
                                         </td>
                                         <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
@@ -195,6 +195,7 @@
             </CCol>
         </CRow>
         <CreateAccount ref="modalCreateAccount"/>
+        <RechargeAccount ref="rechargeAccount"/>
     </div>
 </template>
 
@@ -207,11 +208,20 @@ export default {
         }
     },
     components: {
-        CreateAccount: () => import("@/views/employee/CreateAccount.vue")
+        CreateAccount: () => import("@/views/employee/CreateAccount.vue"),
+        RechargeAccount: () => import("@/views/employee/RechargeAccount.vue")
     },
     methods: {
         showModalCreateAccount() {
             this.$refs.modalCreateAccount.showModal()
+        },
+        showModalRechareAccount() {
+            const props = {
+                name: "Lê Hoàng Sang",
+                cardNumber: "1234 1234 1243 1234",
+                balance: "500 000 VND"
+            }
+            this.$refs.rechargeAccount.showModal(props)
         }
     }
 }
