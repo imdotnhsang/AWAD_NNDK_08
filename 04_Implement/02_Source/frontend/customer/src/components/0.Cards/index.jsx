@@ -7,6 +7,7 @@ import Card from './presentational/Card'
 import CardList from './presentational/List.Card'
 import { selectCard, fetchCardsDataIfNeeded } from '../../actions/cards'
 import AddModal from './container/Modal.AddDeposit'
+import RemoveModal from './container/Modal.RemoveDeposit'
 import SuccessModal from '../common/presentational/Modal.Success'
 import FailureModal from '../common/presentational/Modal.Failure'
 
@@ -45,6 +46,25 @@ const Description = styled.span`
 	color: #fff;
 	line-height: 16px;
 `
+const ActionWrapper = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	& > * {
+		margin-left: 40px;
+	}
+	& > *:first-child {
+		margin-left: 60px;
+	}
+`
+const ActionButton = styled.button`
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+`
 
 const CardsPage = ({
 	currentCard,
@@ -55,10 +75,12 @@ const CardsPage = ({
 	onFetchData,
 }) => {
 	const [showAddModal, setShowAddModal] = useState(false)
+	const [showRemoveModal, setShowRemoveModal] = useState(false)
 	const [showSuccessModal, setShowSuccessModal] = useState(false)
 	const [showFailureModal, setShowFailureModal] = useState(false)
 	const [successMessage, setSuccessMessage] = useState('')
 	const [failureMessage, setFailureMessage] = useState('')
+	const [scrollTop, setScrollTop] = useState(false)
 
 	const handleOpenAddModal = () => {
 		setShowAddModal(true)
@@ -67,11 +89,19 @@ const CardsPage = ({
 		setShowAddModal(false)
 	}
 
+	const handleOpenRemoveModal = () => {
+		setShowRemoveModal(true)
+	}
+	const handleCloseRemoveModal = () => {
+		setShowRemoveModal(false)
+	}
+
 	const handleOpenSuccessModal = (message) => {
 		setTimeout(() => {
 			setShowSuccessModal(true)
 			setSuccessMessage(message)
 		}, 1000)
+		setScrollTop(false)
 	}
 	const handleCloseSuccessModal = () => {
 		setShowSuccessModal(false)
@@ -89,6 +119,13 @@ const CardsPage = ({
 		setFailureMessage('')
 	}
 
+	const handleOpenScrollTop = () => {
+		setScrollTop(true)
+	}
+	const handleCloseScrollTop = () => {
+		setScrollTop(false)
+	}
+
 	const payingCard = defaultCard || {
 		accountID: '',
 		type: '',
@@ -97,10 +134,10 @@ const CardsPage = ({
 	}
 	const savingCard = (savingCards &&
 		savingCards.find((card) => card.account_id === currentCard)) || {
-		accountID: '',
-		type: '',
+		_id: '',
+		account_id: '',
+		account_service: 'MASTERCARD',
 		balance: 0,
-		service: 'MASTERCARD',
 	}
 	const savingCardList = savingCards
 	useEffect(() => {
@@ -128,16 +165,60 @@ const CardsPage = ({
 				<SavingCardSection>
 					<CardWrapper>
 						<Text>Saving cards</Text>
-						<Card
-							cardNumber={savingCard.account_id}
-							balance={savingCard.balance}
-							service={savingCard.account_service}
-							loading={loading}
-							empty={savingCards.length === 0}
-						/>
+						<div style={{ display: 'flex' }}>
+							<Card
+								cardNumber={savingCard.account_id}
+								balance={savingCard.balance}
+								service={savingCard.account_service}
+								loading={loading}
+								empty={savingCards.length === 0}
+							/>
+							{currentCard !== '' && (
+								<ActionWrapper>
+									{/* <ActionButton
+									// onClick={onInfo}
+									type='button'
+								>
+									<svg
+										width='25'
+										height='25'
+										viewBox='0 0 25 25'
+										fill='none'
+										xmlns='http://www.w3.org/2000/svg'
+									>
+										<rect
+											x='10.625'
+											y='10'
+											width='3.75'
+											height='10'
+											rx='1.875'
+											fill='#EF230C'
+										/>
+										<circle cx='12.5' cy='6.875' r='1.875' fill='#EF230C' />
+									</svg>
+								</ActionButton> */}
+									<ActionButton onClick={handleOpenRemoveModal} type='button'>
+										<svg
+											width='25'
+											height='25'
+											viewBox='0 0 25 25'
+											fill='none'
+											xmlns='http://www.w3.org/2000/svg'
+										>
+											<path
+												d='M8.30357 18.3333C8.30357 19.25 9.02679 20 9.91071 20H16.3393C17.2232 20 17.9464 19.25 17.9464 18.3333V8.33333H8.30357V18.3333ZM18.75 5.83333H15.9375L15.1339 5H11.1161L10.3125 5.83333H7.5V7.5H18.75V5.83333Z'
+												fill='#EF230C'
+											/>
+										</svg>
+									</ActionButton>
+								</ActionWrapper>
+							)}
+						</div>
 					</CardWrapper>
 					{!loading && (
 						<CardList
+							scrollTop={scrollTop}
+							onCloseScrollTop={handleCloseScrollTop}
 							value={currentCard}
 							data={savingCardList}
 							onClick={onSelectCard}
@@ -147,7 +228,17 @@ const CardsPage = ({
 			</Wrapper>
 			{showAddModal && (
 				<AddModal
+					onScrollTop={handleOpenScrollTop}
 					onClose={handleCloseAddModal}
+					onSuccess={handleOpenSuccessModal}
+					onFailure={handleOpenFailureModal}
+				/>
+			)}
+			{showRemoveModal && (
+				<RemoveModal
+					id={savingCard._id}
+					onScrollTop={handleOpenScrollTop}
+					onClose={handleCloseRemoveModal}
 					onSuccess={handleOpenSuccessModal}
 					onFailure={handleOpenFailureModal}
 				/>
@@ -185,7 +276,7 @@ CardsPage.propTypes = {
 		service: PropTypes.string,
 		balance: PropTypes.number,
 	}),
-	savingCard: PropTypes.arrayOf(
+	savingCards: PropTypes.arrayOf(
 		PropTypes.shape({
 			cardNumber: PropTypes.string,
 			service: PropTypes.string,

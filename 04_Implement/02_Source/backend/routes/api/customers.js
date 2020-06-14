@@ -84,13 +84,13 @@ router.get('/all-accounts', auth, async (req, res) => {
 						$in: savingAccountsId.map((e) => mongoose.Types.ObjectId(e)),
 					},
 				},
-				{ _id: 0, __v: 0 }
+				{ __v: 0 }
 			),
 			Account.findOne(
 				{
 					account_id: defaultAccountId,
 				},
-				{ _id: 0, __v: 0 }
+				{ __v: 0 }
 			),
 		])
 			.then(([savingAccounts, defaultAccount]) => {

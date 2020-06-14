@@ -25,8 +25,6 @@ const cards = (state = initialState, action) => {
 		case Cards.RECEIVE_CARDS_DATA: {
 			const { account_id } = (action.data.savingAccounts &&
 				action.data.savingAccounts[0]) || { account_id: '' }
-				console.log(action.data.savingAccounts)
-				console.log(action.data.defaultAccount)
 			return {
 				currentCard: account_id,
 				defaultCard: action.data.defaultAccount,

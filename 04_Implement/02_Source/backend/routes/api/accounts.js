@@ -122,4 +122,95 @@ router.post(
 	}
 )
 
+// @route     DELETE /accounts/delete-saving-account
+// @desc      Delete saving account
+// @access    Public
+router.delete(
+	'/delete-saving-account',
+	[auth, check('depositId', 'Deposit id is required').not().notEmpty()],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (errors) {
+			if (!errors.isEmpty()) {
+				return res.status(400).send(errors)
+			}
+		}
+
+		const { depositId } = req.query
+
+		const checkErrorsMongoose = {
+			updateDefaultAccount: false,
+		}
+
+		try {
+			const customer = await Customer.findById(req.user.id)
+			if (!customer) {
+				return res.status(400).json({
+					errors: [{ msg: 'Customer does not exists.' }],
+				})
+			}
+
+			const inxItem = customer.saving_accounts_id.indexOf(depositId)
+
+			if (inxItem === -1) {
+				return res.status(400).json({
+					errors: [{ msg: 'Deposit does not yours.' }],
+				})
+			}
+
+			const depositAccount = await Account.findById(depositId)
+			if (!depositAccount) {
+				return res.status(400).json({
+					errors: [{ msg: 'Deposit does not exist.' }],
+				})
+			}
+
+			await Account.findOneAndUpdate(
+				{
+					account_id: customer.default_account_id,
+				},
+				{
+					$inc: {
+						balance: depositAccount.balance,
+					},
+				},
+				{ new: true }
+			)
+
+			checkErrorsMongoose.updateDefaultAccount = {
+				account_id: customer.default_account_id,
+				deposit_amount: depositAccount.balance,
+			}
+
+			await Account.findByIdAndDelete(depositId)
+
+			customer.saving_accounts_id.splice(inxItem, 1)
+			await customer.save()
+
+			const response = {
+				msg: 'Deposit successfully deleted.',
+				data: { _id: depositId },
+			}
+			return res.status(200).json(response)
+		} catch (error) {
+			if (checkErrorsMongoose.updateDefaultAccount !== false) {
+				await Account.findOneAndUpdate(
+					{
+						account_id: checkErrorsMongoose.updateAccountDefault.account_id,
+					},
+					{
+						$inc: {
+							balance: -checkErrorsMongoose.updateAccountDefault.deposit_amount,
+						},
+					},
+					{ new: true }
+				)
+			}
+
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		}
+	}
+)
+
 module.exports = router

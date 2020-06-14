@@ -63,7 +63,7 @@ class AddDepositModal extends Component {
 
 	async handleSubmit() {
 		const { depositAmount } = this.state
-		const { onClose, onSuccess, onFailure } = this.props
+		const { onClose, onSuccess, onFailure, onScrollTop } = this.props
 		const data = {
 			depositAmount,
 		}
@@ -85,6 +85,7 @@ class AddDepositModal extends Component {
 				loading: false,
 			})
 			onClose()
+			onScrollTop()
 			onSuccess('A new deposit successfully added!')
 			// const { data: newData } = res
 			// onAddAReceiver(newData)

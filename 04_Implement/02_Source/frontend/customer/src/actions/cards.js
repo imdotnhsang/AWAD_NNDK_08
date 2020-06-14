@@ -28,7 +28,6 @@ export const failedRequestCardsData = () => ({
 const fetchCardsData = (cards) => async (dispatch, getState) => {
 	dispatch(requestCardsData())
 	const fetchData = async (cards) => {
-		console.log(cards)
 		const { balance: currentBalance } = cards.defaultCard
 		const { savingCards: savingAccounts } = cards
 		const params = {
