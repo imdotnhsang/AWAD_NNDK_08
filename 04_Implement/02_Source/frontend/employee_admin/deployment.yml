@@ -1,0 +1,21 @@
+---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: frontend-wnc-employee-admin
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          name: frontend-wnc-employee-admin-app
+      template:
+        metadata:
+          labels:
+            name: frontend-wnc-employee-admin-app
+        spec:
+          containers:
+            - name: application
+              image: 20191612557/wnc-employee-admin:v1.0
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 8080

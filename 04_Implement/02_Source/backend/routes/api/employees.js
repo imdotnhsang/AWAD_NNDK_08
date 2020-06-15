@@ -11,28 +11,42 @@ const employee = require('../../middlewares/employee')
 const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 const Transaction = require('../../models/Transaction')
+const CustomerAction = require('../../action/customer')
+const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
+const {GetQuery} = require('../../utils/GetQuery.js')
 
 // @route     GET /employees/all-customers
 // @desc      Get all information of employee page
 // @access    Private (employee)
 router.get('/all-customers', [auth, employee], async (req, res) => {
 	try {
-		const allCustomers = await Customer.find(
-			{},
-			{
-				_id: 0,
-				__v: 0,
-			}
-		)
 
-		const response = {
-			msg: 'All customers page successfully got.',
-			data: allCustomers,
-		}
-		return res.status(200).json(response)
+		const offset = GetQuery("offset",req)
+		const limit = GetQuery("limit",req)
+		const reverse = GetQuery("reverse",req)
+		const getTotal = GetQuery("getTotal",req)
+
+		const result = await CustomerAction.getCustomer({},null,offset,limit,reverse,getTotal)
+
+		// const allCustomers = await Customer.find(
+		// 	{},
+		// 	{
+		// 		_id: 0,
+		// 		__v: 0,
+		// 	}
+		// )
+
+		// const response = {
+		// 	msg: 'All customers page successfully got.',
+		// 	data: allCustomers,
+		// }
+		// return res.status(200).json(response)
+
+		return MakeResponse(req,res,result)
+
 	} catch (error) {
 		console.log(error)
-		return res.status(500).json({ msg: 'Server error...' })
+		return res.status(500).json({ message: 'Server error...' })
 	}
 })
 

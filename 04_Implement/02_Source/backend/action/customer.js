@@ -8,9 +8,9 @@ module.exports = {
 		return response
 	},
 	getCustomer: async (condition, select, offset, limit, reverse, getTotal) => {
-		//  let response = await new DBModel().Query(Customer,condition,select,offset,limit,reverse)
+	  let response = await new DBModel().Query(Customer,condition,select,offset,limit,reverse)
 		//  let response = await new DBModel().Distinct(Customer,'email',{})
-		const response = await new DBModel().QueryS(Customer, {}, null, 0, 1000, { email: 1 })
+		//const response = await new DBModel().QueryS(Customer, condition, select, offset, limit, reverse)
 		if (response.status === 'OK' && getTotal) {
 			const respTotal = await new DBModel().Count(Customer, condition)
 			response.total = respTotal.total
