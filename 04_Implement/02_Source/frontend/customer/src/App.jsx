@@ -11,64 +11,23 @@ import History from './components/4.History'
 import Account from './components/5.Account'
 import PrivateRoute from './PrivateRoute'
 
-
 function App() {
-  return (
-    <Router>
-      <Switch>
-        <PrivateRoute
-          exact
-          path="/"
-          component={Cards}
-        />
-        <PrivateRoute
-          exact
-          path="/cards"
-          component={Cards}
-        />
-        <PrivateRoute
-          exact
-          path="/receivers"
-          component={Receivers}
-        />
-        <PrivateRoute
-          exact
-          path="/transfer"
-          component={Transfer}
-        />
-        <PrivateRoute
-          exact
-          path="/debts"
-          component={Debts}
-        />
-        <PrivateRoute
-          exact
-          path="/history"
-          component={History}
-        />
-        <PrivateRoute
-          exact
-          path="/account"
-          component={Account}
-        />
-        <Route
-          exact
-          path="/forgot-password"
-          component={ForgotPassword}
-        />
-        <Route
-          exact
-          path="/reset-password"
-          component={ResetPassword}
-        />
-        <Route
-          exact
-          path="/login"
-          component={SignIn}
-        />
-      </Switch>
-    </Router>
-  )
+	return (
+		<Router>
+			<Switch>
+				<PrivateRoute exact path='/' component={Cards} />
+				<PrivateRoute exact path='/cards' component={Cards} />
+				<PrivateRoute exact path='/receivers' component={Receivers} />
+				<PrivateRoute exact path='/transfer' component={Transfer} />
+				<PrivateRoute exact path='/debts' component={Debts} />
+				<PrivateRoute exact path='/history' component={History} />
+				<PrivateRoute exact path='/account' component={Account} />
+				<Route exact path='/forgot-password' component={ForgotPassword} />
+				<Route exact path='/reset-password' component={ResetPassword} />
+				<Route exact path='/login' component={SignIn} />
+			</Switch>
+		</Router>
+	)
 }
 
 export default App

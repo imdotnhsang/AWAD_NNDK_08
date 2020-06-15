@@ -69,7 +69,7 @@ class SaveReceiverModal extends Component {
 			onFailure,
 			//
 			// invalidateData,
-			// onAddAReceiver,
+			onAddAReceiver,
 		} = this.props
 		// eslint-disable-next-line react/destructuring-assignment
 		const { accountID, bankID, accountName } = this.props.data
@@ -105,7 +105,8 @@ class SaveReceiverModal extends Component {
 			onClose()
 			// invalidateData()
 			onSuccess('You have successfully added a new receiver')
-			// onAddAReceiver(res.data)
+			console.log(res.data)
+			onAddAReceiver(res.data)
 		}
 	}
 

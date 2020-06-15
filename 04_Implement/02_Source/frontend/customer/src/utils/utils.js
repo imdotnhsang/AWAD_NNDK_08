@@ -109,6 +109,14 @@ export function commaSeparating(value, number) {
 		.replace(new RegExp(`\\B(?=(\\d{${number}})+(?!\\d))`, 'g'), ',')
 }
 
+export function fixBalanceOneThousandBillion(value) {
+	let result = value
+	if (result > 100000000000) {
+		result = parseInt(value / 1000) + 'k'
+	}
+	return result
+}
+
 export function getMonthYear(time) {
 	return new Date(time).toLocaleDateString('en-GB').slice(3)
 }
