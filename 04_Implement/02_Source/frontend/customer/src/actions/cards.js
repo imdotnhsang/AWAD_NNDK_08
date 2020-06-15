@@ -12,9 +12,10 @@ export const requestCardsData = () => ({
 	type: Cards.REQUEST_CARDS_DATA,
 })
 
-export const receiveCardsData = (data) => ({
+export const receiveCardsData = (data, init) => ({
 	type: Cards.RECEIVE_CARDS_DATA,
 	data,
+	init,
 })
 
 export const invalidateCardsData = () => ({
@@ -37,7 +38,7 @@ const fetchCardsData = (cards) => async (dispatch, getState) => {
 		const res = await api.get('/customers/all-accounts', params)
 		if (res.data) {
 			const { data } = res
-			dispatch(receiveCardsData(data))
+			dispatch(receiveCardsData(data, true))
 		} else {
 			const { status, error } = res
 			if (status !== 204) {

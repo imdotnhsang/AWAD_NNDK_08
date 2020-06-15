@@ -119,10 +119,13 @@ class AccountPage extends Component {
 				phone_number: '',
 			})
 
-			onReceiveCardsData({
-				defaultAccount: {},
-				savingAccounts: [],
-			})
+			onReceiveCardsData(
+				{
+					defaultAccount: {},
+					savingAccounts: [],
+				},
+				false
+			)
 
 			onReceiveBanksData([])
 

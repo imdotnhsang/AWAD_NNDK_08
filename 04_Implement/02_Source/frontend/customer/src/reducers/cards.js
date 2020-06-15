@@ -7,6 +7,7 @@ const initialState = {
 	savingCards: [],
 	loading: false,
 	didInvalidate: false,
+	init: false,
 }
 
 const cards = (state = initialState, action) => {
@@ -31,6 +32,7 @@ const cards = (state = initialState, action) => {
 				savingCards: action.data.savingAccounts,
 				loading: false,
 				didInvalidate: false,
+				init: action.init,
 			}
 		}
 		case Cards.INVALIDATE_CARDS_DATA: {
