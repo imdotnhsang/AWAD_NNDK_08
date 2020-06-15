@@ -49,6 +49,7 @@ router.post(
 			}
 
 			const debtCollection = new DebtCollection({
+				entry_time: Date.now(),
 				borrower_default_account: borrowerAccountId,
 				borrower_fullname: borrowerFullname,
 				lender_default_account: customer.default_account_id,

@@ -126,12 +126,12 @@ class AccountPage extends Component {
 
 			onReceiveBanksData([])
 
-			onReceiveDebtsData('createdByYou', [])
-			onReceiveDebtsData('receivedFromOthers', [])
+			onReceiveDebtsData('createdByYou', [], false)
+			onReceiveDebtsData('receivedFromOthers', [], false)
 
-			onReceiveHistoryData('receive', [])
-			onReceiveHistoryData('transfer', [])
-			onReceiveHistoryData('debtRepaying', [])
+			onReceiveHistoryData('receive', [], false)
+			onReceiveHistoryData('transfer', [], false)
+			onReceiveHistoryData('debtRepaying', [], false)
 
 			onReceiveReceiversData([])
 			this.setState({

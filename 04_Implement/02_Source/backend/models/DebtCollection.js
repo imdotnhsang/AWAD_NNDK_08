@@ -3,6 +3,10 @@
 const mongoose = require('mongoose')
 
 const DebtCollectionSchema = new mongoose.Schema({
+	entry_time: {
+		type: Number,
+		required: true,
+	},
 	borrower_fullname: {
 		type: String,
 		required: true,

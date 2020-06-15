@@ -8,10 +8,11 @@ export const requestHistoryData = (category) => ({
 	category,
 })
 
-export const receiverHistoryData = (category, data) => ({
+export const receiverHistoryData = (category, data, init) => ({
 	type: History.RECEIVE_HISTORY_DATA,
 	category,
 	data,
+	init,
 })
 
 export const failedRequestHistoryData = (category) => ({
@@ -31,13 +32,19 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 		const { history: historyData } = getState()
 		switch (category) {
 			case 'receive':
-				currentSizeHistory = historyData.receive.data.length || 0
+				currentSizeHistory = !historyData.receive.init
+					? undefined
+					: historyData.receive.data.length || 0
 				break
 			case 'transfer':
-				currentSizeHistory = historyData.transfer.data.length || 0
+				currentSizeHistory = !historyData.transfer.init
+					? undefined
+					: historyData.transfer.data.length || 0
 				break
-			case 'debt-repaying':
-				currentSizeHistory = historyData.debtRepaying.data.length || 0
+			case 'debtRepaying':
+				currentSizeHistory = !historyData.debtRepaying.init
+					? undefined
+					: historyData.debtRepaying.data.length || 0
 				break
 			default:
 				break
@@ -49,7 +56,7 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 		)
 		if (res.data) {
 			const { data } = res
-			dispatch(receiverHistoryData(category, data))
+			dispatch(receiverHistoryData(category, data, true))
 		} else {
 			const { status, error } = res
 			if (status !== 204) {
@@ -57,15 +64,20 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 				showError(error)
 			}
 		}
-		isAuthenticated() && setTimeout(await fetchData(category), 15000)
+		let timeout
+		if (isAuthenticated() !== null) {
+			timeout = setTimeout(await fetchData(category), 15000)
+		} else {
+			clearTimeout(timeout)
+		}
 	}
 
 	isAuthenticated() && (await fetchData(category))
 }
 
 const shouldFetchHistoryData = (category, state) => {
-	const { data, didInvalidate } = state[category]
-	if (data && !data.length) return true
+	const { data, init, didInvalidate } = state[category]
+	if (!init && !data.length) return true
 	if (didInvalidate) return true
 	return false
 }

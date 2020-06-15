@@ -45,7 +45,12 @@ const fetchCardsData = (cards) => async (dispatch, getState) => {
 				showError(error)
 			}
 		}
-		isAuthenticated() && setTimeout(await fetchData(getState().cards), 15000)
+		let timeout
+		if (isAuthenticated() !== null) {
+			timeout = setTimeout(await fetchData(getState().cards), 15000)
+		} else {
+			clearTimeout(timeout)
+		}
 	}
 
 	isAuthenticated() && (await fetchData(cards))

@@ -8,10 +8,11 @@ export const requestDebtsData = (category) => ({
 	category,
 })
 
-export const receiverDebtsData = (category, data) => ({
+export const receiverDebtsData = (category, data, init) => ({
 	type: Debts.RECEIVE_DEBTS_DATA,
 	category,
 	data,
+	init,
 })
 
 export const failedRequestDebtsData = (category) => ({
@@ -40,9 +41,15 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 						: 1
 					return object
 				}, {})
-				currentSizePaid = currentSizes.PAID || 0
-				currentSizeUnpaid = currentSizes.UNPAID || 0
-				currentSizeCancelled = currentSizes.CANCELLED || 0
+				currentSizePaid = !debtsData.createdByYou.init
+					? undefined
+					: currentSizes.PAID || 0
+				currentSizeUnpaid = !debtsData.createdByYou.init
+					? undefined
+					: currentSizes.UNPAID || 0
+				currentSizeCancelled = !debtsData.createdByYou.init
+					? undefined
+					: currentSizes.CANCELLED || 0
 				break
 			case 'receivedFromOthers':
 				currentSizes = debtsData.receivedFromOthers.data.reduce(
@@ -54,9 +61,15 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 					},
 					{}
 				)
-				currentSizePaid = currentSizes.PAID || 0
-				currentSizeUnpaid = currentSizes.UNPAID || 0
-				currentSizeCancelled = currentSizes.CANCELLED || 0
+				currentSizePaid = !debtsData.receivedFromOthers.init
+					? undefined
+					: currentSizes.PAID || 0
+				currentSizeUnpaid = !debtsData.receivedFromOthers.init
+					? undefined
+					: currentSizes.UNPAID || 0
+				currentSizeCancelled = !debtsData.receivedFromOthers.init
+					? undefined
+					: currentSizes.CANCELLED || 0
 				break
 			default:
 				break
@@ -72,7 +85,7 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 		)
 		if (res.data) {
 			const { data } = res
-			dispatch(receiverDebtsData(category, data))
+			dispatch(receiverDebtsData(category, data, true))
 		} else {
 			const { status, error } = res
 			if (status !== 204) {
@@ -80,15 +93,20 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 				showError(error)
 			}
 		}
-		isAuthenticated() && setTimeout(await fetchData(category), 15000)
+		let timeout
+		if (isAuthenticated() !== null) {
+			timeout = setTimeout(await fetchData(category), 15000)
+		} else {
+			clearTimeout(timeout)
+		}
 	}
 
 	isAuthenticated() && (await fetchData(category))
 }
 
 const shouldFetchDebtsData = (category, state) => {
-	const { data, didInvalidate } = state[category]
-	if (!data.length) return true
+	const { data, init, didInvalidate } = state[category]
+	if (!init && !data.length) return true
 	if (didInvalidate) return true
 	return false
 }
