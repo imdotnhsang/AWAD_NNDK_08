@@ -36,6 +36,11 @@ const tab = (state, action) => {
 				didInvalidate: false,
 				init: action.init,
 			}
+		case History.INITIALIZED_HISTORY:
+			return {
+				...state,
+				init: action.status,
+			}
 		case History.INVALIDATE_HISTORY_DATA:
 			return {
 				...state,
@@ -56,6 +61,7 @@ const history = (state = initialState, action) => {
 	switch (action.type) {
 		case History.REQUEST_HISTORY_DATA:
 		case History.RECEIVE_HISTORY_DATA:
+		case History.INITIALIZED_HISTORY:
 		case History.INVALIDATE_HISTORY_DATA:
 		case History.FAILED_REQUEST_HISTORY_DATA:
 			return {

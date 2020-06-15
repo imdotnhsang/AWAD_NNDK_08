@@ -12,10 +12,15 @@ export const requestCardsData = () => ({
 	type: Cards.REQUEST_CARDS_DATA,
 })
 
-export const receiveCardsData = (data, init) => ({
+export const receiveCardsData = (data) => ({
 	type: Cards.RECEIVE_CARDS_DATA,
 	data,
-	init,
+	// init,
+})
+
+export const initializedCards = (status) => ({
+	type: Cards.INITIALIZED_CARDS,
+	status,
 })
 
 export const invalidateCardsData = () => ({
@@ -38,7 +43,8 @@ const fetchCardsData = (cards) => async (dispatch, getState) => {
 		const res = await api.get('/customers/all-accounts', params)
 		if (res.data) {
 			const { data } = res
-			dispatch(receiveCardsData(data, true))
+			dispatch(receiveCardsData(data))
+			dispatch(initializedCards(true))
 		} else {
 			const { status, error } = res
 			if (status !== 204) {

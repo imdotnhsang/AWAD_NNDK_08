@@ -14,9 +14,9 @@ import SignOutModal from './presentational/Modal.SignOut'
 
 import { receiveBanksData } from '../../actions/banks'
 import { receiveAccountData } from '../../actions/account'
-import { receiveCardsData } from '../../actions/cards'
-import { receiverDebtsData } from '../../actions/debts'
-import { receiverHistoryData } from '../../actions/history'
+import { receiveCardsData, initializedCards } from '../../actions/cards'
+import { receiverDebtsData, initializedDebt } from '../../actions/debts'
+import { receiverHistoryData, initializedHistory } from '../../actions/history'
 import { receiveReceiversData } from '../../actions/receivers'
 
 import api from '../../api/api'
@@ -100,8 +100,11 @@ class AccountPage extends Component {
 			onReceiveAccountData,
 			onReceiveBanksData,
 			onReceiveCardsData,
+			onInitializedCard,
 			onReceiveDebtsData,
+			onInitializedDebt,
 			onReceiveHistoryData,
+			onInitializedHistory,
 			onReceiveReceiversData,
 		} = this.props
 		if (res.error) {
@@ -126,15 +129,21 @@ class AccountPage extends Component {
 				},
 				false
 			)
+			onInitializedCard(false)
 
 			onReceiveBanksData([])
 
-			onReceiveDebtsData('createdByYou', [], false)
-			onReceiveDebtsData('receivedFromOthers', [], false)
+			onReceiveDebtsData('createdByYou', [])
+			onInitializedDebt('createdByYou', false)
+			onReceiveDebtsData('receivedFromOthers', [])
+			onInitializedDebt('receivedFromOthers', false)
 
-			onReceiveHistoryData('receive', [], false)
+			onReceiveHistoryData('receive', [])
+			onInitializedHistory('receive', false)
 			onReceiveHistoryData('transfer', [], false)
+			onInitializedHistory('transfer', false)
 			onReceiveHistoryData('debtRepaying', [], false)
+			onInitializedHistory('debtRepaying', false)
 
 			onReceiveReceiversData([])
 			this.setState({
@@ -244,11 +253,20 @@ const mapDispatchToProps = (dispatch) => ({
 	onReceiveCardsData: (data) => {
 		dispatch(receiveCardsData(data))
 	},
+	onInitializedCard: (status) => {
+		dispatch(initializedCards(status))
+	},
 	onReceiveDebtsData: (category, data) => {
 		dispatch(receiverDebtsData(category, data))
 	},
+	onInitializedDebt: (category, status) => {
+		dispatch(initializedDebt(category, status))
+	},
 	onReceiveHistoryData: (category, data) => {
 		dispatch(receiverHistoryData(category, data))
+	},
+	onInitializedHistory: (category, status) => {
+		dispatch(initializedHistory(category, status))
 	},
 	onReceiveReceiversData: (data) => {
 		dispatch(receiveReceiversData(data))

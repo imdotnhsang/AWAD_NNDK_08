@@ -32,9 +32,14 @@ const cards = (state = initialState, action) => {
 				savingCards: action.data.savingAccounts,
 				loading: false,
 				didInvalidate: false,
-				init: action.init,
+				// init: action.init,
 			}
 		}
+		case Cards.INITIALIZED_CARDS:
+			return {
+				...state,
+				init: action.status,
+			}
 		case Cards.INVALIDATE_CARDS_DATA: {
 			return {
 				...state,

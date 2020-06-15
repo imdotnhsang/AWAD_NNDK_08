@@ -8,11 +8,17 @@ export const requestHistoryData = (category) => ({
 	category,
 })
 
-export const receiverHistoryData = (category, data, init) => ({
+export const receiverHistoryData = (category, data) => ({
 	type: History.RECEIVE_HISTORY_DATA,
 	category,
 	data,
-	init,
+	// init,
+})
+
+export const initializedHistory = (category, status) => ({
+	type: History.INITIALIZED_HISTORY,
+	category,
+	status,
 })
 
 export const failedRequestHistoryData = (category) => ({
@@ -56,7 +62,8 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 		)
 		if (res.data) {
 			const { data } = res
-			dispatch(receiverHistoryData(category, data, true))
+			dispatch(receiverHistoryData(category, data))
+			dispatch(initializedHistory(category, true))
 		} else {
 			const { status, error } = res
 			if (status !== 204) {

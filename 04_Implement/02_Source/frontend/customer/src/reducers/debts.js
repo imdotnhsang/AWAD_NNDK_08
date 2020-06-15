@@ -29,7 +29,13 @@ const tab = (state, action) => {
 				data: action.data,
 				loading: false,
 				didInvalidate: false,
-				init: action.init,
+				// init: action.init,
+			}
+		case Debts.INITIALIZED_DEBTS:
+			console.log(action.status)
+			return {
+				...state,
+				init: action.status,
 			}
 		case Debts.INVALIDATE_DEBTS_DATA:
 			return {
@@ -69,6 +75,7 @@ const debts = (state = initialState, action) => {
 		case Debts.REQUEST_DEBTS_DATA:
 		case Debts.RECEIVE_DEBTS_DATA:
 		case Debts.FAILED_REQUEST_DEBTS_DATA:
+		case Debts.INITIALIZED_DEBTS:
 		case Debts.INVALIDATE_DEBTS_DATA:
 		case Debts.CANCEL_A_DEBT:
 			return {

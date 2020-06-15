@@ -8,11 +8,17 @@ export const requestDebtsData = (category) => ({
 	category,
 })
 
-export const receiverDebtsData = (category, data, init) => ({
+export const initializedDebt = (category, status) => ({
+	type: Debts.INITIALIZED_DEBTS,
+	category,
+	status,
+})
+
+export const receiverDebtsData = (category, data) => ({
 	type: Debts.RECEIVE_DEBTS_DATA,
 	category,
 	data,
-	init,
+	// init,
 })
 
 export const failedRequestDebtsData = (category) => ({
@@ -84,8 +90,10 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 			params
 		)
 		if (res.data) {
+			console.log(getState().debts.createdByYou.init)
 			const { data } = res
-			dispatch(receiverDebtsData(category, data, true))
+			dispatch(receiverDebtsData(category, data))
+			dispatch(initializedDebt(category, true))
 		} else {
 			const { status, error } = res
 			if (status !== 204) {

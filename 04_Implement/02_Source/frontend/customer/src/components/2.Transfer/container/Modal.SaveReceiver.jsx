@@ -45,6 +45,7 @@ class SaveReceiverModal extends Component {
 		this.handleNext = this.handleNext.bind(this)
 		this.handleAdd = this.handleAdd.bind(this)
 		this.handleNickname = this.handleNickname.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	handleNext() {
@@ -110,6 +111,12 @@ class SaveReceiverModal extends Component {
 		}
 	}
 
+	handleEnterKey(e) {
+		if (e.key === 'Enter') {
+			this.handleAdd()
+		}
+	}
+
 	render() {
 		const { nickname, loading, step } = this.state
 		const { show, data, onClose } = this.props
@@ -140,6 +147,7 @@ class SaveReceiverModal extends Component {
 							placeholder={accountName}
 							value={nickname}
 							onChange={this.handleNickname}
+							onKeyDown={this.handleEnterKey}
 						/>
 						<ButtonWrapper>
 							<Button secondary fluid onClick={onClose} name='Cancel' />
