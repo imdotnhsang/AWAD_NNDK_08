@@ -105,7 +105,6 @@ class Table extends Component {
 							smoothScrolling
 							ref={this.ref}
 						>
-							{console.log(sortedData)}
 							{sortedData.length === 0 ? (
 								<NoList>No transaction list</NoList>
 							) : (

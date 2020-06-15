@@ -140,9 +140,9 @@ const CardsPage = ({
 		balance: 0,
 	}
 	const savingCardList = savingCards
-	useEffect(() => {
-		onFetchData()
-	}, [onFetchData])
+	// useEffect(() => {
+	// 	onFetchData()
+	// }, [onFetchData])
 	return (
 		<Template
 			currentTab={0}
@@ -295,6 +295,6 @@ const mapStateToProps = (state) => ({
 })
 const mapDispatchToProps = (dispatch) => ({
 	onSelectCard: (value) => dispatch(selectCard(value)),
-	onFetchData: () => dispatch(fetchCardsDataIfNeeded()),
+	// onFetchData: () => dispatch(fetchCardsDataIfNeeded()),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(CardsPage)
