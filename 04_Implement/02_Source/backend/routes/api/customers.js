@@ -17,40 +17,84 @@ const Receiver = require('../../models/Receiver')
 const Transaction = require('../../models/Transaction')
 const DebtCollection = require('../../models/DebtCollection')
 
-// @route     GET /customers/default-account
-// @desc      Get information default account of customer
+// @route     GET /customers/all-notifications
+// @desc      Get all notifications of customer
 // @access    Private (customer)
-router.get('/default-account', auth, async (req, res) => {
-	try {
-		const customer = await Customer.findById(req.user.id)
-		if (!customer) {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Customer not exists.',
-					},
-				],
-			})
-		}
-
-		const { default_account_id: defaultAccountId } = customer
-
-		const defaultAccount = await Account.findOne(
-			{
-				account_id: defaultAccountId,
-			},
-			{ _id: 0, __v: 0 }
-		)
-
-		const response = {
-			msg: 'Default card successfully got.',
-			data: defaultAccount,
-		}
-		return res.status(200).json(response)
-	} catch (error) {
-		console.log(error)
-		return res.status(500).json({ msg: 'Server error...' })
+router.get('/all-notifications', auth, async (req, res) => {
+	const customer = await Customer.findById(req.user.id)
+	if (!customer) {
+		return res.status(400).json({
+			errors: [
+				{
+					msg: 'Customer not exists.',
+				},
+			],
+		})
 	}
+
+	const { default_account_id: defaultAccountId } = customer
+	const { currentSizeNotification } = req.query
+
+	let loop = 0
+	const fn = () => {
+		Promise.all([
+			DebtCollection.find(
+				//REPAID
+				{ lender_default_account: defaultAccountId, debt_status: 'PAID' },
+				{ _v: 0 }
+			),
+			DebtCollection.find(
+				//CANCELLED DEBT COLLECTION BY BORROWER
+				{
+					lender_default_account: defaultAccountId,
+					debt_status: 'CANCELLED',
+					cancelled_by_id: { $ne: defaultAccountId },
+				},
+				{ _v: 0 }
+			),
+			DebtCollection.find(
+				//CANCELLED DEBT COLLECTION BY LENDER
+				{
+					borrower_default_account: defaultAccountId,
+					debt_status: 'CANCELLED',
+					cancelled_by_id: { $ne: defaultAccountId },
+				},
+				{ _v: 0 }
+			),
+		])
+			.then(
+				([
+					repaidNotifications,
+					cancelDebtCollectionsFromBorrower,
+					cancelDebtCollectionsFromLender,
+				]) => {
+					const data = [
+						...repaidNotifications,
+						...cancelDebtCollectionsFromBorrower,
+						...cancelDebtCollectionsFromLender,
+					].sort((x, y) => y.entry_time - x.entry_time)
+					if (data.length != currentSizeNotification) {
+						const response = {
+							msg: 'All notifications successfully got.',
+							data,
+						}
+						return res.status(200).json(response)
+					} else {
+						loop++
+						if (loop < 4) {
+							setTimeout(fn, 2000)
+						} else {
+							return res.status(204).json({ msg: 'No content...' })
+						}
+					}
+				}
+			)
+			.catch((error) => {
+				console.log(error)
+				return res.status(500).json({ msg: 'Server error...' })
+			})
+	}
+	fn()
 })
 
 // @route     GET /customers/all-accounts

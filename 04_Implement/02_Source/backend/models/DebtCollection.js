@@ -44,6 +44,9 @@ const DebtCollectionSchema = new mongoose.Schema({
 	debt_reason_cancel: {
 		type: String,
 	},
+	is_seen: {
+		type: Boolean,
+	},
 })
 
 module.exports = DebtCollection = mongoose.model(

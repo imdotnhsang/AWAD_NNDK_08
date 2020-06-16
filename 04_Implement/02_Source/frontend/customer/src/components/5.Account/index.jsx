@@ -18,6 +18,10 @@ import { receiveCardsData, initializedCards } from '../../actions/cards'
 import { receiverDebtsData, initializedDebt } from '../../actions/debts'
 import { receiverHistoryData, initializedHistory } from '../../actions/history'
 import { receiveReceiversData } from '../../actions/receivers'
+import {
+	receiverNotificationsData,
+	initializedNotification,
+} from '../../actions/notifications'
 
 import api from '../../api/api'
 
@@ -106,6 +110,8 @@ class AccountPage extends Component {
 			onReceiveHistoryData,
 			onInitializedHistory,
 			onReceiveReceiversData,
+			onReceiveNotificationData,
+			onInitializedNotification,
 		} = this.props
 		if (res.error) {
 			const { error } = res
@@ -146,6 +152,9 @@ class AccountPage extends Component {
 			onInitializedHistory('debtRepaying', false)
 
 			onReceiveReceiversData([])
+
+			onReceiveNotificationData([])
+			onInitializedNotification(false)
 			this.setState({
 				didSignOut: true,
 			})
@@ -270,6 +279,12 @@ const mapDispatchToProps = (dispatch) => ({
 	},
 	onReceiveReceiversData: (data) => {
 		dispatch(receiveReceiversData(data))
+	},
+	onReceiveNotificationData: (data) => {
+		dispatch(receiverNotificationsData(data))
+	},
+	onInitializedNotification: (status) => {
+		dispatch(initializedNotification(status))
 	},
 })
 

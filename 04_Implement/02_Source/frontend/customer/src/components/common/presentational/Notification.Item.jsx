@@ -138,6 +138,9 @@ const Icon = [
 const NotificationItem = ({ type, message, time }) => {
 	let icon = null
 	switch (type) {
+    case 1:
+			icon = Icon[1].component
+			break
 		case 2:
 			icon = Icon[2].component
 			break
@@ -145,8 +148,8 @@ const NotificationItem = ({ type, message, time }) => {
 			icon = Icon[3].component
 			break
 		default: {
-			if (message.includes('debtor')) icon = Icon[1].component
-			else icon = Icon[0].component
+			icon = Icon[0].component
+			break
 		}
 	}
 	return (

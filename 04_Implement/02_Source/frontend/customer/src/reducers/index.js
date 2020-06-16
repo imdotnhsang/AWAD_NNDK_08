@@ -5,7 +5,14 @@ import banks from './banks'
 import debts from './debts'
 import history from './history'
 import account from './account'
+import notifications from './notifications'
 
 export default combineReducers({
-  cards, receivers, banks, debts, history, account,
+	cards,
+	receivers,
+	banks,
+	debts,
+	history,
+	account,
+	notifications,
 })

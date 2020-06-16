@@ -1,9 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import NotificationItem from './Notification.Item'
 import ScrollArea from 'react-scrollbar'
 import Loading from '../../common/presentational/Loading.Table'
+import { connect } from 'react-redux'
+import { fecthNotificationsDataIfNeeded } from '../../../actions/notifications'
+import {
+	getNotificationType,
+	getAccountIDFromStorage,
+} from '../../../utils/utils'
 
 const Wrapper = styled.div`
 	width: 100%;
@@ -54,18 +60,35 @@ const NewNotification = styled.span`
 	border-radius: 50%;
 	display: ${(props) => (props.disabled ? 'none' : 'block')};
 `
+const NoList = styled.p`
+	font-family: OpenSans-Regular;
+	font-size: 12px;
+	color: #fff;
+	line-height: 14px;
+	text-align: center;
+	width: 350px;
+`
 
-const PageHeader = ({ name, button, buttonName, onClick }) => {
+const PageHeader = ({
+	onFetchData,
+	name,
+	button,
+	buttonName,
+	onClick,
+	data,
+	loading,
+}) => {
 	const [showNotification, setShowNotification] = useState(false)
-	const [loading, setLoading] = useState(false)
 
 	const handleOpenAndCloseNotification = () => {
 		setShowNotification(!showNotification)
 	}
-	const handleCloseNotification = () => {
-		setShowNotification(false)
-	}
-
+	// const handleCloseNotification = () => {
+	// 	setShowNotification(false)
+	// }
+	useEffect(() => {
+		onFetchData()
+	}, [onFetchData])
 	return (
 		<Wrapper>
 			<div>
@@ -113,84 +136,61 @@ const PageHeader = ({ name, button, buttonName, onClick }) => {
 					<path d='M3.375 11.125H4.875' stroke='white' />
 				</svg>
 			</ButtonNotification>
-			{showNotification && (
-				<ScrollArea
-					speed={0.5}
-					horizontal={false}
-					style={{
-						maxHeight: '352px',
-						position: 'absolute',
-						top: 'calc(50px + 6%)',
-						right: '60px',
-						borderRadius: '10px',
-						transition: '1s',
-						background: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
-					}}
-					contentStyle={{
-						paddingTop: '10px',
-						paddingBottom: '10px',
-					}}
-					verticalScrollbarStyle={{
-						width: '5px',
-						backgroundColor: '#7C7F87',
-						borderRadius: '10px',
-					}}
-					verticalContainerStyle={{
-						width: '5px',
-						backgroundImage:
-							'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
-						borderRadius: '10px',
-						right: '0px',
-					}}
-					smoothScrolling
-				>
-					<NotificationItem
-						type={0}
-						message={
-							'Your lender (Justin Doe/ 4089) has removed a debt reminder of you'
-						}
-						time={Date.now()}
-						radiusTop
-					></NotificationItem>
-					<NotificationItem
-						type={1}
-						message={
-							'Your debtor (Justin Doe/ 4089) has removed a debt reminder of you'
-						}
-						time={Date.now()}
-						radiusTop
-					></NotificationItem>
-					<NotificationItem
-						type={2}
-						message={'Your debtor (Justin Doe/ 4089) has repaid a debt to you'}
-						time={Date.now()}
-					></NotificationItem>
-					<NotificationItem
-						type={3}
-						message={
-							'Your lender (Justin Doe/ 4089) has removed a debt reminder of you'
-						}
-						time={Date.now()}
-						radiusBottom
-					></NotificationItem>
-					<NotificationItem
-						type={3}
-						message={
-							'Your lender (Justin Doe/ 4089) has removed a debt reminder of you'
-						}
-						time={Date.now()}
-						radiusBottom
-					></NotificationItem>
-					<NotificationItem
-						type={3}
-						message={
-							'Your lender (Justin Doe/ 4089) has removed a debt reminder of you'
-						}
-						time={Date.now()}
-						radiusBottom
-					></NotificationItem>
-				</ScrollArea>
-			)}
+			{showNotification &&
+				(loading ? (
+					<Loading />
+				) : (
+					<ScrollArea
+						speed={0.5}
+						horizontal={false}
+						style={{
+							maxHeight: '352px',
+							position: 'absolute',
+							top: 'calc(50px + 6%)',
+							right: '60px',
+							borderRadius: '10px',
+							transition: '1s',
+							background: 'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
+							zIndex: '2',
+						}}
+						contentStyle={{
+							paddingTop: '10px',
+							paddingBottom: '10px',
+						}}
+						verticalScrollbarStyle={{
+							width: '5px',
+							backgroundColor: '#7C7F87',
+							borderRadius: '10px',
+						}}
+						verticalContainerStyle={{
+							width: '5px',
+							backgroundImage:
+								'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
+							borderRadius: '10px',
+							right: '0px',
+						}}
+						smoothScrolling
+					>
+						{data.length === 0 ? (
+							<NoList>No notification list</NoList>
+						) : (
+							data.map((e) => (
+								<NotificationItem
+									key={e._id}
+									type={getNotificationType(
+										e.debt_status,
+										e.cancelled_by_id,
+										e.borrower_default_account,
+										e.lender_default_account,
+										getAccountIDFromStorage()
+									)}
+									message={e.borrower_fullname}
+									time={e.entry_time}
+								></NotificationItem>
+							))
+						)}
+					</ScrollArea>
+				))}
 		</Wrapper>
 	)
 }
@@ -207,4 +207,15 @@ PageHeader.propTypes = {
 	buttonName: PropTypes.string,
 	onClick: PropTypes.func,
 }
-export default PageHeader
+const mapStateToProps = (state) => {
+	const { data, loading } = state.notifications
+	return {
+		data,
+		loading,
+	}
+}
+const mapDispatchToProps = (dispatch) => ({
+	onFetchData: () => dispatch(fecthNotificationsDataIfNeeded()),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(PageHeader)

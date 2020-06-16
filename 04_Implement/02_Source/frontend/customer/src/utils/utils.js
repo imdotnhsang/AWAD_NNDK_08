@@ -203,3 +203,34 @@ export function getAmountFactTransaction(
 	}
 	return amountFact
 }
+
+export function getNotificationType(
+	status,
+	cancelledByAccountId,
+	borrowerAccountId,
+	lenderAccountId,
+	currentAccountId
+) {
+	let type = 0
+	switch (status) {
+		case 'PAID':
+			type = 2
+			break
+		case 'CANCELLED':
+			if (
+				cancelledByAccountId !== currentAccountId &&
+				lenderAccountId === currentAccountId
+			) {
+				type = 1
+			} else if (
+				cancelledByAccountId !== currentAccountId &&
+				borrowerAccountId === currentAccountId
+			) {
+				type = 0
+			}
+			break
+		default:
+			break
+	}
+	return type
+}
