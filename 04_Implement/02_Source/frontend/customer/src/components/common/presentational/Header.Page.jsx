@@ -118,7 +118,8 @@ const PageHeader = ({
 				)}
 			</div>
 			<ButtonNotification onClick={handleOpenAndCloseNotification}>
-				<NewNotification />
+				{data.length !== 0 &&
+					new Set(data.map((e) => e.is_seen)).has(false) && <NewNotification />}
 				<svg
 					width='27'
 					height='27'
