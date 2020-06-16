@@ -9,6 +9,7 @@ import { fecthNotificationsDataIfNeeded } from '../../../actions/notifications'
 import {
 	getNotificationType,
 	getAccountIDFromStorage,
+	getNotificationMessage,
 } from '../../../utils/utils'
 
 const Wrapper = styled.div`
@@ -184,7 +185,15 @@ const PageHeader = ({
 										e.lender_default_account,
 										getAccountIDFromStorage()
 									)}
-									message={e.borrower_fullname}
+									message={getNotificationMessage(
+										e.debt_status,
+										e.cancelled_by_id,
+										e.borrower_default_account,
+										e.lender_default_account,
+										getAccountIDFromStorage(),
+										e.borrower_fullname,
+										e.lender_fullname
+									)}
 									time={e.entry_time}
 								></NotificationItem>
 							))

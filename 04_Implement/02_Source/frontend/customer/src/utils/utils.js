@@ -234,3 +234,42 @@ export function getNotificationType(
 	}
 	return type
 }
+
+export function getNotificationMessage(
+	status,
+	cancelledByAccountId,
+	borrowerAccountId,
+	lenderAccountId,
+	currentAccountId,
+	borrowerFullname,
+	lenderFullname
+) {
+	let message = ''
+	switch (status) {
+		case 'PAID':
+			message = `${aliasFullname(borrowerFullname)} / ${fourDigit(
+				borrowerAccountId
+			)} (Borrower) has repaid a debt collection to you`
+			break
+		case 'CANCELLED':
+			if (
+				cancelledByAccountId !== currentAccountId &&
+				lenderAccountId === currentAccountId
+			) {
+				message = `${aliasFullname(borrowerFullname)} / ${fourDigit(
+					borrowerAccountId
+				)} (Borrower) has cancelled a debt collection of you`
+			} else if (
+				cancelledByAccountId !== currentAccountId &&
+				borrowerAccountId === currentAccountId
+			) {
+				message = `${aliasFullname(lenderFullname)} / ${fourDigit(
+					lenderAccountId
+				)} (Lender) has cancelled a debt collection to you`
+			}
+			break
+		default:
+			break
+	}
+	return message
+}

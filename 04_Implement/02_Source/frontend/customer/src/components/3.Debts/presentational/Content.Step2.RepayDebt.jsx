@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Row, Col } from 'react-bootstrap'
+import { connect } from 'react-redux'
 import CancelButton from '../../common/presentational/Button'
 import RepayButton from '../../common/presentational/Button.Loading'
 import {
@@ -11,6 +12,7 @@ import {
 } from '../../../utils/utils'
 import api from '../../../api/api'
 import Banner from '../../common/presentational/Banner.Step'
+import { MINIMUM_BALANCE } from '../../../constants/constants'
 
 const Text = styled.span`
 	font-family: OpenSans-Regular;
@@ -85,31 +87,31 @@ class Step2RepayDebt extends Component {
 	}
 
 	async handleSendOTP() {
+		const { data: dataDebtColleciton, balance } = this.props
 		this.setState({
 			error: '',
 			loading: true,
 		})
-		const { onNext } = this.props
-		// const data = {
-		// 	email: getEmailFromStorage(),
-		// }
-		// const config = {
-		// 	headers: {
-		// 		'Content-Type': 'application/x-www-form-urlencoded',
-		// 	},
-		// }
-		const res = await api.post('/customers/send-transferring-otp')
-		if (res.error) {
-			const { error } = res
+		if (dataDebtColleciton.debt_amount > balance - MINIMUM_BALANCE) {
 			this.setState({
+				error: 'Insufficient funds.',
 				loading: false,
-				error,
 			})
 		} else {
-			this.setState({
-				loading: false,
-			})
-			onNext()
+			const { onNext } = this.props
+			const res = await api.post('/customers/send-transferring-otp')
+			if (res.error) {
+				const { error } = res
+				this.setState({
+					loading: false,
+					error,
+				})
+			} else {
+				this.setState({
+					loading: false,
+				})
+				onNext()
+			}
 		}
 	}
 
@@ -127,7 +129,7 @@ class Step2RepayDebt extends Component {
 			debt_amount: amount,
 			debt_message: message,
 		} = data
-		console.log(data)
+
 		return (
 			<>
 				<Banner
@@ -224,4 +226,12 @@ Step2RepayDebt.propTypes = {
 	onBack: PropTypes.func,
 	onNext: PropTypes.func,
 }
-export default Step2RepayDebt
+const mapStateToProps = (state) => {
+	const { defaultCard } = state.cards
+	const { balance } = defaultCard
+	return {
+		balance,
+	}
+}
+
+export default connect(mapStateToProps)(Step2RepayDebt)

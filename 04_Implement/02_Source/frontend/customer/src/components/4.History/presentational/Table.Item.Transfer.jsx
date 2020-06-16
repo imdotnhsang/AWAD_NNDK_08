@@ -67,8 +67,8 @@ const TableItem = ({
 			<StyledCol md={2}>
 				<Text>
 					{' '}
-					<sup style={{ fontSize: '11px', paddingRight: '2px' }}>₫</sup>
-					{commaSeparating(amount, 3)}
+					{/* <sup style={{ fontSize: '11px', paddingRight: '2px' }}>₫</sup> */}
+					- {commaSeparating(amount, 3)}
 				</Text>
 			</StyledCol>
 			<StyledCol md={2}>

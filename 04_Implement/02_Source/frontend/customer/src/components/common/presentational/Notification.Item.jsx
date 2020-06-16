@@ -138,7 +138,7 @@ const Icon = [
 const NotificationItem = ({ type, message, time }) => {
 	let icon = null
 	switch (type) {
-    case 1:
+		case 1:
 			icon = Icon[1].component
 			break
 		case 2:
