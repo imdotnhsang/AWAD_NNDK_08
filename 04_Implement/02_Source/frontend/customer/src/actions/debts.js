@@ -90,7 +90,6 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 			params
 		)
 		if (res.data) {
-			console.log(getState().debts.createdByYou.init)
 			const { data } = res
 			dispatch(receiverDebtsData(category, data))
 			dispatch(initializedDebt(category, true))

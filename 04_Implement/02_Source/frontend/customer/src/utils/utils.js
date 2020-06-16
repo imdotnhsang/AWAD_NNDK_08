@@ -126,10 +126,13 @@ export function fourDigit(cardNumber) {
 }
 
 export function generateErrorResponse(res) {
-	const { status } = res
+	const { status } = res && res
 	let error = ''
 	switch (status) {
 		case 500:
+			error = res.data.msg || 'Something wrong happened ...'
+			break
+		case 401:
 			error = res.data.msg || 'Something wrong happened ...'
 			break
 		case 204:

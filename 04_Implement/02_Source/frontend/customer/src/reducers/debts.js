@@ -32,7 +32,6 @@ const tab = (state, action) => {
 				// init: action.init,
 			}
 		case Debts.INITIALIZED_DEBTS:
-			console.log(action.status)
 			return {
 				...state,
 				init: action.status,
