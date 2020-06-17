@@ -1,8 +1,8 @@
 import { Banks } from '../constants/actionTypes'
 import api from '../api/api'
 import { loginTimeout } from './timeout'
-import { showError } from '../components/common/presentational/Error'
 import { isAuthenticated } from '../utils/utils'
+
 export const requestBanksData = () => ({
 	type: Banks.REQUEST_BANKS_DATA,
 })
@@ -24,8 +24,7 @@ const fetchBanksData = () => async (dispatch) => {
 		const { errors, status } = res
 		switch (status) {
 			case 401:
-				loginTimeout()(dispatch)
-				showError(errors)
+				loginTimeout(errors)(dispatch)
 				break
 			default:
 				if (status !== 204) {

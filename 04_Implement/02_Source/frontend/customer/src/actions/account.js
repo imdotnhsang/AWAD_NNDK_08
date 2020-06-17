@@ -1,7 +1,7 @@
 import { Account } from '../constants/actionTypes'
 import api from '../api/api'
 import { loginTimeout } from './timeout'
-import { showError } from '../components/common/presentational/Error'
+
 export const requestAccountData = () => ({
 	type: Account.REQUEST_ACCOUNT_DATA,
 })
@@ -23,8 +23,7 @@ const fetchAccountData = () => async (dispatch) => {
 		const { error, status } = res
 		switch (status) {
 			case 401:
-				loginTimeout()(dispatch)
-				showError(error)
+				loginTimeout(error)(dispatch)
 				break
 			default:
 				if (status !== 204) {

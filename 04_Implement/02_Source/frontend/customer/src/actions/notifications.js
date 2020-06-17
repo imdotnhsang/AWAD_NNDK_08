@@ -54,8 +54,7 @@ const fetchNotificationsData = () => async (dispatch, getState) => {
 			const { status, error } = res
 			switch (status) {
 				case 401:
-					loginTimeout()(dispatch)
-					showError(error)
+					loginTimeout(error)(dispatch)
 					break
 				default:
 					if (status !== 204) {

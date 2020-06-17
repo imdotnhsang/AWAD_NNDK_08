@@ -46,8 +46,8 @@ class EditReceiverModal extends Component {
 	async handleSubmit() {
 		const { id } = this.props
 		const { nickname } = this.state
-		// const { onClose, onSuccess, onFailure, onEditReceiver } = this.props
-		const { onClose, onSuccess, onFailure } = this.props
+		const { onClose, onSuccess, onFailure, onEditReceiver } = this.props
+		// const { onClose, onSuccess, onFailure } = this.props
 		if (!nickname) {
 			this.setState({
 				error: 'Required field',
@@ -83,7 +83,7 @@ class EditReceiverModal extends Component {
 			})
 			onClose()
 			onSuccess("You have successfully updated your receiver's information!")
-			// onEditReceiver(res.data)
+			onEditReceiver(res.data)
 		}
 	}
 

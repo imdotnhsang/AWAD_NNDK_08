@@ -2,6 +2,7 @@ import { Receivers } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
 import { loginTimeout } from './timeout'
+
 export const requestReceiversData = () => ({
 	type: Receivers.REQUEST_RECEIVERS_DATA,
 })
@@ -26,8 +27,7 @@ const fetchReceiversData = () => async (dispatch) => {
 		const { status, error } = res
 		switch (status) {
 			case 401:
-				loginTimeout()(dispatch)
-				showError(error)
+				loginTimeout(error)(dispatch)
 				break
 			default:
 				if (status !== 204) {
