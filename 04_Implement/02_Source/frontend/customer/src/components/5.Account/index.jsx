@@ -128,13 +128,10 @@ class AccountPage extends Component {
 				phone_number: '',
 			})
 
-			onReceiveCardsData(
-				{
-					defaultAccount: {},
-					savingAccounts: [],
-				},
-				false
-			)
+			onReceiveCardsData({
+				defaultAccount: {},
+				savingAccounts: [],
+			})
 			onInitializedCard(false)
 
 			onReceiveBanksData([])
@@ -155,6 +152,7 @@ class AccountPage extends Component {
 
 			onReceiveNotificationData([])
 			onInitializedNotification(false)
+
 			this.setState({
 				didSignOut: true,
 			})

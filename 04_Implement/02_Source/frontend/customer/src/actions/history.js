@@ -2,6 +2,7 @@ import { History } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
 import { getUrlFromCategory, isAuthenticated } from '../utils/utils'
+import { loginTimeout } from './timeout'
 
 export const requestHistoryData = (category) => ({
 	type: History.REQUEST_HISTORY_DATA,
@@ -66,9 +67,17 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 			dispatch(initializedHistory(category, true))
 		} else {
 			const { status, error } = res
-			if (status !== 204) {
-				dispatch(failedRequestHistoryData(category))
-				showError(error)
+			switch (status) {
+				case 401:
+					loginTimeout()(dispatch)
+					showError(error)
+					break
+				default:
+					if (status !== 204) {
+						dispatch(failedRequestHistoryData(category))
+						showError(error)
+					}
+					break
 			}
 		}
 		let timeout

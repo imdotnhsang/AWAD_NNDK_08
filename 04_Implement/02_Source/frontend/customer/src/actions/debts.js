@@ -2,6 +2,7 @@ import { Debts } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
 import { getUrlFromCategory, isAuthenticated } from '../utils/utils'
+import { loginTimeout } from './timeout'
 
 export const requestDebtsData = (category) => ({
 	type: Debts.REQUEST_DEBTS_DATA,
@@ -95,9 +96,17 @@ const fecthDebtsData = (category) => async (dispatch, getState) => {
 			dispatch(initializedDebt(category, true))
 		} else {
 			const { status, error } = res
-			if (status !== 204) {
-				dispatch(failedRequestDebtsData(category))
-				showError(error)
+			switch (status) {
+				case 401:
+					loginTimeout()(dispatch)
+					showError(error)
+					break
+				default:
+					if (status !== 204) {
+						dispatch(failedRequestDebtsData(category))
+						showError(error)
+					}
+					break
 			}
 		}
 		let timeout

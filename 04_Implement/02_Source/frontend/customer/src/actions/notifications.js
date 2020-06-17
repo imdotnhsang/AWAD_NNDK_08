@@ -2,6 +2,7 @@ import { Notifications } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
 import { isAuthenticated } from '../utils/utils'
+import { loginTimeout } from './timeout'
 
 export const requestNotificationsData = () => ({
 	type: Notifications.REQUEST_NOTIFICATIONS_DATA,
@@ -51,9 +52,17 @@ const fetchNotificationsData = () => async (dispatch, getState) => {
 			dispatch(initializedNotification(true))
 		} else {
 			const { status, error } = res
-			if (status !== 204) {
-				dispatch(failedRequestNotificationsData())
-				showError(error)
+			switch (status) {
+				case 401:
+					loginTimeout()(dispatch)
+					showError(error)
+					break
+				default:
+					if (status !== 204) {
+						dispatch(failedRequestNotificationsData())
+						showError(error)
+					}
+					break
 			}
 		}
 		let timeout

@@ -1,6 +1,8 @@
 import { Banks } from '../constants/actionTypes'
 import api from '../api/api'
-
+import { loginTimeout } from './timeout'
+import { showError } from '../components/common/presentational/Error'
+import { isAuthenticated } from '../utils/utils'
 export const requestBanksData = () => ({
 	type: Banks.REQUEST_BANKS_DATA,
 })
@@ -19,19 +21,31 @@ const fetchBanksData = () => async (dispatch) => {
 	dispatch(requestBanksData())
 	const res = await api.get('/linked-banks/all-linked-banks')
 	if (res.errors) {
-		const { errors } = res
-		dispatch(failedRequestBanksData(errors))
+		const { errors, status } = res
+		switch (status) {
+			case 401:
+				loginTimeout()(dispatch)
+				showError(errors)
+				break
+			default:
+				if (status !== 204) {
+					dispatch(failedRequestBanksData(errors))
+				}
+				break
+		}
 	} else {
-		const { data } = res
-		dispatch(
-			receiveBanksData([
-				{
-					bank_name: 'Eight Bank',
-					bank_id: 'EIGHT.Bank',
-				},
-				...data,
-			])
-		)
+		if (isAuthenticated() !== null) {
+			const { data } = res
+			dispatch(
+				receiveBanksData([
+					{
+						bank_name: 'Eight Bank',
+						bank_id: 'EIGHT.Bank',
+					},
+					...data,
+				])
+			)
+		}
 	}
 }
 

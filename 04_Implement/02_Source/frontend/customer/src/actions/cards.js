@@ -2,6 +2,7 @@ import { Cards } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
 import { isAuthenticated } from '../utils/utils'
+import { loginTimeout } from './timeout'
 
 export const selectCard = (value) => ({
 	type: Cards.SELECT_CARD,
@@ -47,9 +48,17 @@ const fetchCardsData = (cards) => async (dispatch, getState) => {
 			dispatch(initializedCards(true))
 		} else {
 			const { status, error } = res
-			if (status !== 204) {
-				dispatch(failedRequestCardsData())
-				showError(error)
+			switch (status) {
+				case 401:
+					loginTimeout()(dispatch)
+					showError(error)
+					break
+				default:
+					if (status !== 204) {
+						dispatch(failedRequestCardsData())
+						showError(error)
+					}
+					break
 			}
 		}
 		let timeout

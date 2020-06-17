@@ -1,7 +1,7 @@
 import { Receivers } from '../constants/actionTypes'
 import api from '../api/api'
 import { showError } from '../components/common/presentational/Error'
-
+import { loginTimeout } from './timeout'
 export const requestReceiversData = () => ({
 	type: Receivers.REQUEST_RECEIVERS_DATA,
 })
@@ -23,9 +23,19 @@ const fetchReceiversData = () => async (dispatch) => {
 	dispatch(requestReceiversData())
 	const res = await api.get('/customers/all-receivers')
 	if (res.error) {
-		const { error } = res
-		dispatch(failedRequestReceiversData())
-		showError(error)
+		const { status, error } = res
+		switch (status) {
+			case 401:
+				loginTimeout()(dispatch)
+				showError(error)
+				break
+			default:
+				if (status !== 204) {
+					dispatch(failedRequestReceiversData())
+					showError(error)
+				}
+				break
+		}
 	} else {
 		const { data } = res
 		dispatch(receiveReceiversData(data))
