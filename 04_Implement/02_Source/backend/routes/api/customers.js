@@ -33,7 +33,7 @@ router.get('/all-notifications', auth, async (req, res) => {
 	}
 
 	const { default_account_id: defaultAccountId } = customer
-	const { currentSizeNotification } = req.query
+	const { currentSizeNotification, currentSizeIsNotificationSeen } = req.query
 
 	let loop = 0
 	const fn = () => {
@@ -73,7 +73,17 @@ router.get('/all-notifications', auth, async (req, res) => {
 						...cancelDebtCollectionsFromBorrower,
 						...cancelDebtCollectionsFromLender,
 					].sort((x, y) => y.entry_time - x.entry_time)
-					if (data.length != currentSizeNotification) {
+					const countSeenIsFalse =
+						data.reduce((object, key) => {
+							object[key.is_seen] = object[key.is_seen]
+								? object[key.is_seen] + 1
+								: 1
+							return object
+						}, {}).false || 0
+					if (
+						data.length != currentSizeNotification ||
+						currentSizeIsNotificationSeen != countSeenIsFalse
+					) {
 						const response = {
 							msg: 'All notifications successfully got.',
 							data,

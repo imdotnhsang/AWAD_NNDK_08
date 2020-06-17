@@ -11,6 +11,7 @@ import {
 	getAccountIDFromStorage,
 	getNotificationMessage,
 } from '../../../utils/utils'
+import api from '../../../api/api'
 
 const Wrapper = styled.div`
 	width: 100%;
@@ -81,8 +82,11 @@ const PageHeader = ({
 }) => {
 	const [showNotification, setShowNotification] = useState(false)
 
-	const handleOpenAndCloseNotification = () => {
+	const handleOpenAndCloseNotification = async () => {
 		setShowNotification(!showNotification)
+		const body = { debtCollectionsId: data.map((e) => e._id) }
+		!showNotification &&
+			(await api.put('/notifications/seen-notifications', body))
 	}
 	// const handleCloseNotification = () => {
 	// 	setShowNotification(false)

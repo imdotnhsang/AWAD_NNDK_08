@@ -32,8 +32,17 @@ const fetchNotificationsData = () => async (dispatch, getState) => {
 		const currentSizeNotification = !notificationsData.init
 			? undefined
 			: notificationsData.data.length || 0
+		const currentSizeIsNotificationSeen = !notificationsData.init
+			? undefined
+			: notificationsData.data.reduce((object, key) => {
+					object[key.is_seen] = object[key.is_seen]
+						? object[key.is_seen] + 1
+						: 1
+					return object
+			  }, {}).false || 0
 		const params = {
 			currentSizeNotification,
+			currentSizeIsNotificationSeen,
 		}
 		const res = await api.get('/customers/all-notifications', params)
 		if (res.data) {

@@ -249,7 +249,7 @@ export function getNotificationMessage(
 		case 'PAID':
 			message = `${aliasFullname(borrowerFullname)} / ${fourDigit(
 				borrowerAccountId
-			)} (Borrower) has repaid a debt collection to you`
+			)} (Borrower) repaid a debt collection to you`
 			break
 		case 'CANCELLED':
 			if (
@@ -258,14 +258,14 @@ export function getNotificationMessage(
 			) {
 				message = `${aliasFullname(borrowerFullname)} / ${fourDigit(
 					borrowerAccountId
-				)} (Borrower) has cancelled a debt collection of you`
+				)} (Borrower) cancelled a debt collection of you`
 			} else if (
 				cancelledByAccountId !== currentAccountId &&
 				borrowerAccountId === currentAccountId
 			) {
 				message = `${aliasFullname(lenderFullname)} / ${fourDigit(
 					lenderAccountId
-				)} (Lender) has cancelled a debt collection to you`
+				)} (Lender) cancelled a debt collection to you`
 			}
 			break
 		default:
