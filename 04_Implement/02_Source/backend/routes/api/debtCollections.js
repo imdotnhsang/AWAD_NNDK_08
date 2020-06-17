@@ -123,6 +123,7 @@ router.put(
 			debtCollection.debt_status = 'CANCELLED'
 			debtCollection.debt_reason_cancel = debtReasonCancel || ''
 			debtCollection.is_seen = false
+			debtCollection.notification_time = Date.now()
 			debtCollection.save()
 
 			const response = { msg: 'Debt collection successfully cancelled' }
@@ -317,6 +318,7 @@ router.post(
 
 			debtCollection.debt_status = 'PAID'
 			debtCollection.is_seen = false
+			debtCollection.notification_time = Date.now()
 			debtCollection.save()
 
 			const response = {

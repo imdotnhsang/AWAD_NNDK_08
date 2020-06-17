@@ -72,7 +72,7 @@ router.get('/all-notifications', auth, async (req, res) => {
 						...repaidNotifications,
 						...cancelDebtCollectionsFromBorrower,
 						...cancelDebtCollectionsFromLender,
-					].sort((x, y) => y.entry_time - x.entry_time)
+					].sort((x, y) => y.notification_time - x.notification_time)
 					const countSeenIsFalse =
 						data.reduce((object, key) => {
 							object[key.is_seen] = object[key.is_seen]

@@ -44,6 +44,9 @@ const DebtCollectionSchema = new mongoose.Schema({
 	debt_reason_cancel: {
 		type: String,
 	},
+	notification_time: {
+		type: Number,
+	},
 	is_seen: {
 		type: Boolean,
 	},

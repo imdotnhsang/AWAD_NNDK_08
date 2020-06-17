@@ -85,8 +85,7 @@ const PageHeader = ({
 	const handleOpenAndCloseNotification = async () => {
 		setShowNotification(!showNotification)
 		const body = { debtCollectionsId: data.map((e) => e._id) }
-		!showNotification &&
-			(await api.put('/notifications/seen-notifications', body))
+		await api.put('/notifications/seen-notifications', body)
 	}
 	// const handleCloseNotification = () => {
 	// 	setShowNotification(false)
@@ -199,7 +198,7 @@ const PageHeader = ({
 										e.borrower_fullname,
 										e.lender_fullname
 									)}
-									time={e.entry_time}
+									time={e.notification_time}
 								></NotificationItem>
 							))
 						)}
