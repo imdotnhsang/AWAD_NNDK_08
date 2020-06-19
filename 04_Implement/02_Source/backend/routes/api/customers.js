@@ -21,88 +21,77 @@ const DebtCollection = require('../../models/DebtCollection')
 // @desc      Get all notifications of customer
 // @access    Private (customer)
 router.get('/all-notifications', auth, async (req, res) => {
-	const customer = await Customer.findById(req.user.id)
-	if (!customer) {
-		return res.status(400).json({
-			errors: [
-				{
-					msg: 'Customer not exists.',
-				},
-			],
-		})
-	}
-
-	const { default_account_id: defaultAccountId } = customer
 	const { currentSizeNotification, currentSizeIsNotificationSeen } = req.query
-
 	let loop = 0
-	const fn = () => {
-		Promise.all([
-			DebtCollection.find(
-				//REPAID
-				{ lender_default_account: defaultAccountId, debt_status: 'PAID' },
-				{ _v: 0 }
-			),
-			DebtCollection.find(
-				//CANCELLED DEBT COLLECTION BY BORROWER
-				{
-					lender_default_account: defaultAccountId,
-					debt_status: 'CANCELLED',
-					cancelled_by_id: { $ne: defaultAccountId },
-				},
-				{ _v: 0 }
-			),
-			DebtCollection.find(
-				//CANCELLED DEBT COLLECTION BY LENDER
-				{
-					borrower_default_account: defaultAccountId,
-					debt_status: 'CANCELLED',
-					cancelled_by_id: { $ne: defaultAccountId },
-				},
-				{ _v: 0 }
-			),
-		])
-			.then(
-				([
-					repaidNotifications,
-					cancelDebtCollectionsFromBorrower,
-					cancelDebtCollectionsFromLender,
-				]) => {
-					const data = [
-						...repaidNotifications,
-						...cancelDebtCollectionsFromBorrower,
-						...cancelDebtCollectionsFromLender,
-					].sort((x, y) => y.notification_time - x.notification_time)
-					const countSeenIsFalse =
-						data.reduce((object, key) => {
-							object[key.is_seen] = object[key.is_seen]
-								? object[key.is_seen] + 1
-								: 1
-							return object
-						}, {}).false || 0
-					if (
-						data.length != currentSizeNotification ||
-						currentSizeIsNotificationSeen != countSeenIsFalse
-					) {
-						const response = {
-							msg: 'All notifications successfully got.',
-							data,
-						}
-						return res.status(200).json(response)
-					} else {
-						loop++
-						if (loop < 4) {
-							setTimeout(fn, 2000)
-						} else {
-							return res.status(204).json({ msg: 'No content...' })
-						}
-					}
+	const fn = async () => {
+		try {
+			const customer = await Customer.findById(req.user.id)
+			if (!customer) {
+				return res.status(400).json({
+					errors: [
+						{
+							msg: 'Customer not exists.',
+						},
+					],
+				})
+			}
+
+			const { default_account_id: defaultAccountId } = customer
+
+			const data = (
+				await DebtCollection.find(
+					{
+						$or: [
+							{
+								//REPAID
+								lender_default_account: defaultAccountId,
+								debt_status: 'PAID',
+							},
+							{
+								//CANCELLED DEBT COLLECTION BY BORROWER
+								lender_default_account: defaultAccountId,
+								debt_status: 'CANCELLED',
+								cancelled_by_id: { $ne: defaultAccountId },
+							},
+							{
+								//CANCELLED DEBT COLLECTION BY LENDER
+								borrower_default_account: defaultAccountId,
+								debt_status: 'CANCELLED',
+								cancelled_by_id: { $ne: defaultAccountId },
+							},
+						],
+					},
+					{ _v: 0 }
+				)
+			).sort((x, y) => y.notification_time - x.notification_time)
+			const countSeenIsFalse =
+				data.reduce((object, key) => {
+					object[key.is_seen] = object[key.is_seen]
+						? object[key.is_seen] + 1
+						: 1
+					return object
+				}, {}).false || 0
+			if (
+				data.length != currentSizeNotification ||
+				currentSizeIsNotificationSeen != countSeenIsFalse
+			) {
+				const response = {
+					msg: 'All notifications successfully got.',
+					data,
 				}
-			)
-			.catch((error) => {
-				console.log(error)
-				return res.status(500).json({ msg: 'Server error...' })
-			})
+				return res.status(200).json(response)
+			} else {
+				loop++
+				if (loop < 4) {
+					setTimeout(fn, 2000)
+				} else {
+					return res.status(204).json({ msg: 'No content...' })
+				}
+			}
+		} catch (error) {
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		}
 	}
 	fn()
 })
