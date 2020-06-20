@@ -12,6 +12,7 @@ const Backdrop = styled(resolveTagFromProps(styleModifiers, 'div'))`
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.75);
+	z-index: 3;
 `
 const Wrapper = styled(resolveTagFromProps(styleModifiers, 'div'))`
 	position: fixed;
