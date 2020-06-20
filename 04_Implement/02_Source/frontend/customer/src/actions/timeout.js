@@ -48,5 +48,5 @@ export const loginTimeout = (error) => async (dispatch) => {
 	dispatch(initializedNotification(false))
 
 	dispatch(receiveReceiversData([]))
-	setTimeout(() => (window.location = 'http://localhost:3000/login'), 2000)
+	setTimeout(() => (window.location = 'http://localhost:3000/login'), 1500)
 }
