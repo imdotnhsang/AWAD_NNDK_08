@@ -3,11 +3,10 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
 import Template from '../../common/presentational/Template.Modal'
-// import Select from '../../common/container/Select.Bank'
+import Select from '../../common/container/Select.Term'
 import Input from '../../common/presentational/Input'
 import Button from '../../common/presentational/Button.Loading'
 import api from '../../../api/api'
-// import { addAReceiver } from '../../../actions/receivers'
 import { commaSeparating } from '../../../utils/utils'
 import { MINIMUM_BALANCE } from '../../../constants/constants'
 
@@ -25,17 +24,41 @@ const Text = styled.span`
 	color: #fff;
 	margin-bottom: 24px;
 `
+const TextInfoTitle = styled.p`
+	font-family: OpenSans-Bold;
+	font-size: 15px;
+	color: #fff;
+	margin: 0;
+	margin-bottom: 8px;
+`
+const TextInfo = styled.p`
+	font-family: OpenSans-Regular;
+	font-size: 12px;
+	color: #fff;
+	margin: 0;
+`
+const InterestRateInfo = styled.div`
+	margin-bottom: 24px;
+	background: #111;
+	width: 100%;
+	padding: 12px 16px;
+`
 class AddDepositModal extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			depositAmount: 1000000,
+			depositTerm: 0,
+			depositInterestRate: 0,
+			interestRateInfo: false,
+			depositInterestRateInfo: '',
 			error: '',
 			loading: false,
 		}
 		this.handleAmount = this.handleAmount.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleEnterKey = this.handleEnterKey.bind(this)
+		this.handleTerm = this.handleTerm.bind(this)
 	}
 
 	handleAmount(event) {
@@ -43,7 +66,12 @@ class AddDepositModal extends Component {
 		if (value < 1000000) {
 			this.setState({
 				depositAmount: value,
-				error: 'Value must be bigger than 1,000,000',
+				error: 'Value must be bigger than 1,000,000 VND',
+			})
+		} else if (value > 1000000000000) {
+			this.setState({
+				depositAmount: value,
+				error: 'Value must be smaller than 1,000,000,000,000 VND',
 			})
 		} else {
 			const { balance } = this.props
@@ -62,33 +90,42 @@ class AddDepositModal extends Component {
 	}
 
 	async handleSubmit() {
-		const { depositAmount } = this.state
+		const { depositAmount, depositTerm, depositInterestRate } = this.state
 		const { onClose, onSuccess, onFailure, onScrollTop } = this.props
 		const data = {
 			depositAmount,
+			depositTerm,
+			depositInterestRate,
 		}
-		this.setState({
-			loading: true,
-			error: '',
-		})
-		const res = await api.post('/accounts/add-saving-account', data)
-		if (res.error) {
-			const { error } = res
+		if (depositTerm === 0) {
 			this.setState({
-				loading: false,
+				loading: true,
+				error: 'Please choose a term',
 			})
-			onClose()
-			onFailure(error)
 		} else {
 			this.setState({
+				loading: true,
 				error: '',
-				loading: false,
 			})
-			onClose()
-			onScrollTop()
-			onSuccess('A new deposit successfully added!')
-			// const { data: newData } = res
-			// onAddAReceiver(newData)
+			const res = await api.post('/accounts/add-saving-account', data)
+			if (res.error) {
+				const { error } = res
+				this.setState({
+					loading: false,
+				})
+				onClose()
+				onFailure(error)
+			} else {
+				this.setState({
+					error: '',
+					loading: false,
+				})
+				onClose()
+				onScrollTop()
+				onSuccess('A new deposit successfully added!')
+				// const { data: newData } = res
+				// onAddAReceiver(newData)
+			}
 		}
 	}
 
@@ -98,21 +135,47 @@ class AddDepositModal extends Component {
 		}
 	}
 
+	handleTerm(valueTerm, valueInterestRate, textInterestRate) {
+		this.setState({
+			depositTerm: valueTerm,
+			depositInterestRate: valueInterestRate,
+			depositInterestRateInfo: textInterestRate,
+			error: '',
+			interestRateInfo: true,
+		})
+	}
+
 	render() {
-		const { depositAmount, error, loading } = this.state
+		const {
+			depositAmount,
+			depositTerm,
+			depositInterestRateInfo,
+			error,
+			loading,
+			interestRateInfo,
+		} = this.state
 		const { onClose } = this.props
 		return (
 			<Template name='Add deposit' onClose={onClose}>
 				<>
 					<Text>Enter the information for your new deposit</Text>
-					{/* <InputWrapper>
+					<InputWrapper>
 						<Select
 							error={error}
-							value={bankID}
-							onChange={this.handleBankID}
-							disabled={loading || accountIDLoading}
+							value={depositTerm}
+							onChange={this.handleTerm}
+							disabled={loading}
 						/>
-					</InputWrapper> */}
+					</InputWrapper>
+					{interestRateInfo && (
+						<InterestRateInfo active={interestRateInfo}>
+							<TextInfoTitle>
+								Interest rate: {depositInterestRateInfo}
+							</TextInfoTitle>
+							<TextInfo>Minimum deposit amount: 1,000,000 VND</TextInfo>
+							<TextInfo>Maximum deposit amount: 1,000,000,000,000 VND</TextInfo>
+						</InterestRateInfo>
+					)}
 					<InputWrapper>
 						<Input
 							label='Deposit amount'
