@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {logIn} from "@/api/auth.js"
 Vue.use(Vuex)
+
 
 const state = {
   sidebarShow: 'responsive',
@@ -21,8 +23,20 @@ const mutations = {
   }
 }
 
+const actions = {
+  login({ctx},payload) {
+    return new Promise((resolve,reject) => {
+      logIn(payload.data).then(response => {
+        console.log("Response login: " + response)
+        resolve(response)
+      }).catch(err => reject(err))
+    })
+  }
+}
+
 
 export default new Vuex.Store({
   state,
-  mutations
+  mutations,
+  actions
 })
