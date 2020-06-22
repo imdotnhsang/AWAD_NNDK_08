@@ -270,7 +270,9 @@ router.get(
 					break
 				}
 
-				const data = (await Transaction.find(condition, project)).reverse()
+				const data = (await Transaction.find(condition, project)).sort(
+					(x, y) => y.entry_time - x.entry_time
+				)
 
 				if (data.length != currentSizeHistory) {
 					const response = {
@@ -655,7 +657,9 @@ router.get(
 					break
 				}
 
-				const data = (await DebtCollection.find(condition, project)).reverse()
+				const data = (await DebtCollection.find(condition, project)).sort(
+					(x, y) => y.entry_time - x.entry_time
+				)
 
 				const sizes = data.reduce((object, key) => {
 					object[key.debt_status] = object[key.debt_status]

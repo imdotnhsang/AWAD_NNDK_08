@@ -20,6 +20,18 @@ const AccountSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 	},
+	created_at: {
+		type: Number,
+	},
+	term: {
+		type: Number,
+	},
+	end_time: {
+		type: Number,
+	},
+	interest_rate: {
+		type: Number,
+	},
 })
 
 module.exports = Account = mongoose.model('account', AccountSchema)

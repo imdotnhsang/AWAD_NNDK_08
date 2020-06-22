@@ -172,7 +172,12 @@ class AddDepositModal extends Component {
 							<TextInfoTitle>
 								Interest rate: {depositInterestRateInfo}
 							</TextInfoTitle>
-							<TextInfo>Minimum deposit amount: 1,000,000 VND</TextInfo>
+							<TextInfo style={{ marginBottom: '2px' }}>
+								Deposit type: VND
+							</TextInfo>
+							<TextInfo style={{ marginBottom: '2px' }}>
+								Minimum deposit amount: 1,000,000 VND
+							</TextInfo>
 							<TextInfo>Maximum deposit amount: 1,000,000,000,000 VND</TextInfo>
 						</InterestRateInfo>
 					)}

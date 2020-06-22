@@ -121,6 +121,10 @@ export function getMonthYear(time) {
 	return new Date(time).toLocaleDateString('en-GB').slice(3)
 }
 
+export function getDayMonthYear(time) {
+	return new Date(time).toLocaleDateString('en-GB')
+}
+
 export function fourDigit(cardNumber) {
 	return cardNumber.slice(cardNumber.length - 4)
 }
@@ -272,4 +276,24 @@ export function getNotificationMessage(
 			break
 	}
 	return message
+}
+
+export function getPercentOfProgress(term, now, end) {
+	const result = (1 - (end - now) / term) * 100
+	return (
+		Math.floor(result) + '.' + result.toString().split('.')[1].slice(0, 2) + '%'
+	)
+}
+
+export function getTermText(term) {
+	const result = term / 2419200000
+	return result === 1
+		? `0${result} Month`
+		: result < 9
+		? `0${result} Months`
+		: `${result} Months`
+}
+
+export function getInterestEarned(balance, term, interestRate) {
+	return balance * (term / 29030400000) * interestRate
 }

@@ -58,19 +58,19 @@ const List = styled(resolveTagFromProps(styleModifiers, 'div'))`
 	z-index: 1;
 	box-shadow: -4px 4px 6px #ef230c;
 	max-height: 367px;
-	overflow: auto;
-	::-webkit-scrollbar {
-		width: 5px;
-	}
-	::-webkit-scrollbar-track {
-		background: linear-gradient(rgb(38, 41, 46) 0%, rgb(22, 24, 28) 100%);
-	}
-	::-webkit-scrollbar-thumb {
-		background: rgb(124, 127, 135, 0.08);
-	}
-	::-webkit-scrollbar-thumb:hover {
-		background: rgb(124, 127, 135);
-	}
+	// overflow: auto;
+	// ::-webkit-scrollbar {
+	// 	width: 5px;
+	// }
+	// ::-webkit-scrollbar-track {
+	// 	background: linear-gradient(rgb(38, 41, 46) 0%, rgb(22, 24, 28) 100%);
+	// }
+	// ::-webkit-scrollbar-thumb {
+	// 	background: rgb(124, 127, 135, 0.08);
+	// }
+	// ::-webkit-scrollbar-thumb:hover {
+	// 	background: rgb(124, 127, 135);
+	// }
 `
 const Item = styled(resolveTagFromProps(styleModifiers, 'button'))`
 	padding: 8px 16px;

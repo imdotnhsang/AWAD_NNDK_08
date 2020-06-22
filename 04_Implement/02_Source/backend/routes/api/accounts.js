@@ -19,8 +19,13 @@ router.post(
 		check('depositAmount', 'Please enter a balance with 1000000 or more').isInt(
 			{
 				min: 1000000,
+				max: 1000000000000,
 			}
 		),
+		check('depositTerm', 'Please enter a term with 1 week or more').isInt({
+			min: 604800000,
+		}),
+		check('depositInterestRate', 'Interest rate is required').not().notEmpty(),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -28,7 +33,7 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { depositAmount } = req.body
+		const { depositAmount, depositInterestRate, depositTerm } = req.body
 		const service = Date.now() % 2 === 1 ? 'MASTERCARD' : 'VISA'
 
 		const checkErrorsMongoose = {
@@ -64,6 +69,10 @@ router.post(
 				account_type: 'SAVING',
 				balance: depositAmount,
 				account_service: service,
+				created_at: Date.now(),
+				term: depositTerm,
+				end_time: Date.now() + depositTerm,
+				interest_rate: depositInterestRate,
 			})
 
 			const responseAccount = await account.save()

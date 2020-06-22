@@ -12,21 +12,27 @@ const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 const Transaction = require('../../models/Transaction')
 const CustomerAction = require('../../action/customer')
-const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
-const {GetQuery} = require('../../utils/GetQuery.js')
+const { MakeResponse } = require('../../utils/APIStatus.js')
+const { GetQuery } = require('../../utils/GetQuery.js')
 
 // @route     GET /employees/all-customers
 // @desc      Get all information of employee page
 // @access    Private (employee)
 router.get('/all-customers', [auth, employee], async (req, res) => {
 	try {
+		const offset = GetQuery('offset', req)
+		const limit = GetQuery('limit', req)
+		const reverse = GetQuery('reverse', req)
+		const getTotal = GetQuery('getTotal', req)
 
-		const offset = GetQuery("offset",req)
-		const limit = GetQuery("limit",req)
-		const reverse = GetQuery("reverse",req)
-		const getTotal = GetQuery("getTotal",req)
-
-		const result = await CustomerAction.getCustomer({},null,offset,limit,reverse,getTotal)
+		const result = await CustomerAction.getCustomer(
+			{},
+			null,
+			offset,
+			limit,
+			reverse,
+			getTotal
+		)
 
 		// const allCustomers = await Customer.find(
 		// 	{},
@@ -42,8 +48,7 @@ router.get('/all-customers', [auth, employee], async (req, res) => {
 		// }
 		// return res.status(200).json(response)
 
-		return MakeResponse(req,res,result)
-
+		return MakeResponse(req, res, result)
 	} catch (error) {
 		console.log(error)
 		return res.status(500).json({ message: 'Server error...' })
@@ -112,6 +117,7 @@ router.post(
 				account_type: 'DEFAULT',
 				balance,
 				account_service: service,
+				created_at: Date.now(),
 			})
 
 			const responseAccount = await account.save()

@@ -6,6 +6,7 @@ import {
 	spaceSeparating,
 	getMonthYear,
 	resolveTagFromProps,
+	getDayMonthYear,
 } from '../../../utils/utils'
 
 const styleModifiers = ['loading', 'empty', 'service']
@@ -111,7 +112,7 @@ const NoCard = styled.p`
 	font-size: 15px;
 `
 
-const Card = ({ service, balance, cardNumber, date, loading, empty }) => (
+const Card = ({ service, balance, cardNumber, date, loading, empty, type }) => (
 	<OuterWrapper>
 		<Wrapper service={service} loading={loading} empty={empty}>
 			{loading && (
@@ -211,7 +212,7 @@ const Card = ({ service, balance, cardNumber, date, loading, empty }) => (
 				{spaceSeparating(cardNumber, 4)}
 			</CardNumber>
 			<Date loading={loading} empty={empty}>
-				{getMonthYear(date)}
+				{type === 'SAVING' ? 'By ' + getDayMonthYear(date) : getMonthYear(date)}
 			</Date>
 			{!(loading || empty) &&
 				(service === 'MASTERCARD' ? (
