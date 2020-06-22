@@ -10,6 +10,7 @@ import { selectCard } from '../../actions/cards'
 import AddModal from './container/Modal.AddDeposit'
 import RemoveModal from './container/Modal.RemoveDeposit'
 import CompleteModal from './container/Modal.CompleteDeposit'
+import InfoModal from './container/Modal.InfoDeposit'
 import SuccessModal from '../common/presentational/Modal.Success'
 import FailureModal from '../common/presentational/Modal.Failure'
 
@@ -79,6 +80,7 @@ const CardsPage = ({
 	const [showAddModal, setShowAddModal] = useState(false)
 	const [showRemoveModal, setShowRemoveModal] = useState(false)
 	const [showCompleteModal, setShowCompleteModal] = useState(false)
+	const [showInfoModal, setShowInfoModal] = useState(false)
 	const [showSuccessModal, setShowSuccessModal] = useState(false)
 	const [showFailureModal, setShowFailureModal] = useState(false)
 	const [successMessage, setSuccessMessage] = useState('')
@@ -104,6 +106,13 @@ const CardsPage = ({
 	}
 	const handleCloseCompleteModal = () => {
 		setShowCompleteModal(false)
+	}
+
+	const handleOpenInfoModal = () => {
+		setShowInfoModal(true)
+	}
+	const handleCloseInfoModal = () => {
+		setShowInfoModal(false)
 	}
 
 	const handleOpenSuccessModal = (message) => {
@@ -224,7 +233,7 @@ const CardsPage = ({
 									{Date.now() < savingCard.end_time && (
 										<>
 											<ActionButton
-												// onClick={onInfo}
+												onClick={handleOpenInfoModal}
 												type='button'
 												title={'Deposit information'}
 											>
@@ -322,6 +331,17 @@ const CardsPage = ({
 					onClose={handleCloseCompleteModal}
 					onSuccess={handleOpenSuccessModal}
 					onFailure={handleOpenFailureModal}
+				/>
+			)}
+			{showInfoModal && (
+				<InfoModal
+					id={savingCard._id}
+					balance={savingCard.balance}
+					term={savingCard.term}
+					interestRate={savingCard.interest_rate}
+					endTime={savingCard.end_time}
+					createdAt={savingCard.created_at}
+					onClose={handleCloseInfoModal}
 				/>
 			)}
 			{showSuccessModal && (
