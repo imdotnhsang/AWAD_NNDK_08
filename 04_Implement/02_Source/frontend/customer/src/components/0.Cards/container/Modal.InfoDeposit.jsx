@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import Button from '../../common/presentational/Button.Loading'
+import Button from '../../common/presentational/Button'
 import Template from '../../common/presentational/Template.Modal'
 import {
 	getDayMonthYear,
@@ -23,7 +23,7 @@ const ButtonWrapper = styled.div`
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	margin-top: 54px;
+	margin-top: 32px;
 `
 const OkayWrapper = styled.div`
 	width: 100%;

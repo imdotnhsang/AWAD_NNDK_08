@@ -160,6 +160,7 @@ router.delete(
 			}
 
 			const inxItem = customer.saving_accounts_id.indexOf(depositId)
+			console.log(inxItem)
 
 			if (inxItem === -1) {
 				return res.status(400).json({
@@ -181,6 +182,107 @@ router.delete(
 				{
 					$inc: {
 						balance: depositAccount.balance,
+					},
+				},
+				{ new: true }
+			)
+
+			checkErrorsMongoose.updateDefaultAccount = {
+				account_id: customer.default_account_id,
+				deposit_amount: depositAccount.balance,
+			}
+
+			await Account.findByIdAndDelete(depositId)
+
+			customer.saving_accounts_id.splice(inxItem, 1)
+			await customer.save()
+
+			const response = {
+				msg: 'Deposit successfully deleted.',
+				data: { _id: depositId },
+			}
+			return res.status(200).json(response)
+		} catch (error) {
+			if (checkErrorsMongoose.updateDefaultAccount !== false) {
+				await Account.findOneAndUpdate(
+					{
+						account_id: checkErrorsMongoose.updateAccountDefault.account_id,
+					},
+					{
+						$inc: {
+							balance: -checkErrorsMongoose.updateAccountDefault.deposit_amount,
+						},
+					},
+					{ new: true }
+				)
+			}
+
+			console.log(error)
+			return res.status(500).json({ msg: 'Server error...' })
+		}
+	}
+)
+
+// @route     POST /accounts/complete-saving-account
+// @desc      Complete saving account
+// @access    Public
+router.post(
+	'/complete-saving-account',
+	[auth, check('depositId', 'Deposit id is required').not().notEmpty()],
+	async (req, res) => {
+		const errors = validationResult(req)
+		if (errors) {
+			if (!errors.isEmpty()) {
+				return res.status(400).send(errors)
+			}
+		}
+
+		const { depositId } = req.body
+
+		const checkErrorsMongoose = {
+			updateDefaultAccount: false,
+		}
+
+		try {
+			const customer = await Customer.findById(req.user.id)
+			if (!customer) {
+				return res.status(400).json({
+					errors: [{ msg: 'Customer does not exists.' }],
+				})
+			}
+
+			const inxItem = customer.saving_accounts_id.indexOf(depositId)
+			console.log(inxItem)
+			if (inxItem === -1) {
+				return res.status(400).json({
+					errors: [{ msg: 'Deposit is not yours.' }],
+				})
+			}
+
+			const depositAccount = await Account.findById(depositId)
+			if (!depositAccount) {
+				return res.status(400).json({
+					errors: [{ msg: 'Deposit does not exist.' }],
+				})
+			}
+
+			if (Date.now() < depositAccount.end_time) {
+				return res.status(400).json({
+					errors: [{ msg: 'Deposit is not be completed.' }],
+				})
+			}
+
+			await Account.findOneAndUpdate(
+				{
+					account_id: customer.default_account_id,
+				},
+				{
+					$inc: {
+						balance:
+							depositAccount.balance +
+							depositAccount.balance *
+								(depositAccount.term / 29030400000) *
+								depositAccount.interest_rate,
 					},
 				},
 				{ new: true }

@@ -72,8 +72,8 @@ const CompleteDepositModal = ({
 		setLoading(true)
 		const data = {
 			depositId: id,
-		}
-		const res = await api.delete('/accounts/delete-saving-account', data)
+    }
+		const res = await api.post('/accounts/complete-saving-account', data)
 		if (res.error) {
 			setLoading(false)
 			onClose()
