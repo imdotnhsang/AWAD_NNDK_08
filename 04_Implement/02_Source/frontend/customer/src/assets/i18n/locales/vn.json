@@ -1,0 +1,16 @@
+{
+	"src": {
+		"components": {
+			"common": {},
+			"cards": {},
+			"receivers": {},
+			"transfer": {},
+			"debts": {},
+			"history": {},
+			"account": {},
+			"forgotPassword": {},
+			"resetPassword": {},
+			"signIn": {}
+		}
+	}
+}
