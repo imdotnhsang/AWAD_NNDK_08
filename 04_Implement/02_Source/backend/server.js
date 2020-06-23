@@ -9,7 +9,16 @@ const app = express()
 
 app.use((req, res, next) => {
 	// Website you wish to allow to connect
-	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+	const allowedOrigins = [
+		'http://localhost:3000',
+		'http://localhost:8080',
+		'https://eightbankonline.netlify.app',
+	]
+	const origin = req.headers.origin
+	if (allowedOrigins.indexOf(origin) > -1) {
+		res.setHeader('Access-Control-Allow-Origin', origin)
+	}
+	// res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
 
 	// Request methods you wish to allow
 	res.setHeader(
