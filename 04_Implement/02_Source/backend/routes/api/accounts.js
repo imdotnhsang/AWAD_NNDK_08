@@ -160,7 +160,6 @@ router.delete(
 			}
 
 			const inxItem = customer.saving_accounts_id.indexOf(depositId)
-			console.log(inxItem)
 
 			if (inxItem === -1) {
 				return res.status(400).json({
