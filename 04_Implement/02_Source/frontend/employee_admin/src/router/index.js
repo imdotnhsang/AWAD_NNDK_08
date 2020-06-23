@@ -58,6 +58,7 @@ const Users = () => import('@/views/users/Users')
 const User = () => import('@/views/users/User')
 
 const Accounts = () => import('@/views/employee/Accounts')
+const StaffLogin = () => import("@/views/login/Login")
 
 Vue.use(Router)
 
@@ -72,7 +73,7 @@ function configRoutes () {
   return [
     {
       path: '/',
-      redirect: '/dashboard',
+      redirect: '/login',
       name: 'Home',
       component: TheContainer,
       children: [
@@ -313,6 +314,11 @@ function configRoutes () {
           ]
         }
       ]
+    },
+    {
+      path: '/login',
+      name: 'Pages',
+      component: StaffLogin
     },
     {
       path: '/pages',
