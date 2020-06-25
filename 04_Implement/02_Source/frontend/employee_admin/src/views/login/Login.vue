@@ -2,7 +2,7 @@
   <div class="c-app flex-row align-items-center">
     <CContainer>
       <CRow class="justify-content-center">
-        <CCol md="8">
+        <CCol md="10">
           <CCardGroup>
             <CCard class="p-4">
               <CCardBody>
