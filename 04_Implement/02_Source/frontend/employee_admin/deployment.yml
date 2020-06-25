@@ -15,7 +15,7 @@
         spec:
           containers:
             - name: application
-              image: 20191612557/wnc-employee-admin:v3.4
+              image: 20191612557/wnc-employee-admin:v3.5
               imagePullPolicy: IfNotPresent
               ports:
                 - containerPort: 80
