@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {logIn} from "@/api/auth.js"
+import {logIn,logOut} from "@/api/auth.js"
 Vue.use(Vuex)
 
 
 const state = {
   sidebarShow: 'responsive',
-  sidebarMinimize: false
+  sidebarMinimize: false,
+  isLoadingRedirect: false
 }
 
 const mutations = {
@@ -20,16 +21,56 @@ const mutations = {
   },
   set (state, [variable, value]) {
     state[variable] = value
+  },
+  LOGIN(state,data) {
+    window.localStorage.setItem('wnc.access_token',data['access-token'])
+    window.localStorage.setItem('wnc.refresh_token',data['refresh-token'])
+  },
+  LOADING_REDIRECT(state, {isLoadingRedirect, time}) {
+    if (isLoadingRedirect) {
+        state.isLoadingRedirect = true;
+        if (time > 0) {
+            setTimeout(() => {
+                state.isLoadingRedirect = false;
+            },time)
+        }
+    } else {
+        if (time > 0) {
+            setTimeout(() => {
+                state.isLoadingRedirect = false;
+            },time)
+        } else {
+            state.isLoadingRedirect = false;
+        }
+    }
   }
 }
 
 const actions = {
-  login({ctx},payload) {
+  login(ctx,payload) {
     return new Promise((resolve,reject) => {
       logIn(payload.data).then(response => {
-        console.log("Response login: " + response)
+        if (response && !response.error) {
+          ctx.commit('LOGIN',response.data.data)
+        } else {
+          let data = "{'wnc.access_token':'','wnc.refresh_token':''}"
+          ctx.commit('LOGIN',JSON.parse(data))
+        }
         resolve(response)
       }).catch(err => reject(err))
+    })
+  },
+  logout(ctx) {
+    return new Promise((resolve,reject) => {
+      logOut().then(response => {
+        if (response && !response.error) {
+          let data = "{'wnc.access_token':'','wnc.refresh_token':''}"
+          ctx.commit('LOGIN',JSON.parse(data))
+        } else {
+
+        }
+        resolve(response)
+      })
     })
   }
 }

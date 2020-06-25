@@ -1,6 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+//Page Loading
+
+const PageLoading = () => import("@/views/pages/PageLoading")
+Vue.component('PageLoading', PageLoading)
+
 // Containers
 const TheContainer = () => import('@/containers/TheContainer')
 
@@ -62,7 +67,7 @@ const StaffLogin = () => import("@/views/login/Login")
 
 Vue.use(Router)
 
-export default new Router({
+const router =  new Router({
   mode: 'history', // https://router.vuejs.org/api/#mode
   linkActiveClass: 'active',
   scrollBehavior: () => ({ y: 0 }),
@@ -73,9 +78,9 @@ function configRoutes () {
   return [
     {
       path: '/',
-      redirect: '/login',
       name: 'Home',
       component: TheContainer,
+      meta: { requiresAuth: true, title: 'Home'},
       children: [
         {
           path: 'dashboard',
@@ -85,7 +90,8 @@ function configRoutes () {
         {
           path: '/employee/accounts',
           name: 'Accounts',
-          component: Accounts
+          component: Accounts,
+          meta: {title: 'Manage accounts'}
         },
         {
           path: 'theme',
@@ -317,8 +323,9 @@ function configRoutes () {
     },
     {
       path: '/login',
-      name: 'Pages',
-      component: StaffLogin
+      name: 'Login',
+      component: StaffLogin,
+      meta: {title: 'Login'}
     },
     {
       path: '/pages',
@@ -353,3 +360,33 @@ function configRoutes () {
   ]
 }
 
+import store from '@/store'
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || "EIGHT BANK"
+  store.commit("LOADING_REDIRECT",{
+    isLoadingRedirect: true,
+    time: 0
+  })
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!localStorage['wnc.access_token'] || localStorage['wnc.access_token'] === '') {
+      next({
+        path: '/login'
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // make sure to always call next()!
+  }
+})
+
+router.afterEach((to, from) => {
+    document.title = to.meta.title || "EIGHT BANK"
+    store.commit("LOADING_REDIRECT",{
+      isLoadingRedirect: false,
+      time: 500
+    })
+});
+
+export default router
