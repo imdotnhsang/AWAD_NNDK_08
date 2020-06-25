@@ -23,8 +23,8 @@ const mutations = {
     state[variable] = value
   },
   LOGIN(state,data) {
-    window.localStorage.setItem('wnc.access_token',data['access-token'])
-    window.localStorage.setItem('wnc.refresh_token',data['refresh-token'])
+    window.localStorage.setItem('wnc_access_token',data['wnc_access_token'])
+    window.localStorage.setItem('wnc_refresh_token',data['wnc_refresh_token'])
   },
   LOADING_REDIRECT(state, {isLoadingRedirect, time}) {
     if (isLoadingRedirect) {
@@ -53,8 +53,11 @@ const actions = {
         if (response && !response.error) {
           ctx.commit('LOGIN',response.data.data)
         } else {
-          let data = "{'wnc.access_token':'','wnc.refresh_token':''}"
-          ctx.commit('LOGIN',JSON.parse(data))
+          let data = {
+            wnc_access_token: '',
+            wnc_refresh_token: ''
+          }
+          ctx.commit('LOGIN',data)
         }
         resolve(response)
       }).catch(err => reject(err))
@@ -64,8 +67,11 @@ const actions = {
     return new Promise((resolve,reject) => {
       logOut().then(response => {
         if (response && !response.error) {
-          let data = "{'wnc.access_token':'','wnc.refresh_token':''}"
-          ctx.commit('LOGIN',JSON.parse(data))
+          let data = {
+            wnc_access_token: '',
+            wnc_refresh_token: ''
+          }
+          ctx.commit('LOGIN',data)
         } else {
 
         }

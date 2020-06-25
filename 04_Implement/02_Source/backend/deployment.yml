@@ -4,7 +4,7 @@
   metadata:
     name: wnc
   spec:
-    replicas: 3
+    replicas: 1
     selector:
       matchLabels:
         name: wnc-app
@@ -15,7 +15,7 @@
       spec:
         containers:
           - name: application
-            image: 20191612557/wnc:v2.0
+            image: 20191612557/wnc:v2.1
             imagePullPolicy: IfNotPresent
             ports:
               - containerPort: 5000

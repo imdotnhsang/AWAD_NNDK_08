@@ -68,7 +68,7 @@ const StaffLogin = () => import("@/views/login/Login")
 Vue.use(Router)
 
 const router =  new Router({
-  mode: 'history', // https://router.vuejs.org/api/#mode
+  mode: 'hash', // https://router.vuejs.org/api/#mode
   linkActiveClass: 'active',
   scrollBehavior: () => ({ y: 0 }),
   routes: configRoutes()
@@ -369,7 +369,7 @@ router.beforeEach((to, from, next) => {
     time: 0
   })
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!localStorage['wnc.access_token'] || localStorage['wnc.access_token'] === '') {
+    if (!localStorage['wnc_access_token'] || localStorage['wnc_access_token'] === '') {
       next({
         path: '/login'
       })
@@ -388,5 +388,7 @@ router.afterEach((to, from) => {
       time: 500
     })
 });
+
+
 
 export default router

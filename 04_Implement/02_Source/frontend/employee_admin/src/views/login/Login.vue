@@ -70,7 +70,7 @@ export default {
     }
   },
   mounted() {
-    if (localStorage.getItem('wnc.access_token') && localStorage.getItem('wnc.access_token') != '') {
+    if (localStorage.getItem('wnc_access_token') && localStorage.getItem('wnc_access_token') != '') {
         this.$router.push("/")
     }
   },
@@ -89,7 +89,7 @@ export default {
       })
       await this.$store.dispatch("login",payload)
      
-      if (localStorage.getItem('wnc.access_token') && localStorage.getItem('wnc.access_token') != '') {
+      if (localStorage.getItem('wnc_access_token') && localStorage.getItem('wnc_access_token') != '') {
         this.$router.push("/")
       } else {
         this.$store.commit("LOADING_REDIRECT",{
