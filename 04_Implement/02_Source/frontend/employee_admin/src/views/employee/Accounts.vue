@@ -27,21 +27,21 @@
                             <table class="table table-striped border-table">
                                 <thead>
                                     <tr>
-                                        <td width="5%">
+                                        <th width="5%">
 
-                                        </td>
-                                        <td>
+                                        </th>
+                                        <th>
                                             Account
-                                        </td>
-                                        <td>
+                                        </th>
+                                        <th>
                                             Phone
-                                        </td>
-                                        <td>
+                                        </th>
+                                        <th>
                                             Email
-                                        </td>
-                                        <td>
+                                        </th>
+                                        <th>
                                             Actions
-                                        </td>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>

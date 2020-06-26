@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // create an axios instance
 const service = axios.create({
-    baseURL: "http://35.198.211.163/auth/staffs", // url = base url + request url
+    baseURL: "http://34.87.97.142/auth", // url = base url + request url
     timeout: 5000 // request timeout
 })
 
@@ -19,10 +19,8 @@ service.interceptors.request.use(
 )
 
 service.interceptors.response.use((response) => {
-    console.log(response)
     return response;
 }, (error) => {
-    console.log(error)
     return Promise.resolve({ error });
 });
 

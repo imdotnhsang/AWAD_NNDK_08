@@ -13,6 +13,7 @@ app.use((req, res, next) => {
 		'http://localhost:3000',
 		'http://localhost:8080',
 		'https://eightonlinebanking.netlify.app',
+		'http://35.247.140.240'
 	]
 	const origin = req.headers.origin
 	if (allowedOrigins.indexOf(origin) > -1) {

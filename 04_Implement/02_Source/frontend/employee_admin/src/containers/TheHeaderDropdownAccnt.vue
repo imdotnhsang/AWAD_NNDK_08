@@ -59,8 +59,8 @@
     <CDropdownItem>
       <CIcon name="cil-shield-alt" /> Lock Account
     </CDropdownItem>
-    <CDropdownItem>
-      <CIcon name="cil-lock-locked" /> Logout
+    <CDropdownItem  @click="logOut">
+      <CIcon name="cil-lock-locked"/> Logout
     </CDropdownItem>
   </CDropdown>
 </template>
@@ -71,6 +71,11 @@ export default {
   data () {
     return { 
       itemsCount: 42
+    }
+  },
+  methods: {
+    async logOut() {
+      await this.$store.dispatch('logout')
     }
   }
 }

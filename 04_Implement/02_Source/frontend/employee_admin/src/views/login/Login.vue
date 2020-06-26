@@ -2,7 +2,7 @@
   <div class="c-app flex-row align-items-center">
     <CContainer>
       <CRow class="justify-content-center">
-        <CCol md="8">
+        <CCol md="10">
           <CCardGroup>
             <CCard class="p-4">
               <CCardBody>
@@ -11,7 +11,7 @@
                   <p class="text-muted">Sign In to your account</p>
                   <CInput
                     placeholder="User name"
-                    autocomplete="User name"
+                    autocomplete="username"
                     v-model="username"
                   >
                     <template #prepend-content><CIcon name="cil-user"/></template>
@@ -30,30 +30,28 @@
                     </CCol>
                     <CCol col="6" class="text-right">
                       <CButton color="link" class="px-0">Forgot password?</CButton>
-                      <CButton color="link" class="d-lg-none">Register now!</CButton>
                     </CCol>
                   </CRow>
                 </CForm>
               </CCardBody>
             </CCard>
-            <!-- <CCard
-              color="primary"
+            <CCard
+             
               text-color="white"
               class="text-center py-5 d-md-down-none"
               body-wrapper
+              style="background-color:#111;"
             >
-              <CCardBody>
-                <h2>Sign up</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <CButton
-                  color="light"
-                  variant="outline"
-                  size="lg"
-                >
-                  Register Now!
-                </CButton>
+              <CCardBody >
+                <img src="/img/avatars/eight.gif" class="logo">
+                <CSidebarBrand class="d-md-down-none">
+                  <div style="padding-top:50px;">
+                    <svg style="margin-bottom:15px;" width="250" height="44" viewBox="0 0 250 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="sc-fznJRM ijEQAI"><path d="M21.4637 13.2534V18.0639H5.21323V26.0813H19.8082V30.6318H5.21323V38.7359H21.9865V43.5463H0.0723267V13.2534H21.4637Z" fill="white"></path><path d="M28.5781 13.2534H33.719V43.5463H28.5781V13.2534Z" fill="white"></path><path d="M63.2367 28.8116H68.3776V39.1692C65.5022 42.3184 61.3923 43.893 56.0481 43.893C51.5462 43.893 47.7704 42.4196 44.7207 39.4726C41.7 36.5257 40.1897 32.7986 40.1897 28.2915C40.1897 23.7844 41.7291 20.0285 44.8078 17.0238C47.9156 14.0191 51.6624 12.5167 56.0481 12.5167C60.4339 12.5167 64.079 13.7879 66.9835 16.3304L64.2387 20.2308C63.0479 19.2196 61.8425 18.5262 60.6227 18.1506C59.4318 17.7461 58.0377 17.5439 56.4402 17.5439C53.3615 17.5439 50.7765 18.5406 48.6853 20.5341C46.5941 22.4988 45.5485 25.099 45.5485 28.3349C45.5485 31.5419 46.565 34.1277 48.5982 36.0923C50.6313 38.028 53.0856 38.9959 55.961 38.9959C58.8655 38.9959 61.2907 38.3747 63.2367 37.1324V28.8116Z" fill="white"></path><path d="M75.1233 43.5463V13.2534H80.2642V26.3847H95.382V13.2534H100.523V43.5463H95.382V31.1518H80.2642V43.5463H75.1233Z" fill="white"></path><path d="M120.492 17.9339V43.5463H115.351V17.9339H106.114V13.2534H129.728V17.9339H120.492Z" fill="white"></path><path d="M132.337 42.9396C131.727 42.304 131.422 41.5384 131.422 40.6427C131.422 39.7471 131.727 38.9959 132.337 38.3892C132.976 37.7536 133.746 37.4357 134.646 37.4357C135.547 37.4357 136.316 37.7536 136.955 38.3892C137.594 38.9959 137.914 39.7471 137.914 40.6427C137.914 41.5384 137.594 42.304 136.955 42.9396C136.316 43.5752 135.547 43.893 134.646 43.893C133.746 43.893 132.976 43.5752 132.337 42.9396Z" fill="white"></path><path d="M158.315 43.5463H144.984V13.2534H156.834C158.896 13.2534 160.668 13.499 162.149 13.9902C163.659 14.4813 164.778 15.1459 165.504 15.9837C166.898 17.5439 167.595 19.3062 167.595 21.2709C167.595 23.64 166.84 25.4024 165.33 26.558C164.778 26.9625 164.4 27.2226 164.197 27.3381C163.993 27.4248 163.63 27.5837 163.108 27.8148C164.995 28.2193 166.491 29.0716 167.595 30.3717C168.728 31.643 169.294 33.232 169.294 35.1389C169.294 37.248 168.568 39.1115 167.116 40.7294C165.402 42.6074 162.469 43.5463 158.315 43.5463ZM150.125 25.8213H156.66C160.377 25.8213 162.236 24.5645 162.236 22.051C162.236 20.6064 161.786 19.5663 160.886 18.9307C159.985 18.295 158.591 17.9772 156.703 17.9772H150.125V25.8213ZM150.125 38.8225H158.185C160.072 38.8225 161.51 38.5336 162.498 37.9558C163.514 37.3491 164.023 36.2223 164.023 34.5755C164.023 31.8886 161.859 30.5451 157.531 30.5451H150.125V38.8225Z" fill="white"></path><path d="M193.825 43.5463H189.381V40.4694C187.464 42.7518 184.893 43.893 181.67 43.893C179.259 43.893 177.255 43.2141 175.657 41.8562C174.089 40.4983 173.305 38.6925 173.305 36.439C173.305 34.1565 174.147 32.4519 175.832 31.3252C177.516 30.1984 179.796 29.635 182.672 29.635H188.989V28.7683C188.989 25.7057 187.275 24.1745 183.848 24.1745C181.699 24.1745 179.462 24.9546 177.139 26.5147L174.96 23.4811C177.778 21.2564 180.972 20.1441 184.545 20.1441C187.275 20.1441 189.497 20.8375 191.211 22.2243C192.953 23.5822 193.825 25.7346 193.825 28.6816V43.5463ZM188.945 34.9655V33.0153H183.456C179.941 33.0153 178.184 34.1132 178.184 36.309C178.184 37.4357 178.62 38.3025 179.491 38.9092C180.363 39.4871 181.568 39.776 183.107 39.776C184.676 39.776 186.041 39.3426 187.203 38.4758C188.364 37.6091 188.945 36.439 188.945 34.9655Z" fill="white"></path><path d="M205.497 31.0651V43.5463H200.617V20.4908H205.497V24.6945C206.281 23.2788 207.356 22.1665 208.721 21.3576C210.115 20.5486 211.611 20.1441 213.208 20.1441C215.822 20.1441 217.928 20.9386 219.526 22.5277C221.152 24.1167 221.965 26.4136 221.965 29.4183V43.5463H217.086V30.8918C217.086 26.6447 215.314 24.5212 211.771 24.5212C210.086 24.5212 208.619 25.0846 207.37 26.2113C206.121 27.3092 205.497 28.9272 205.497 31.0651Z" fill="white"></path><path d="M233.662 43.5463H228.783V11.3899H233.662V30.2851L243.073 20.4908H249.346L240.546 29.635L250 43.5463H244.075L237.191 33.4487L233.662 37.0024V43.5463Z" fill="white"></path><path d="M0 4.76712V0H118.502L129.83 4.76712H0Z" fill="#EF230C"></path></svg>
+                    <div style="font-size:16px;"><span >an internet banking service by Team Eight</span></div>
+                  </div>     
+                </CSidebarBrand>
               </CCardBody>
-            </CCard> -->
+            </CCard>
           </CCardGroup>
         </CCol>
       </CRow>
@@ -70,6 +68,11 @@ export default {
       username: ''
     }
   },
+  mounted() {
+    if (localStorage.getItem('wnc_access_token') && localStorage.getItem('wnc_access_token') != '') {
+        this.$router.push("/")
+    }
+  },
   methods: {
     async login(e) {
       e.preventDefault()
@@ -79,11 +82,29 @@ export default {
           password: this.password
         }
       }
-
-      const response = await this.$store.dispatch("login",payload)
-      console.log(response)
-
+      this.$store.commit("LOADING_REDIRECT",{
+        isLoadingRedirect: true,
+        time: 0
+      })
+      await this.$store.dispatch("login",payload)
+     
+      if (localStorage.getItem('wnc_access_token') && localStorage.getItem('wnc_access_token') != '') {
+        this.$router.push("/")
+      } else {
+        this.$store.commit("LOADING_REDIRECT",{
+          isLoadingRedirect: false,
+          time: 500
+        })
+        alert("Đăng nhập thất bại")
+      }
     }
   }
 }
 </script>
+
+<style scoped>
+  .logo {
+    width: 148px;
+    height: auto;
+  }
+</style>
