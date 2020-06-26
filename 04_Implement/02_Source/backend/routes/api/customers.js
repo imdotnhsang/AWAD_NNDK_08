@@ -38,32 +38,30 @@ router.get('/all-notifications', auth, async (req, res) => {
 
 			const { default_account_id: defaultAccountId } = customer
 
-			const data = (
-				await DebtCollection.find(
-					{
-						$or: [
-							{
-								//REPAID
-								lender_default_account: defaultAccountId,
-								debt_status: 'PAID',
-							},
-							{
-								//CANCELLED DEBT COLLECTION BY BORROWER
-								lender_default_account: defaultAccountId,
-								debt_status: 'CANCELLED',
-								cancelled_by_id: { $ne: defaultAccountId },
-							},
-							{
-								//CANCELLED DEBT COLLECTION BY LENDER
-								borrower_default_account: defaultAccountId,
-								debt_status: 'CANCELLED',
-								cancelled_by_id: { $ne: defaultAccountId },
-							},
-						],
-					},
-					{ _v: 0 }
-				)
-			).sort((x, y) => y.notification_time - x.notification_time)
+			const data = await DebtCollection.find(
+				{
+					$or: [
+						{
+							//REPAID
+							lender_default_account: defaultAccountId,
+							debt_status: 'PAID',
+						},
+						{
+							//CANCELLED DEBT COLLECTION BY BORROWER
+							lender_default_account: defaultAccountId,
+							debt_status: 'CANCELLED',
+							cancelled_by_id: { $ne: defaultAccountId },
+						},
+						{
+							//CANCELLED DEBT COLLECTION BY LENDER
+							borrower_default_account: defaultAccountId,
+							debt_status: 'CANCELLED',
+							cancelled_by_id: { $ne: defaultAccountId },
+						},
+					],
+				},
+				{ _v: 0 }
+			).sort({ notification_time: -1 })
 			const countSeenIsFalse =
 				data.reduce((object, key) => {
 					object[key.is_seen] = object[key.is_seen]
@@ -270,9 +268,9 @@ router.get(
 					break
 				}
 
-				const data = (await Transaction.find(condition, project)).sort(
-					(x, y) => y.entry_time - x.entry_time
-				)
+				const data = await Transaction.find(condition, project).sort({
+					entry_time: -1,
+				})
 
 				if (data.length != currentSizeHistory) {
 					const response = {
@@ -657,9 +655,9 @@ router.get(
 					break
 				}
 
-				const data = (await DebtCollection.find(condition, project)).sort(
-					(x, y) => y.entry_time - x.entry_time
-				)
+				const data = await DebtCollection.find(condition, project).sort({
+					entry_time: -1,
+				})
 
 				const sizes = data.reduce((object, key) => {
 					object[key.debt_status] = object[key.debt_status]
