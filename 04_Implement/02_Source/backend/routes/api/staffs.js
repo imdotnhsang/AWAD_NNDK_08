@@ -1,6 +1,7 @@
 const express = require('express')
 
 const router = express.Router()
+const { customAlphabet } = require('nanoid')
 const bcrypt = require('bcrypt')
 const { check, validationResult } = require('express-validator')
 
@@ -18,9 +19,6 @@ router.put(
 		auth,
 		administrator,
 		check('username', 'Username is required').not().notEmpty(),
-		check('newPassword', 'Please include a valid password').isLength({
-			min: 8,
-		}),
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -28,7 +26,13 @@ router.put(
 			return res.status(400).send(errors)
 		}
 
-		const { username, newPassword } = req.body
+		const { username } = req.body
+
+		const nanoidPassword = customAlphabet(
+			'1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM',
+			8
+		)
+		const newPassword = nanoidPassword()
 
 		try {
 			const staff = await Staff.findOne({ username })
@@ -43,7 +47,10 @@ router.put(
 
 			await staff.save()
 
-			const response = { msg: 'Password successfully reset.' }
+			const response = {
+				msg: 'Password successfully reset.',
+				data: { username, password: newPassword },
+			}
 			return res.status(200).json(response)
 		} catch (error) {
 			return res.status(500).json({ msg: 'Server error...' })
