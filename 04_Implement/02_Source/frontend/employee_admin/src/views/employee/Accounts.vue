@@ -13,7 +13,7 @@
                                     style="margin-bottom:10px;"
                                 >
                                  <template #append>
-                                    <CButton color="info"><i class="fas fa-search"></i></CButton>
+                                    <CButton color="info" @click="searchCustomer"><i class="fas fa-search"></i></CButton>
                                 </template>
                                 </CInput>
                             </CCol>
@@ -164,7 +164,8 @@ export default {
                 index: this.index,
                 limit: this.limit,
                 getTotal: true,
-                reverse: true
+                reverse: true,
+                search: this.emailOrCardNumber
             }
             let response = await this.$store.dispatch("getAllCustomer",payload)
             if (response && !response.error) {
@@ -188,6 +189,10 @@ export default {
         },
         async onPaginationClick(pageNum) {
             this.index = pageNum
+            await this.loadData()
+        },
+        async searchCustomer(e) {
+            e.preventDefault()
             await this.loadData()
         }
     }
