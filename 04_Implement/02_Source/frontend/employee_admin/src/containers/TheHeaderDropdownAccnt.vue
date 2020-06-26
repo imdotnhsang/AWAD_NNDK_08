@@ -76,6 +76,9 @@ export default {
   methods: {
     async logOut() {
       await this.$store.dispatch('logout')
+      if (window.localStorage.getItem("wnc_access_token") == '') {
+        this.$router.push('/login')
+      }
     }
   }
 }
