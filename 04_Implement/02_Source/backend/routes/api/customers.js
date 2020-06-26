@@ -221,7 +221,7 @@ router.get(
 
 				const { default_account_id: defaultAccountId } = customer
 				const { type_transaction_history } = req.params
-				const { currentSizeHistory } = req.query
+				const { currentSizeHistory, limit } = req.query
 
 				let condition = {}
 				let project = {}
@@ -267,14 +267,17 @@ router.get(
 				default:
 					break
 				}
+				const countData = await Transaction.countDocuments(condition)
+				const data = await Transaction.find(condition, project)
+					.sort({
+						entry_time: -1,
+					})
+					.limit(Number(limit))
 
-				const data = await Transaction.find(condition, project).sort({
-					entry_time: -1,
-				})
-
-				if (data.length != currentSizeHistory) {
+				if (countData != currentSizeHistory) {
 					const response = {
 						msg: 'All transactions successfully got.',
+						length: countData,
 						data,
 					}
 					return res.status(200).json(response)
