@@ -79,17 +79,9 @@ router.post(
 			return res.status(400).send(errors)
 		}
 
-		const { fullName, email, phoneNumber, balance, service } = req.body
+		const { fullName, email, phoneNumber, balance } = req.body
 
-		if (service !== 'VISA' && service !== 'MASTERCARD') {
-			return res.status(400).json({
-				errors: [
-					{
-						msg: 'Service does not exist.',
-					},
-				],
-			})
-		}
+		const service = Date.now() % 2 === 1 ? 'MASTERCARD' : 'VISA'
 
 		const checkErrorsMongoose = {
 			createAccountDefault: false,

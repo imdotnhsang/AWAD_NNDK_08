@@ -1,0 +1,50 @@
+{
+	"customer01": {
+		"login_info": {
+			"email": "hoangsang160898@gmail.com",
+			"password": "uiHIdFsQ"
+		}
+	},
+	"customer02": {
+		"login_info": {
+			"email": "lhsanghcmus@gmail.com",
+			"password": "vpfm6ydo"
+		}
+	},
+	"customer03": {
+		"login_info": {
+			"email": "medaxim577@uwuefr.com",
+			"password": "8U3aElym"
+		}
+	},
+	"customer04": {
+		"login_info": {
+			"email": "semps0@nydailynews.com",
+			"password": "JIEVyUw3"
+		}
+	},
+	"customer05": {
+		"login_info": {
+			"email": "fsmitham1@hc360.com",
+			"password": "r0mHXBBm"
+		}
+	},
+	"customer06": {
+		"login_info": {
+			"email": "alownds2@simplemachines.org",
+			"password": "5aEhfOt9"
+		}
+	},
+	"customer07": {
+		"login_info": {
+			"email": "awaterfall3@netlog.com",
+			"password": "pM5ttjXo"
+		}
+	},
+	"customer08": {
+		"login_info": {
+			"email": "apainter4@quantcast.com",
+			"password": "ODx8SaIy"
+		}
+	}
+}

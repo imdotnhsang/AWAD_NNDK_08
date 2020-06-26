@@ -1,0 +1,38 @@
+{
+	"admin": {
+		"username": "admin",
+		"password": "12345678"
+	},
+	"employee01": {
+		"username": "employee01",
+		"password": "12345678"
+	},
+	"employee02": {
+		"username": "employee02",
+		"password": "12345678"
+	},
+	"employee03": {
+		"username": "employee03",
+		"password": "12345678"
+	},
+	"employee04": {
+		"username": "employee04",
+		"password": "12345678"
+	},
+	"employee05": {
+		"username": "employee05",
+		"password": "12345678"
+	},
+	"employee06": {
+		"username": "employee06",
+		"password": "12345678"
+	},
+	"employee07": {
+		"username": "employee07",
+		"password": "12345678"
+	},
+	"employee08": {
+		"username": "employee08",
+		"password": "12345678"
+	}
+}
