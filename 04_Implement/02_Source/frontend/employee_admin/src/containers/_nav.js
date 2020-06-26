@@ -16,7 +16,11 @@ export default [
         _name: 'CSidebarNavItem',
         name: 'Accounts',
         to: '/employee/accounts',
-        icon: 'cil-cursor'
+        icon: 'cil-cursor',
+        badge: {
+          color: 'danger',
+          text: 'EMPLOYEE'
+        }
       },
       {
         _name: 'CSidebarNavTitle',

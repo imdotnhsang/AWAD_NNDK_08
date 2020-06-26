@@ -24,30 +24,33 @@ router.get('/all-customers', [auth, employee], async (req, res) => {
 		const limit = GetQuery('limit', req)
 		const reverse = GetQuery('reverse', req)
 		const getTotal = GetQuery('getTotal', req)
+		const search = GetQuery('search',req)
 
-		const result = await CustomerAction.getCustomer(
-			{},
-			null,
-			offset,
-			limit,
-			reverse,
-			getTotal
-		)
-
-		// const allCustomers = await Customer.find(
-		// 	{},
-		// 	{
-		// 		_id: 0,
-		// 		__v: 0,
-		// 	}
-		// )
-
-		// const response = {
-		// 	msg: 'All customers page successfully got.',
-		// 	data: allCustomers,
-		// }
-		// return res.status(200).json(response)
-
+		let result = []
+		if (search && search != '') {
+			result = await CustomerAction.getCustomer(
+				{
+					$or: [
+						{email:search},
+						{default_account_id:search}
+					]
+				},
+				null,
+				offset,
+				limit,
+				reverse,
+				getTotal
+			)
+		} else {
+			result = await CustomerAction.getCustomer(
+				{},
+				null,
+				offset,
+				limit,
+				reverse,
+				getTotal
+			)
+		}
 		return MakeResponse(req, res, result)
 	} catch (error) {
 		console.log(error)
