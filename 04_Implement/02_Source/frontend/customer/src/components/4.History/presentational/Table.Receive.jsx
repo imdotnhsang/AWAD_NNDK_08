@@ -39,6 +39,7 @@ class Table extends Component {
 		super(props)
 		this.state = {
 			desc: null,
+			limit: 10,
 		}
 		this.ref = createRef()
 		this.handleDesc = this.handleDesc.bind(this)
@@ -50,11 +51,12 @@ class Table extends Component {
 			// onInvalidateData,
 			onFetchData,
 		} = this.props
+		const { limit } = this.state
 		if (!loading) {
 			this.ref.current.scrollArea.scrollTop()
 		}
 		// onInvalidateData()
-		onFetchData('receive')
+		onFetchData('receive', limit)
 	}
 
 	componentDidUpdate() {
@@ -72,7 +74,7 @@ class Table extends Component {
 
 	render() {
 		const { desc } = this.state
-		const { data, loading } = this.props
+		const { data, loading, onFetchData } = this.props
 		let sortedData = data
 		if (desc !== null) {
 			sortedData = sortedData.sort((a, b) =>
@@ -101,6 +103,10 @@ class Table extends Component {
 									'linear-gradient(180deg, #26292E 0%, #16181C 100%)',
 								borderRadius: '10px',
 								right: '0px',
+							}}
+							onScroll={(e) => {
+								console.log(e.topPosition)
+								e.topPosition > 400 && onFetchData('receive', 20)
 							}}
 							smoothScrolling
 							ref={this.ref}
@@ -138,7 +144,7 @@ Table.defaultProps = {
 	data: [],
 	loading: false,
 	// onInvalidateDate: (f) => f,
-	onFetchData: (f) => f,
+	// onFetchData: (f) => f,
 }
 Table.propTypes = {
 	data: PropTypes.arrayOf(
@@ -164,6 +170,7 @@ const mapStateToProps = (state) => ({
 })
 const mapDispatchToProps = (dispatch) => ({
 	onInvalidateDate: (category) => dispatch(invalidateHistoryData(category)),
-	onFetchData: (category) => dispatch(fecthHistoryDataIfNeeded(category)),
+	onFetchData: (category, limit) =>
+		dispatch(fecthHistoryDataIfNeeded(category, limit)),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(Table)

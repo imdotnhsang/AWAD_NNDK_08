@@ -9,10 +9,11 @@ export const requestHistoryData = (category) => ({
 	category,
 })
 
-export const receiverHistoryData = (category, data) => ({
+export const receiverHistoryData = (category, data, lengthData) => ({
 	type: History.RECEIVE_HISTORY_DATA,
 	category,
 	data,
+	lengthData,
 	// init,
 })
 
@@ -32,39 +33,47 @@ export const invalidateHistoryData = (category) => ({
 	category,
 })
 
-const fecthHistoryData = (category) => async (dispatch, getState) => {
+export const lazyLoadingHistoryData = (category, limit) => ({
+	type: History.LAZY_LOADING_HISTORY,
+	category,
+	limit,
+})
+
+const fecthHistoryData = (category, limit) => async (dispatch, getState) => {
 	dispatch(requestHistoryData(category))
-	const fetchData = async (category) => {
+	const fetchData = async (category, limit) => {
 		let currentSizeHistory = 0
 		const { history: historyData } = getState()
 		switch (category) {
 			case 'receive':
 				currentSizeHistory = !historyData.receive.init
 					? undefined
-					: historyData.receive.data.length || 0
+					: historyData.receive.lengthData
 				break
 			case 'transfer':
 				currentSizeHistory = !historyData.transfer.init
 					? undefined
-					: historyData.transfer.data.length || 0
+					: historyData.transfer.lengthData
 				break
 			case 'debtRepaying':
 				currentSizeHistory = !historyData.debtRepaying.init
 					? undefined
-					: historyData.debtRepaying.data.length || 0
+					: historyData.debtRepaying.lengthData
 				break
 			default:
 				break
 		}
-		const params = { currentSizeHistory }
+
+		const params = { currentSizeHistory, limit }
 		const res = await api.get(
 			`/customers/transaction-history/${getUrlFromCategory(category)}`,
 			params
 		)
 		if (res.data) {
-			const { data } = res
-			dispatch(receiverHistoryData(category, data))
+			const { data, length: lengthData } = res
+			dispatch(receiverHistoryData(category, data, lengthData))
 			dispatch(initializedHistory(category, true))
+			dispatch(lazyLoadingHistoryData(category, limit))
 		} else {
 			const { status, error } = res
 			switch (status) {
@@ -79,15 +88,32 @@ const fecthHistoryData = (category) => async (dispatch, getState) => {
 					break
 			}
 		}
+
+		let limitHistory = 0
+		const { history: newHistoryData } = getState()
+		switch (category) {
+			case 'receive':
+				limitHistory = newHistoryData.receive.limit
+				break
+			case 'transfer':
+				limitHistory = newHistoryData.transfer.limit
+				break
+			case 'debtRepaying':
+				limitHistory = newHistoryData.debtRepaying.limit
+				break
+			default:
+				break
+		}
+		console.log(limit, limitHistory)
 		let timeout
-		if (isAuthenticated() !== null) {
+		if (isAuthenticated() !== null && limitHistory === limit) {
 			timeout = setTimeout(await fetchData(category), 15000)
 		} else {
 			clearTimeout(timeout)
 		}
 	}
 
-	isAuthenticated() && (await fetchData(category))
+	isAuthenticated() && (await fetchData(category, limit))
 }
 
 const shouldFetchHistoryData = (category, state) => {
@@ -97,9 +123,12 @@ const shouldFetchHistoryData = (category, state) => {
 	return false
 }
 
-export const fecthHistoryDataIfNeeded = (category) => (dispatch, getState) => {
+export const fecthHistoryDataIfNeeded = (category, limit) => (
+	dispatch,
+	getState
+) => {
 	if (shouldFetchHistoryData(category, getState().history)) {
-		return dispatch(fecthHistoryData(category, getState().history))
+		return dispatch(fecthHistoryData(category, limit))
 	}
 	return Promise.resolve()
 }

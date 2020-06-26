@@ -3,21 +3,27 @@ import { History } from '../constants/actionTypes'
 const initialState = {
 	receive: {
 		data: [],
+		lengthData: 0,
 		loading: false,
 		didInvalidate: false,
 		init: false,
+		limit: 10,
 	},
 	transfer: {
 		data: [],
+		lengthData: 0,
 		loading: false,
 		didInvalidate: false,
 		init: false,
+		limit: 10,
 	},
 	debtRepaying: {
 		data: [],
+		lengthData: 0,
 		loading: false,
 		didInvalidate: false,
 		init: false,
+		limit: 10,
 	},
 }
 const tab = (state, action) => {
@@ -32,6 +38,7 @@ const tab = (state, action) => {
 			return {
 				...state,
 				data: action.data,
+				lengthData: action.lengthData,
 				loading: false,
 				didInvalidate: false,
 				init: action.init,
@@ -52,6 +59,11 @@ const tab = (state, action) => {
 				loading: false,
 				didInvalidate: false,
 			}
+		case History.LAZY_LOADING_HISTORY:
+			return {
+				...state,
+				limit: action.limit,
+			}
 		default:
 			return state
 	}
@@ -63,6 +75,7 @@ const history = (state = initialState, action) => {
 		case History.RECEIVE_HISTORY_DATA:
 		case History.INITIALIZED_HISTORY:
 		case History.INVALIDATE_HISTORY_DATA:
+		case History.LAZY_LOADING_HISTORY:
 		case History.FAILED_REQUEST_HISTORY_DATA:
 			return {
 				...state,
