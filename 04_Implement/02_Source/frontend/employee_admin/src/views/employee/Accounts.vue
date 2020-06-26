@@ -89,7 +89,9 @@
                                     :last-button-text="'&#187;'"
                                     :first-button-text="'&#171;'"
                                     :click-handler="onPaginationClick"
+                                    v-model="this.index"
                                     :hide-prev-next="true">
+                                    
                                     </paginate>
                                </div>
                             </div>
@@ -193,6 +195,7 @@ export default {
         },
         async searchCustomer(e) {
             e.preventDefault()
+            this.index = 1
             await this.loadData()
         }
     }
