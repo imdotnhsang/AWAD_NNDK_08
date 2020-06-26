@@ -45,125 +45,6 @@
                                     </tr>
                                 </thead>
                                 <tbody v-if="listCustomer">
-                                    <!-- <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr> -->
-                                    <!-- <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr> -->
                                     <tr v-for="(value,index) in listCustomer" :key="index">
                                         <td width="5%">{{start + index}}</td>
                                         <td>
@@ -204,10 +85,11 @@
                                     :page-link-class="'page-link'"
                                     :prev-link-class="'page-link'"
                                     :next-link-class="'page-link'"
-                                    :first-last-button=true
+                                    :first-last-button="true"
                                     :last-button-text="'&#187;'"
                                     :first-button-text="'&#171;'"
-                                    :hide-prev-next=true>
+                                    :click-handler="onPaginationClick"
+                                    :hide-prev-next="true">
                                     </paginate>
                                </div>
                             </div>
@@ -303,6 +185,10 @@ export default {
                 isLoadingRedirect: false,
                 time: 200
             })
+        },
+        async onPaginationClick(pageNum) {
+            this.index = pageNum
+            await this.loadData()
         }
     }
 }
@@ -322,7 +208,7 @@ export default {
 
     .btn-account-info-container {
         cursor:pointer; 
-        margin-left: 30px;
+        margin-left: 10px;
     }
 
     .btn-account-info {
