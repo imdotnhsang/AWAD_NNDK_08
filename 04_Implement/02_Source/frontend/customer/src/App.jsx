@@ -11,12 +11,12 @@ import History from './components/4.History'
 import Account from './components/5.Account'
 import PrivateRoute from './PrivateRoute'
 
-function App() {
+function App(theme) {
 	return (
 		<Router>
 			<Switch>
 				<PrivateRoute exact path='/' component={Cards} />
-				<PrivateRoute exact path='/cards' component={Cards} />
+				<PrivateRoute exact path='/cards' component={Cards} theme={theme} />
 				<PrivateRoute exact path='/receivers' component={Receivers} />
 				<PrivateRoute exact path='/transfer' component={Transfer} />
 				<PrivateRoute exact path='/debts' component={Debts} />

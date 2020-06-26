@@ -14,44 +14,44 @@ import * as serviceWorker from './serviceWorker'
 import rootReducer from './reducers'
 import 'bootstrap/dist/css/bootstrap-grid.min.css'
 
-const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunkMiddleware)))
+const store = createStore(
+	rootReducer,
+	composeWithDevTools(applyMiddleware(thunkMiddleware))
+)
 
 const StyledToastContainer = styled(ToastContainer)`
-  .Toastify__toast-container {
-    width: max-content;
-  }
-  .Toastify__toast {
-    min-height: 55px;
-    width: max-content;
-    padding: 0;
-  }
-  .Toastify__toast-body {
-    padding: 0;
-    margin: 0;
-  }
-  .Toastify__toast--default {
-    background-color: ${(props) => props.theme.blackMedium};
-  }
-  
-  .Toastify__progress-bar--default {
-    background: #fff;
-  }
-  .Toastify__progress-bar {
-    height: 3px;
-  }
+	.Toastify__toast-container {
+		width: max-content;
+	}
+	.Toastify__toast {
+		min-height: 55px;
+		width: max-content;
+		padding: 0;
+	}
+	.Toastify__toast-body {
+		padding: 0;
+		margin: 0;
+	}
+	.Toastify__toast--default {
+		background-color: ${(props) => props.theme.blackMedium};
+	}
+
+	.Toastify__progress-bar--default {
+		background: #fff;
+	}
+	.Toastify__progress-bar {
+		height: 3px;
+	}
 `
 
 ReactDOM.render(
-  <Provider store={store}>
-    <ThemeProvider theme={theme}>
-      <StyledToastContainer
-        autoClose={5000}
-        closeButton={false}
-      />
-      <App />
-    </ThemeProvider>
-  </Provider>,
-  document.getElementById('root'),
+	<Provider store={store}>
+		<ThemeProvider theme={theme}>
+			<StyledToastContainer autoClose={5000} closeButton={false} />
+			<App theme={theme} />
+		</ThemeProvider>
+	</Provider>,
+	document.getElementById('root')
 )
 
 // If you want your app to work offline and load faster, you can change

@@ -76,6 +76,7 @@ const CardsPage = ({
 	loading,
 	onSelectCard,
 	onFetchData,
+	theme,
 }) => {
 	const [showAddModal, setShowAddModal] = useState(false)
 	const [showRemoveModal, setShowRemoveModal] = useState(false)
