@@ -59,7 +59,7 @@
                                         </td>
                                           <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail(value)"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -108,6 +108,7 @@
 
 <script>
 import {mapState} from "vuex"
+import {getDateFromTimeStamp} from "@/utils/convert"
 export default {
     name: "Accounts",
     data() {
@@ -146,14 +147,14 @@ export default {
             }
             this.$refs.rechargeAccount.showModal(props)
         },
-        showModalAccountDetail() {
+        showModalAccountDetail(value) {
             const props = {
-                name: "Lê Hoàng Sang",
-                cardNumber: "1234 1234 1234 1234",
+                name: value.full_name,
+                cardNumber: value.default_account_id,
                 balance: "500 000 VND",
-                email: "lhsanghcmus@gmail.com",
-                createdAt: "13:05 23/05/2020",
-                phone: "0979279932"
+                email: value.email,
+                createdAt: getDateFromTimeStamp(value.created_at),
+                phone: value.phone_number
             }
             this.$refs.accountDetail.showModal(props)
         },
