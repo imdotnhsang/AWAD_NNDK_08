@@ -27,3 +27,4 @@ export const logo = ['556 134',`
     </g>
   </g>
 `]
+

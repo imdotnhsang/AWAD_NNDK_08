@@ -383,10 +383,12 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to, from) => {
     document.title = to.meta.title || "EIGHT BANK"
-    store.commit("LOADING_REDIRECT",{
-      isLoadingRedirect: false,
-      time: 500
-    })
+    if (to.path != '/employee/accounts') {
+      store.commit("LOADING_REDIRECT",{
+        isLoadingRedirect: false,
+        time: 500
+      })
+    }
 });
 
 

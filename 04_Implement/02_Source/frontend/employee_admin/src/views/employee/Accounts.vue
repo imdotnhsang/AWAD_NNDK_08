@@ -13,7 +13,7 @@
                                     style="margin-bottom:10px;"
                                 >
                                  <template #append>
-                                    <CButton color="info"><i class="fas fa-search"></i></CButton>
+                                    <CButton color="info" @click="searchCustomer"><i class="fas fa-search"></i></CButton>
                                 </template>
                                 </CInput>
                             </CCol>
@@ -44,137 +44,40 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td width="5%">1</td>
+                                <tbody v-if="listCustomer">
+                                    <tr v-for="(value,index) in listCustomer" :key="index">
+                                        <td width="5%">{{start + index}}</td>
                                         <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
+                                            <span>{{value.full_name}}</span><br>
+                                            <span>{{value.default_account_id}}</span>
                                         </td>
                                         <td>
-                                            +84979279932
+                                            {{value.phone_number}}
                                         </td>
                                         <td>
-                                            email@gmail.com
+                                            {{value.email}}
                                         </td>
-                                        <td>
+                                          <td>
                                             <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail(value)"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
+                                </tbody>
+                                <tbody v-else>
                                     <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="5%">1</td>
-                                        <td>
-                                            <span>Justin Doe</span><br>
-                                            <span>9080 9009 2323 2411</span>
-                                        </td>
-                                        <td>
-                                            +84979279932
-                                        </td>
-                                        <td>
-                                            email@gmail.com
-                                        </td>
-                                        <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td>
+                                        <td colspan="5" style="padding:20px;">Not found any customer</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="row" style="margin-bottom:-20px;">
                             <div class="col-lg-6" style="padding-top:8px;">
-                                <span>Show 1 - 20 accounts</span>
+                                <span>Show <b>{{start}}</b> - <b>{{end}}</b> accounts</span>
                             </div>
                             <div class="col-lg-6">
                                <div class="paginate-container">
                                     <paginate
-                                    :page-count="20"
+                                    :page-count="lastIndex"
                                     :prev-text="'&#8249;'"
                                     :next-text="'&#8250;'"
                                     :container-class="'pagination'"
@@ -182,10 +85,13 @@
                                     :page-link-class="'page-link'"
                                     :prev-link-class="'page-link'"
                                     :next-link-class="'page-link'"
-                                    :first-last-button=true
+                                    :first-last-button="true"
                                     :last-button-text="'&#187;'"
                                     :first-button-text="'&#171;'"
-                                    :hide-prev-next=true>
+                                    :click-handler="onPaginationClick"
+                                    v-model="this.index"
+                                    :hide-prev-next="true">
+                                    
                                     </paginate>
                                </div>
                             </div>
@@ -201,17 +107,33 @@
 </template>
 
 <script>
+import {mapState} from "vuex"
+import {getDateFromTimeStamp} from "@/utils/convert"
 export default {
     name: "Accounts",
     data() {
         return {
-            emailOrCardNumber: ""
+            emailOrCardNumber: "",
+            index:1,
+            limit:10,
+            start: 0,
+            end: 0,
+            total: 0,
+            lastIndex: 1
         }
     },
     components: {
         CreateAccount: () => import("@/views/employee/CreateAccount.vue"),
         RechargeAccount: () => import("@/views/employee/RechargeAccount.vue"),
         AccountDetail: () => import("@/views/employee/AccountDetail.vue")
+    },
+    computed: {
+        ...mapState({
+            listCustomer: state => state.listCustomer
+        })
+    },
+    async mounted() {
+        await this.loadData()
     },
     methods: {
         showModalCreateAccount() {
@@ -225,16 +147,57 @@ export default {
             }
             this.$refs.rechargeAccount.showModal(props)
         },
-        showModalAccountDetail() {
+        showModalAccountDetail(value) {
             const props = {
-                name: "Lê Hoàng Sang",
-                cardNumber: "1234 1234 1234 1234",
+                name: value.full_name,
+                cardNumber: value.default_account_id,
                 balance: "500 000 VND",
-                email: "lhsanghcmus@gmail.com",
-                createdAt: "13:05 23/05/2020",
-                phone: "0979279932"
+                email: value.email,
+                createdAt: getDateFromTimeStamp(value.created_at),
+                phone: value.phone_number
             }
             this.$refs.accountDetail.showModal(props)
+        },
+        async loadData() {
+            this.$store.commit("LOADING_REDIRECT",{
+                isLoadingRedirect: true,
+                time: 0
+            })
+            let payload = {
+                index: this.index,
+                limit: this.limit,
+                getTotal: true,
+                reverse: true,
+                search: this.emailOrCardNumber
+            }
+            let response = await this.$store.dispatch("getAllCustomer",payload)
+            if (response && !response.error) {
+                this.total = response.data.total
+                if ((this.total % this.limit) == 0) {
+                    this.lastIndex = this.total / this.limit;
+                } else {
+                    this.lastIndex = parseInt(this.total/this.limit) + 1;
+                }
+                this.end = (this.index * this.limit) > this.total ? this.total : this.index*this.limit;
+                this.start = (this.index-1)*this.limit + 1;
+            } else {
+                this.lastIndex = 1
+                this.total = 0
+                this.start = this.end = 0
+            }
+            this.$store.commit("LOADING_REDIRECT",{
+                isLoadingRedirect: false,
+                time: 200
+            })
+        },
+        async onPaginationClick(pageNum) {
+            this.index = pageNum
+            await this.loadData()
+        },
+        async searchCustomer(e) {
+            e.preventDefault()
+            this.index = 1
+            await this.loadData()
         }
     }
 }
@@ -254,7 +217,7 @@ export default {
 
     .btn-account-info-container {
         cursor:pointer; 
-        margin-left: 30px;
+        margin-left: 10px;
     }
 
     .btn-account-info {

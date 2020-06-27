@@ -13,12 +13,12 @@
                    <CRow>
                        <CCol lg="12" md="12" sm="12">
                             <div>
-                                <label><span>Name:</span><span style="margin-left:72px">{{props.name}}</span></label><br>
-                                <label><span>Email:</span><span style="margin-left:76px;">{{props.email}}</span></label><br>
-                                <label><span>Phone:</span><span style="margin-left:68px;">{{props.phone}}</span></label><br>
-                                <label><span>Card number:</span><span style="margin-left:26px">{{props.cardNumber}}</span></label><br>
-                                <label><span>Balance:</span><span style="margin-left:60px;">{{props.balance}}</span></label><br>
-                                <label><span>Created at:</span><span style="margin-left:42px;">{{props.createdAt}}</span></label>
+                                <label><span style="font-weight:bold;">Name:</span><span style="margin-left:72px">{{props.name}}</span></label><br>
+                                <label><span style="font-weight:bold;">Email:</span><span style="margin-left:76px;">{{props.email}}</span></label><br>
+                                <label><span style="font-weight:bold;">Phone:</span><span style="margin-left:68px;">{{props.phone}}</span></label><br>
+                                <label><span style="font-weight:bold;">Card number:</span><span style="margin-left:26px">{{props.cardNumber}}</span></label><br>
+                                <label><span style="font-weight:bold;">Balance:</span><span style="margin-left:60px;">{{props.balance}}</span></label><br>
+                                <label><span style="font-weight:bold;">Created at:</span><span style="margin-left:42px;">{{props.createdAt}}</span></label>
                             </div>
                        </CCol>
                    </CRow>
