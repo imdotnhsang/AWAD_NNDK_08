@@ -187,11 +187,11 @@ router.post(
 						: -transactionAmount,
 			}
 
-			const transactionTransfererResponse = await new Transaction({
+			const transactionTransfererResponse = {
 				...transactionTransferer,
 				transaction_balance_after: accountTransfererResponse.balance,
 				transaction_status: 'FAILED',
-			}).save()
+			}
 
 			checkErrorsMongoose.transfererTransactionFailed = transactionTransfererResponse
 
@@ -230,7 +230,7 @@ router.post(
 			}).save()
 
 			transactionTransfererResponse.transaction_status = 'SUCCESS'
-			transactionTransfererResponse.save()
+			await new Transaction(transactionTransfererResponse).save()
 
 			transactionReceiverResponse.transaction_status = 'SUCCESS'
 			transactionReceiverResponse.save()
@@ -287,6 +287,9 @@ router.post(
 			}
 
 			if (checkErrorsMongoose.createTransfererTransaction !== false) {
+				await new Transaction(
+					checkErrorsMongoose.transfererTransactionFailed
+				).save()
 				await new Transaction(
 					checkErrorsMongoose.createTransfererTransaction
 				).save()

@@ -116,8 +116,8 @@ class Step2RepayDebt extends Component {
 	}
 
 	render() {
-		// const { loading, error } = this.state
-		const { error } = this.state
+		const { loading, error } = this.state
+		// const { error } = this.state
 
 		const { data, onBack } = this.props
 
@@ -192,8 +192,8 @@ class Step2RepayDebt extends Component {
 						name='Confirm'
 						fluid
 						onClick={this.handleSendOTP}
-						// loading={loading}
-						// disabled={loading}
+						loading={loading}
+						disabled={loading}
 					/>
 				</ButtonWrapper>
 			</>

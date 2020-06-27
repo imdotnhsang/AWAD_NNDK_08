@@ -295,5 +295,5 @@ export function getTermText(term) {
 }
 
 export function getInterestEarned(balance, term, interestRate) {
-	return balance * (term / 29030400000) * interestRate
+	return Math.floor(balance * (term / 29030400000) * interestRate)
 }

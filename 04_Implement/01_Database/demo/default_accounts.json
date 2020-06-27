@@ -1,8 +1,7 @@
 {
 	"account01": {
 		"login_info": {
-			"email": "hoangsang160898@gmail.com",
-			"password": "uiHIdFsQ"
+			"email": "hoangsang160898@gmail.com"
 		},
 		"card_info": {
 			"default_account_id": "36888269842022"
@@ -10,8 +9,7 @@
 	},
 	"account02": {
 		"login_info": {
-			"email": "lhsanghcmus@gmail.com",
-			"password": "vpfm6ydo"
+			"email": "lhsanghcmus@gmail.com"
 		},
 		"card_info": {
 			"default_account_id": "70654882602106"
@@ -19,8 +17,7 @@
 	},
 	"account03": {
 		"login_info": {
-			"email": "medaxim577@uwuefr.com",
-			"password": "8U3aElym"
+			"email": "medaxim577@uwuefr.com"
 		},
 		"card_info": {
 			"default_account_id": "73733293469381"
@@ -28,8 +25,7 @@
 	},
 	"account04": {
 		"login_info": {
-			"email": "semps0@nydailynews.com",
-			"password": "JIEVyUw3"
+			"email": "semps0@nydailynews.com"
 		},
 		"card_info": {
 			"default_account_id": "34640844628419"
@@ -37,8 +33,7 @@
 	},
 	"account05": {
 		"login_info": {
-			"email": "fsmitham1@hc360.com",
-			"password": "r0mHXBBm"
+			"email": "fsmitham1@hc360.com"
 		},
 		"card_info": {
 			"default_account_id": "95848661045485"
@@ -46,8 +41,7 @@
 	},
 	"account06": {
 		"login_info": {
-			"email": "alownds2@simplemachines.org",
-			"password": "5aEhfOt9"
+			"email": "alownds2@simplemachines.org"
 		},
 		"card_info": {
 			"default_account_id": "28811471434450"
@@ -55,8 +49,7 @@
 	},
 	"account07": {
 		"login_info": {
-			"email": "awaterfall3@netlog.com",
-			"password": "pM5ttjXo"
+			"email": "awaterfall3@netlog.com"
 		},
 		"card_info": {
 			"default_account_id": "23785248658150"
@@ -64,8 +57,7 @@
 	},
 	"account08": {
 		"login_info": {
-			"email": "apainter4@quantcast.com",
-			"password": "ODx8SaIy"
+			"email": "apainter4@quantcast.com"
 		},
 		"card_info": {
 			"default_account_id": "39206145681203"

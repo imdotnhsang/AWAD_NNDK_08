@@ -99,7 +99,7 @@ class AddDepositModal extends Component {
 		}
 		if (depositTerm === 0) {
 			this.setState({
-				loading: true,
+				loading: false,
 				error: 'Please choose a term',
 			})
 		} else {
