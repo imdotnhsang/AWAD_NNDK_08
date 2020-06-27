@@ -44,7 +44,7 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="listCustomer">
+                                <tbody v-if="listCustomer && listCustomer.length != 0">
                                     <tr v-for="(value,index) in listCustomer" :key="index">
                                         <td width="5%">{{start + index}}</td>
                                         <td>
@@ -58,14 +58,14 @@
                                             {{value.email}}
                                         </td>
                                           <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount(value)"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
                                             <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail(value)"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td>
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="5" style="padding:20px;">Not found any customer</td>
+                                        <td colspan="5" style="padding:20px;text-align:center;">Not found any customer</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -108,7 +108,7 @@
 
 <script>
 import {mapState} from "vuex"
-import {getDateFromTimeStamp} from "@/utils/convert"
+import {getDateFromTimeStamp,formatMoney} from "@/utils/convert"
 export default {
     name: "Accounts",
     data() {
@@ -129,7 +129,8 @@ export default {
     },
     computed: {
         ...mapState({
-            listCustomer: state => state.employee.listCustomer
+            listCustomer: state => state.employee.listCustomer,
+            customerDetail: state => state.employee.customerDetail
         })
     },
     async mounted() {
@@ -139,24 +140,66 @@ export default {
         showModalCreateAccount() {
             this.$refs.modalCreateAccount.showModal()
         },
-        showModalRechareAccount() {
-            const props = {
-                name: "Lê Hoàng Sang",
-                cardNumber: "1234 1234 1243 1234",
-                balance: "500 000 VND"
+        async showModalRechareAccount(value) {
+            this.$store.commit("LOADING_REDIRECT",{
+                isLoadingRedirect: true,
+                time: 0
+            })
+            const payload = {
+                q: {
+                    email:value.email
+                }
             }
-            this.$refs.rechargeAccount.showModal(props)
+            const response = await this.$store.dispatch("employee/getCustomerWithBalance",payload)
+            if (this.customerDetail != null) {
+                const props = {
+                    name: this.customerDetail.full_name,
+                    cardNumber: this.customerDetail.default_account_id,
+                    balance: formatMoney(this.customerDetail.balance),
+                    email: this.customerDetail.email,
+                    createdAt: getDateFromTimeStamp(this.customerDetail.created_at),
+                    phone: this.customerDetail.phone_number
+                }
+                this.$refs.rechargeAccount.showModal(props)
+               
+            } else {
+                alert("Something went wrong. Please try again.")
+            } 
+            this.$store.commit("LOADING_REDIRECT",{
+                isLoadingRedirect: false,
+                time: 0
+            })
+
         },
-        showModalAccountDetail(value) {
-            const props = {
-                name: value.full_name,
-                cardNumber: value.default_account_id,
-                balance: "500 000 VND",
-                email: value.email,
-                createdAt: getDateFromTimeStamp(value.created_at),
-                phone: value.phone_number
+        async showModalAccountDetail(value) {
+            this.$store.commit("LOADING_REDIRECT",{
+                isLoadingRedirect: true,
+                time: 0
+            })
+            const payload = {
+                q: {
+                    email:value.email
+                }
             }
-            this.$refs.accountDetail.showModal(props)
+            const response = await this.$store.dispatch("employee/getCustomerWithBalance",payload)
+            if (this.customerDetail != null) {
+                const props = {
+                    name: this.customerDetail.full_name,
+                    cardNumber: this.customerDetail.default_account_id,
+                    balance: formatMoney(this.customerDetail.balance),
+                    email: this.customerDetail.email,
+                    createdAt: getDateFromTimeStamp(this.customerDetail.created_at),
+                    phone: this.customerDetail.phone_number
+                }
+                this.$refs.accountDetail.showModal(props)
+            } else {
+                alert("Something went wrong. Please try again.")
+            }
+            this.$store.commit("LOADING_REDIRECT",{
+                isLoadingRedirect: false,
+                time: 0
+            })
+           
         },
         async loadData() {
             this.$store.commit("LOADING_REDIRECT",{
