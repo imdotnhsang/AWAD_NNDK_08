@@ -38,6 +38,7 @@
     "@coreui/vue": "^3.0.12",
     "@coreui/vue-chartjs": "^1.0.5",
     "axios": "^0.19.2",
+    "moment": "^2.27.0",
     "vue": "~2.6.11",
     "vue-router": "~3.3.2",
     "vuejs-paginate": "^2.1.0",

@@ -129,7 +129,7 @@ export default {
     },
     computed: {
         ...mapState({
-            listCustomer: state => state.listCustomer
+            listCustomer: state => state.employee.listCustomer
         })
     },
     async mounted() {
@@ -170,7 +170,7 @@ export default {
                 reverse: true,
                 search: this.emailOrCardNumber
             }
-            let response = await this.$store.dispatch("getAllCustomer",payload)
+            let response = await this.$store.dispatch("employee/getAllCustomer",payload)
             if (response && !response.error) {
                 this.total = response.data.total
                 if ((this.total % this.limit) == 0) {
