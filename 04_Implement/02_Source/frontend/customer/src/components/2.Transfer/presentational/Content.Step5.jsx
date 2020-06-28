@@ -28,8 +28,8 @@ class Step5Content extends Component {
 			error: '',
 		}
 		this.handleOTP = this.handleOTP.bind(this)
-    this.handleFinish = this.handleFinish.bind(this)
-    this.handleEnterKey = this.handleEnterKey.bind(this)
+		this.handleFinish = this.handleFinish.bind(this)
+		this.handleEnterKey = this.handleEnterKey.bind(this)
 	}
 
 	handleOTP(event) {
@@ -45,47 +45,48 @@ class Step5Content extends Component {
 			error: '',
 			loading: true,
 		})
-		onDisabled(true)
+		// onDisabled(true)
 		const { otp } = this.state
 		// eslint-disable-next-line no-restricted-globals
 		if (otp.length !== 6 || isNaN(otp)) {
 			this.setState({
+				loading: false,
 				error: 'Invalid value',
 			})
-			return
+		} else {
+			// const data = {
+			//   email: getEmailFromStorage(),
+			//   otp,
+			// }
+			// const config = {
+			//   headers: {
+			//     'Content-Type': 'application/x-www-form-urlencoded',
+			//   },
+			// }
+			// const res = await api.post('/otp/validate', data, config)
+			// if (res.error) {
+			//   const { error } = res
+			//   this.setState({
+			//     loading: false,
+			//     error,
+			//   })
+			// } else {
+			//   const { valid } = res
+			//   if (valid) {
+			//     this.setState({
+			//       loading: false,
+			//     })
+			const { onTransfer } = this.props
+			onTransfer(otp)
+			//   } else {
+			//     this.setState({
+			//       loading: false,
+			//       error: 'Invalid OTP code',
+			//     })
+			//   }
+			// }
+			// onDisabled(false)
 		}
-		// const data = {
-		//   email: getEmailFromStorage(),
-		//   otp,
-		// }
-		// const config = {
-		//   headers: {
-		//     'Content-Type': 'application/x-www-form-urlencoded',
-		//   },
-		// }
-		// const res = await api.post('/otp/validate', data, config)
-		// if (res.error) {
-		//   const { error } = res
-		//   this.setState({
-		//     loading: false,
-		//     error,
-		//   })
-		// } else {
-		//   const { valid } = res
-		//   if (valid) {
-		//     this.setState({
-		//       loading: false,
-		//     })
-		const { onTransfer } = this.props
-		onTransfer(otp)
-		//   } else {
-		//     this.setState({
-		//       loading: false,
-		//       error: 'Invalid OTP code',
-		//     })
-		//   }
-		// }
-		onDisabled(false)
 	}
 
 	handleEnterKey(e) {
@@ -114,8 +115,8 @@ class Step5Content extends Component {
 					placeholder='Enter the OTP code'
 					value={otp}
 					error={error}
-          onChange={this.handleOTP}
-          onKeyDown={this.handleEnterKey}
+					onChange={this.handleOTP}
+					onKeyDown={this.handleEnterKey}
 				/>
 				<ButtonWrapper>
 					<VerifyButton
