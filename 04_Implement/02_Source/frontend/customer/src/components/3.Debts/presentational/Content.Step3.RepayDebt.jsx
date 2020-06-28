@@ -40,12 +40,12 @@ class Step3RepayContent extends Component {
 	}
 
 	async handleFinish() {
-		const { onDisabled } = this.props
+		// const { onDisabled } = this.props
 		this.setState({
 			error: '',
 			loading: true,
 		})
-		onDisabled(true)
+		// onDisabled(true)
 		const { otp } = this.state
 		// eslint-disable-next-line no-restricted-globals
 		if (otp.length !== 6 || isNaN(otp)) {
@@ -53,41 +53,41 @@ class Step3RepayContent extends Component {
 				loading: false,
 				error: 'Invalid value',
 			})
-			return
+		} else {
+			// const data = {
+			// 	// email: getEmailFromStorage(),
+			// 	debtCollectionId: debtInfo._id,
+			// 	otp,
+			// }
+			// const config = {
+			//   headers: {
+			//     'Content-Type': 'application/x-www-form-urlencoded',
+			//   },
+			// }
+			// const res = await api.post('/debt-collections/repayment', data)
+			// if (res.error) {
+			// 	const { error } = res
+			// 	this.setState({
+			// 		loading: false,
+			// 		error,
+			// 	})
+			// } else {
+			// 	const { data } = res
+			// 	if (data) {
+			// 		this.setState({
+			// 			loading: false,
+			// 		})
+			const { onRepay } = this.props
+			onRepay(otp)
+			// 	} else {
+			// this.setState({
+			// 	loading: false,
+			// 	error: 'Invalid OTP code',
+			// })
+			// 	}
+			// }
+			// onDisabled(false)
 		}
-		// const data = {
-		// 	// email: getEmailFromStorage(),
-		// 	debtCollectionId: debtInfo._id,
-		// 	otp,
-		// }
-		// const config = {
-		//   headers: {
-		//     'Content-Type': 'application/x-www-form-urlencoded',
-		//   },
-		// }
-		// const res = await api.post('/debt-collections/repayment', data)
-		// if (res.error) {
-		// 	const { error } = res
-		// 	this.setState({
-		// 		loading: false,
-		// 		error,
-		// 	})
-		// } else {
-		// 	const { data } = res
-		// 	if (data) {
-		// 		this.setState({
-		// 			loading: false,
-		// 		})
-		const { onRepay } = this.props
-		onRepay(otp)
-		// 	} else {
-				// this.setState({
-				// 	loading: false,
-				// 	error: 'Invalid OTP code',
-				// })
-		// 	}
-		// }
-		onDisabled(false)
 	}
 
 	handleEnterKey(e) {
