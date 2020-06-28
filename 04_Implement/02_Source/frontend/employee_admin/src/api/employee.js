@@ -6,3 +6,18 @@ export function getCustomer(payload) {
         method: 'get'
     })
 }
+
+export function getCustomerWithBalance(payload) {
+    return request({
+        url: `/customer-detail?email=${payload.q.email}`,
+        method: 'get'
+    })
+}
+
+export function rechargeMoney(payload) {
+    return request({
+        url: `/recharge-customer`,
+        data: payload.data,
+        method: 'post'
+    })
+}

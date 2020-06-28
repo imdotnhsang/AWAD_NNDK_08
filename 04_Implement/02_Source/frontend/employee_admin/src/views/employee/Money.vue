@@ -1,10 +1,11 @@
 <template>
     <div class="basic-class" v-bind:style="{marginRight: mr+'px'}" v-bind:class="{'is-chosen':isChosenComputed}" @click="clickEvent">
-        {{value}}
+        {{moneyToShow}}
     </div>
 </template>
 
 <script>
+import {formatMoney} from "@/utils/convert"
 export default {
     name: "Money",
     props: [
@@ -26,6 +27,9 @@ export default {
     computed: {
         isChosenComputed() {
             return this.isChosen
+        },
+        moneyToShow() {
+            return formatMoney(this.value)
         }
      }
 }

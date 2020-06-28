@@ -95,9 +95,27 @@ export default {
                 this.isChosen10000k = true
             }
         },
-        doNextStep() {
+        async doNextStep() {
             if (this.step == 1) {
-                this.step ++
+                // this.step ++
+                 this.$store.commit("LOADING_REDIRECT",{
+                    isLoadingRedirect: true,
+                    time: 0
+                })
+                const payload = {
+                    data: {
+                        rechargeAccountId: this.props.cardNumber,
+                        rechargeAmount: this.balance
+                    }
+                }
+                const response = await this.$store.dispatch("employee/rechargeMoney",payload)
+                if (response && !response.error) {
+                    this.step++
+                }
+                this.$store.commit("LOADING_REDIRECT",{
+                    isLoadingRedirect: false,
+                    time: 0
+                })
             } else {
                 this.hideModal()
             }

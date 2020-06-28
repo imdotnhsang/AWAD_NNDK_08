@@ -12,8 +12,11 @@ const Customer = require('../../models/Customer')
 const Account = require('../../models/Account')
 const Transaction = require('../../models/Transaction')
 const CustomerAction = require('../../action/customer')
-const { MakeResponse } = require('../../utils/APIStatus.js')
+const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 const { GetQuery } = require('../../utils/GetQuery.js')
+const DBModel = require('../../utils/DBModel.js')
+
+const DBModelInstance = new DBModel()
 
 // @route     GET /employees/all-customers
 // @desc      Get all information of employee page
@@ -55,6 +58,53 @@ router.get('/all-customers', [auth, employee], async (req, res) => {
 	} catch (error) {
 		console.log(error)
 		return res.status(500).json({ message: 'Server error...' })
+	}
+})
+
+// @route     GET /employees/customer/detail
+// @desc      Get account detail
+// @access    Private (employee)
+router.get('/customer-detail', [auth,employee], async (req,res) => {
+	try {
+		const email = GetQuery('email',req)
+		if (!email || email == '') {
+			return MakeResponse(req,res,{
+				status:APIStatus.Invalid,
+				message: 'Require email'
+			})
+		}
+
+		let customerResult = await CustomerAction.getCustomer({email,is_active:true},null,0,1,false,false)
+		if (customerResult.status != APIStatus.Ok) {
+			return MakeResponse(req,res,{
+				status: APIStatus.NotFound,
+				message: 'Not found any match customer'
+			})
+		}
+
+		let accountResult = await DBModelInstance.Query(Account, {account_id:customerResult.data[0].default_account_id},null,0,1,false)
+		if (accountResult.status != APIStatus.Ok) {
+			return MakeResponse(req,res,accountResult)
+		}
+
+		return MakeResponse(req,res,{
+			status: APIStatus.Ok,
+			message: 'Get customer detail successfully',
+			data: [
+				{
+					email:  customerResult.data[0].email,
+					full_name: customerResult.data[0].full_name,
+					phone_number: customerResult.data[0].phone_number,
+					default_account_id: customerResult.data[0].default_account_id,
+					balance: accountResult.data[0].balance,
+					created_at: customerResult.data[0].created_at
+				}
+			]
+		})
+
+	} catch (error) {
+		console.log(error)
+		return res.status(500).json({message: 'Server error...'})
 	}
 })
 

@@ -78,7 +78,7 @@ class DBModel {
 	Count(collection, filter) {
 		return new Promise((resolve) => {
 			const { modelName } = collection
-			collection.count(filter, (err, count) => {
+			collection.countDocuments(filter, (err, count) => {
 				if (err) {
 					resolve(new APIResponse({
 						status: APIStatus.Error,
