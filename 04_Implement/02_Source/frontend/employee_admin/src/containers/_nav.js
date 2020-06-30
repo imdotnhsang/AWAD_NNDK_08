@@ -23,6 +23,16 @@ export default [
         }
       },
       {
+        _name: 'CSidebarNavItem',
+        name: 'History',
+        to: '/employee/history',
+        icon: 'cil-calculator',
+        badge: {
+          color: 'danger',
+          text: 'EMPLOYEE'
+        }
+      },
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Theme']
       },

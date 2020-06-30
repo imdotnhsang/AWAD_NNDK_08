@@ -21,3 +21,11 @@ export function rechargeMoney(payload) {
         method: 'post'
     })
 }
+
+export function getTransactionHistory(payload) {
+    return request({
+        url: `/transaction-history/${payload.type}`,
+        data: payload.data,
+        method: 'get'
+    })
+}

@@ -65,6 +65,8 @@ const User = () => import('@/views/users/User')
 const Accounts = () => import('@/views/employee/Accounts')
 const StaffLogin = () => import("@/views/login/Login")
 
+const History = () => import('@/views/employee/History')
+
 Vue.use(Router)
 
 const router =  new Router({
@@ -92,6 +94,12 @@ function configRoutes () {
           name: 'Accounts',
           component: Accounts,
           meta: {title: 'Manage accounts'}
+        },
+        {
+          path: '/employee/history',
+          name: 'History',
+          component: History,
+          meta:{title: 'Manage history'}
         },
         {
           path: 'theme',
@@ -383,7 +391,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to, from) => {
     document.title = to.meta.title || "EIGHT BANK"
-    if (to.path != '/employee/accounts') {
+    if (to.path != '/employee/accounts' || to.path != '/employee/history') {
       store.commit("LOADING_REDIRECT",{
         isLoadingRedirect: false,
         time: 500
