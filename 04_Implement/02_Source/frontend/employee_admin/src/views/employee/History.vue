@@ -111,20 +111,16 @@
                             </div>
                             <CTabs add-tab-classes="mt-1">
                                 <CTab active>
-                                    <template slot="title">
+                                    <div slot="title" @click="clickOnTabReceive">
                                         <CIcon name="cil-calculator"/> Receive
-                                    </template>
-                                    <ReceiveHistory v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
+                                    </div>
+                                    <ReceiveHistory ref="receiveHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
                                 </CTab>
                                 <CTab >
-                                    <template slot="title">
-                                    <CIcon name="cil-basket"/> Homea
-                                    </template>
-                                    2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-                                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                                    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                                    officia deserunt mollit anim id est laborum.
+                                    <div slot="title" @click="clickOnTabTransfer">
+                                        <CIcon name="cil-basket"/> Transfer
+                                    </div>
+                                    <TransferHistory ref="transferHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
                                 </CTab>
                                 <CTab>
                                     <template slot="title">
@@ -150,7 +146,8 @@ import {mapState} from "vuex"
 export default {
     name: "History",
     components: {
-        ReceiveHistory: () => import("@/views/employee/ReceiveHistory.vue")
+        ReceiveHistory: () => import("@/views/employee/ReceiveHistory.vue"),
+        TransferHistory: () => import("@/views/employee/TransferHistory.vue")
     },
     computed: {
         ...mapState({
@@ -223,6 +220,14 @@ export default {
             this.isClickedOnRow = false
             this.$store.commit('employee/SET_LIST_TRANSACTION',[])
             await this.loadData()
+        },
+        async clickOnTabReceive() {
+              this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+            await this.$refs.receiveHistory.loadData()
+        },
+        async clickOnTabTransfer() {
+              this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+            await this.$refs.transferHistory.loadData()
         }
     }
 }

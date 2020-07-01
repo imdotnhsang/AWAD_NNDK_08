@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {logIn,logOut} from "@/api/auth.js"
 import router from "@/router"
+import getters from './getters'
 Vue.use(Vuex)
 
 const modulesFiles = require.context('./modules', true, /\.js$/)
@@ -115,5 +116,6 @@ export default new Vuex.Store({
   state,
   modules,
   mutations,
-  actions
+  actions,
+  getters
 })

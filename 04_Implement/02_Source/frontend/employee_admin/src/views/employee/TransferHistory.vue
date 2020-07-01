@@ -86,14 +86,16 @@
 </template>
 
 <script>
-import {mapState,mapGetters} from "vuex"
+import {mapState} from "vuex"
+import { mapGetters } from 'vuex';
 import {getDateFromTimeStamp,formatMoney} from "@/utils/convert"
 export default {
-    name: "ReceiveHistory",
+    name: "TransferHistory",
     computed: {
-        ...mapState({
-            listTransaction: state => state.employee.listTransaction
-        }),
+        // ...mapState({
+        //     listTransaction: state => state.employee.listTransaction
+        // }),
+        ...mapGetters(['listTransactionToShow'])
         // listTransactionToRender() {
         //     if (!this.listTransaction || this.listTransaction == null || this.listTransaction.length == 0) {
         //         return []
@@ -107,7 +109,6 @@ export default {
         //     }
         //     return result
         // }
-        ...mapGetters(["listTransactionToShow"])
     },
     data:function(){
         return {
@@ -132,7 +133,7 @@ export default {
                 data: {
                     historyAccountId: this.accountId
                 },
-                type: 'receive',
+                type: 'transfer',
                 index: this.index,
                 limit: this.limit,
                 getTotal:true
