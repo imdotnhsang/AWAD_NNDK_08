@@ -65,6 +65,31 @@
                 </tbody>
             </table>
         </div>
+        <div class="row" style="margin-bottom:-20px;">
+            <div class="col-lg-6" style="padding-top:8px;">
+                <span>Show <b>{{start}}</b> - <b>{{end}}</b> transaction</span>
+            </div>
+            <div class="col-lg-6">
+                <div class="paginate-container">
+                    <paginate
+                    :page-count="lastIndex"
+                    :prev-text="'&#8249;'"
+                    :next-text="'&#8250;'"
+                    :container-class="'pagination'"
+                    :page-class="'page-item'"
+                    :page-link-class="'page-link'"
+                    :prev-link-class="'page-link'"
+                    :next-link-class="'page-link'"
+                    :first-last-button="true"
+                    :last-button-text="'&#187;'"
+                    :first-button-text="'&#171;'"
+                    :click-handler="onPaginationClick"
+                    v-model="this.index"
+                    :hide-prev-next="true">
+                    </paginate>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -80,9 +105,12 @@ export default {
     },
     data:function(){
         return {
-        index: 1,
-        limit: 10
-    }
+            index: 1,
+            limit: 10,
+            start:1,
+            end: 10,
+            total: 10
+        }
     } ,
     async mounted() {
         await this.loadData()

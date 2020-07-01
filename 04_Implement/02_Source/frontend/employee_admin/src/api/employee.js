@@ -24,8 +24,7 @@ export function rechargeMoney(payload) {
 
 export function getTransactionHistory(payload) {
     return request({
-        url: `/transaction-history/${payload.type}`,
-        data: payload.data,
+        url: `/transaction-history/${payload.type}?historyAccountId=${payload.data.historyAccountId}`,
         method: 'get'
     })
 }
