@@ -344,7 +344,7 @@ router.get(
 	],
 	async (req, res) => {
 		try {
-			const { historyAccountId } = req.body
+			const { historyAccountId } = req.query
 
 			if (historyAccountId.length !== 14) {
 				return res.status(400).json({
