@@ -95,6 +95,8 @@ const actions = {
               ctx.commit('SET_EXPIRED',true)
               resolve(response)
               return
+            }else {
+              ctx.commit('SET_LIST_TRANSACTION',[])
             }
           }
           resolve(response)

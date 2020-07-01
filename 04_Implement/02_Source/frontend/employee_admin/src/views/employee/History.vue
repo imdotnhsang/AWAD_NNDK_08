@@ -4,8 +4,8 @@
             <CCol col="12" lg="12" xl="10">
                 <CCard>
                     <CCardHeader>
-                        <CRow>
-                            <CCol col="12" lg="9" xl="9">
+                        <CRow v-if="!isClickedOnRow">
+                            <CCol col="12" lg="12" xl="12">
                                 <CInput
                                     label="Email/Card number"
                                     placeholder="Enter email or card number"
@@ -18,6 +18,9 @@
                                 </CInput>
                             </CCol>
                         </CRow>
+                        <div v-else>
+                            <CButton color="danger" @click="backToCustomerFilter">Back to customer filter</CButton>
+                        </div>
                     </CCardHeader>
                     <CCardBody>
                         <div v-if="!isClickedOnRow">
@@ -107,13 +110,13 @@
                                 <span><b>Account:</b> {{currentAccount.full_name}} / {{currentAccount.default_account_id}} / {{currentAccount.email}}</span>
                             </div>
                             <CTabs add-tab-classes="mt-1">
-                                <CTab>
+                                <CTab active>
                                     <template slot="title">
                                         <CIcon name="cil-calculator"/> Receive
                                     </template>
                                     <ReceiveHistory v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
                                 </CTab>
-                                <CTab active>
+                                <CTab >
                                     <template slot="title">
                                     <CIcon name="cil-basket"/> Homea
                                     </template>
@@ -214,6 +217,12 @@ export default {
         async onClickRow(value) {
             this.currentAccount = value
             this.isClickedOnRow = true
+        },
+        async backToCustomerFilter(e) {
+            e.preventDefault()
+            this.isClickedOnRow = false
+            this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+            await this.loadData()
         }
     }
 }
