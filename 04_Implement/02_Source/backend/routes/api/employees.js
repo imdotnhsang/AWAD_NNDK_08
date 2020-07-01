@@ -345,6 +345,10 @@ router.get(
 	async (req, res) => {
 		try {
 			const { historyAccountId } = req.query
+			const offset = GetQuery('offset', req)
+			const limit = GetQuery('limit', req)
+			const reverse = GetQuery('reverse', req)
+			const getTotal = GetQuery('getTotal', req)
 
 			if (historyAccountId.length !== 14) {
 				return res.status(400).json({
@@ -409,12 +413,21 @@ router.get(
 				break
 			}
 
-			const data = await Transaction.find(condition, project)
-			const response = {
-				msg: 'All transactions successfully got.',
-				data,
+			//const data = await Transaction.find(condition, project)
+			let result = await DBModelInstance.Query(Transaction,condition,project,offset,limit,reverse)
+			if (result.status != APIStatus.Ok) {
+				return MakeResponse(req,res,result)
 			}
-			return res.status(200).json(response)
+			if (getTotal) {
+				let count = await DBModelInstance.Count(Transaction,condition)
+				result.total = count.total
+			}
+			// const response = {
+			// 	msg: 'All transactions successfully got.',
+			// 	data,
+			// }
+			// return res.status(200).json(response)
+			return MakeResponse(req,res,result)
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ msg: 'Server error...' })
