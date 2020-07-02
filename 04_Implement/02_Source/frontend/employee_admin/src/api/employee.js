@@ -21,3 +21,10 @@ export function rechargeMoney(payload) {
         method: 'post'
     })
 }
+
+export function getTransactionHistory(payload) {
+    return request({
+        url: `/transaction-history/${payload.type}?historyAccountId=${payload.data.historyAccountId}&offset=${(payload.index-1)*payload.limit}&limit=${payload.limit}&getTotal=${payload.getTotal}`,
+        method: 'get'
+    })
+}

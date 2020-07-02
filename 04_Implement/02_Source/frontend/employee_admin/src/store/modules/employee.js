@@ -1,7 +1,9 @@
 
 import {
   getCustomer,
-  getCustomerWithBalance,rechargeMoney
+  getCustomerWithBalance,
+  rechargeMoney,
+  getTransactionHistory
 } from "@/api/employee.js"
 
 import {checkIsExpired} from "@/utils/check.js"
@@ -9,7 +11,8 @@ import store from "@/store"
 
 const state = {
     listCustomer: [],
-    customerDetail: null
+    customerDetail: null,
+    listTransaction: []
 }
 
 const mutations = {
@@ -21,6 +24,9 @@ const mutations = {
     },
     SET_EXPIRED(state,data) {
       store.commit('SET_EXPIRED',data)
+    },
+    SET_LIST_TRANSACTION(state,data) {
+      state.listTransaction = data
     }
 }
 
@@ -78,8 +84,26 @@ const actions = {
           resolve(response)
         }).catch(err => reject(err))
       })
+    },
+    getTransactionHistory(ctx,payload) {
+      return new Promise((resolve,reject) => {
+        getTransactionHistory(payload).then(response => {
+          if (response && !response.error) {
+            ctx.commit('SET_LIST_TRANSACTION',response.data.data)
+          } else {
+            if (checkIsExpired(response)) {
+              ctx.commit('SET_EXPIRED',true)
+              resolve(response)
+              return
+            }else {
+              ctx.commit('SET_LIST_TRANSACTION',[])
+            }
+          }
+          resolve(response)
+        }).catch(err => reject(err))
+      })
     }
-  }
+}
   
   
 export default ({

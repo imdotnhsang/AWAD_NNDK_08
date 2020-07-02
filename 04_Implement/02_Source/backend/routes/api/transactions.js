@@ -450,6 +450,9 @@ router.get('/receiver-interbank', async (req, res) => {
 				publicKeys: (await openpgp.key.readArmored(bankInfo.partner_public_key))
 					.keys, // for verification
 			})
+
+			console.log(digitalSignature)
+
 			const { valid } = verified.signatures[0]
 			if (!valid) {
 				return MakeResponse(req, res, {
@@ -527,7 +530,7 @@ router.get('/receiver-interbank', async (req, res) => {
 		}
 
 		// Kiểm tra entryTime có bị "sớm" hơn thời điểm hiện tại hay không
-		let currentTime = Math.round(new Date().getTime() / 1000)
+		let currentTime = Math.round(new Date().getTime() / 1)
 		if (entryTimeDecrypted > currentTime) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Invalid,
@@ -536,7 +539,8 @@ router.get('/receiver-interbank', async (req, res) => {
 		}
 
 		// Kiểm tra entryTime có bị quá 5 phút kể từ thời điểm hiện tại hay không
-		if (currentTime - entryTimeDecrypted > 300) {
+		console.log("Current time: " + currentTime)
+		if (currentTime - entryTimeDecrypted > 300000) {
 			return MakeResponse(req, res, {
 				status: APIStatus.Invalid,
 				message: 'Your entrytime is expired. Please try again',
@@ -779,7 +783,7 @@ router.post(
 			}
 
 			// Kiểm tra entryTime có bị "sớm" hơn thời điểm hiện tại hay không
-			let currentTime = Math.round(new Date().getTime() / 1000)
+			let currentTime = Math.round(new Date().getTime() / 1)
 			if (dataDecryptedObject.entryTime > currentTime) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
@@ -788,7 +792,7 @@ router.post(
 			}
 
 			// Kiểm tra entryTime có bị quá 5 phút kể từ thời điểm hiện tại hay không
-			if (currentTime - dataDecryptedObject.entryTime > 300) {
+			if (currentTime - dataDecryptedObject.entryTime > 300000) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
 					message: 'Your entrytime is expired. Please try again.',
