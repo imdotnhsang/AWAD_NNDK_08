@@ -48,7 +48,6 @@ const Wrapper = styled.div`
 `
 
 const InfoModal = ({ show, data, onClose }) => {
-	const {} = data
 	return (
 		<Template show={show} name='Transaction messages' onClose={onClose}>
 			<Wrapper>
