@@ -1,5 +1,5 @@
 {
-	"mongoURI": "mongodb://admin:Sang1608@ds019472.mlab.com:19472/eightonlinebanking",
+	"mongoURI": "mongodb://admin:a123456@ds337718.mlab.com:37718/eight-db-test",
 	"mongoURI_test": "mongodb://admin:a123456@ds337718.mlab.com:37718/eight-db-test",
 	"mongoURI_demo": "mongodb://admin:Sang1608@ds019472.mlab.com:19472/eightonlinebanking",
 	"redisURI": "redis://3Rwfoaj3wxzVVC4vjKOGMstcj7j5ha3s@redis-19614.c10.us-east-1-4.ec2.cloud.redislabs.com:19614",

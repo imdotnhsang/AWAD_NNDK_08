@@ -36,7 +36,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
     >
     <img src="https://i.ibb.co/w0CNFNB/Logo.png" alt="" border="0">
     <div style="height:16px"></div>
-      <p style="margin: 0; padding-top: 16px; font-size: 16px;border-top: 1px solid #7C7F87;">
+      <p style="margin: 0; color: #fff; padding-top: 16px; font-size: 16px;border-top: 1px solid #7C7F87;">
         Hi, ${fullName}
       </p>
       <p
@@ -45,6 +45,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
           padding-top: 16px;
           padding-bottom: 16px;
           font-size: 16px;
+          color: #fff;
         "
       >
       We received a request to confirm your Eight transaction. Enter the
@@ -67,6 +68,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
         margin: 0;
         padding-top: 16px;
         font-size: 16px;
+        color: #fff;
       "
     >
     This code will expire five minutes after this mail was sent.
@@ -97,7 +99,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
       >
       <img src="https://i.ibb.co/w0CNFNB/Logo.png" alt="Logo" border="0">
       <div style="height:16px"></div>
-        <p style="margin: 0; padding-top: 16px; font-size: 16px;border-top: 1px solid #7C7F87;">
+        <p style="margin: 0;color: #fff; padding-top: 16px; font-size: 16px;border-top: 1px solid #7C7F87;">
           Hi, ${fullName}
         </p>
         <p
@@ -106,6 +108,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
             padding-top: 16px;
             padding-bottom: 16px;
             font-size: 16px;
+            color: #fff;
           "
         >
           We received a request to reset your Eight password. Enter the
@@ -128,6 +131,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
           margin: 0;
           padding-top: 16px;
           font-size: 16px;
+          color: #fff;
         "
       >
       This code will expire five minutes after this mail was sent.
