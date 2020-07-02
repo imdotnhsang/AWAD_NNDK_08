@@ -40,7 +40,14 @@ const InfoWrapper = styled.div`
 		// margin-bottom: 10px;
 	}
 `
-
+const ActionButton = styled.button`
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+	opacity: ${(props) => props.disabled && '0.5'};
+`
 const TableItem = ({
 	index,
 	accountID,
@@ -48,7 +55,9 @@ const TableItem = ({
 	amount,
 	bankName,
 	date,
+	message,
 	lastItem,
+	onOpenMessageModal,
 }) => (
 	<Wrapper lastItem={lastItem}>
 		<Row>
@@ -70,8 +79,30 @@ const TableItem = ({
 			<StyledCol md={2}>
 				<Text>{bankName}</Text>
 			</StyledCol>
-			<StyledCol md={3}>
+			<StyledCol md={2}>
 				<Text>{milisecondToDatetime(date)}</Text>
+			</StyledCol>
+			<StyledCol md={1}>
+				<ActionButton
+					onClick={() => {
+						onOpenMessageModal(message)
+					}}
+					type='button'
+					disabled={message ? (message.length !== 0 ? false : true) : true}
+				>
+					<svg
+						width='18'
+						height='18'
+						viewBox='0 0 20 20'
+						fill='none'
+						xmlns='http://www.w3.org/2000/svg'
+					>
+						<path
+							d='M18 0H2C1.46957 0 0.960859 0.210714 0.585786 0.585786C0.210714 0.960859 0 1.46957 0 2V20L4 16H18C18.5304 16 19.0391 15.7893 19.4142 15.4142C19.7893 15.0391 20 14.5304 20 14V2C20 1.46957 19.7893 0.960859 19.4142 0.585786C19.0391 0.210714 18.5304 0 18 0ZM4 7H16V9H4V7ZM12 12H4V10H12V12ZM16 6H4V4H16'
+							fill='#EF230C'
+						/>
+					</svg>
+				</ActionButton>
 			</StyledCol>
 		</Row>
 	</Wrapper>

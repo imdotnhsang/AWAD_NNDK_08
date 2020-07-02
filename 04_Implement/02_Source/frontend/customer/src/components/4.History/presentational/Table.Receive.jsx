@@ -72,7 +72,8 @@ class Table extends Component {
 
 	render() {
 		const { desc } = this.state
-		const { data, loading } = this.props
+		const { data, loading, onOpenMessageModal } = this.props
+		console.log(data)
 		let sortedData = data
 		if (desc !== null) {
 			sortedData = sortedData.sort((a, b) =>
@@ -120,9 +121,11 @@ class Table extends Component {
 											item.transaction_payer,
 											item.from_bank_id
 										)}
+										message={item.transaction_message}
 										bankName={item.from_bank_id}
 										date={item.entry_time}
 										lastItem={index === data.length - 1}
+										onOpenMessageModal={onOpenMessageModal}
 									/>
 								))
 							)}

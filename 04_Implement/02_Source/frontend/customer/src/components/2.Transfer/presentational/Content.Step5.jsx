@@ -40,7 +40,7 @@ class Step5Content extends Component {
 	}
 
 	async handleFinish() {
-		const { onDisabled } = this.props
+		// const { onDisabled } = this.props
 		this.setState({
 			error: '',
 			loading: true,

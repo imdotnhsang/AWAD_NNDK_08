@@ -26,13 +26,14 @@ const TableHeader = ({
       <Col md={3}><Text>Transferer</Text></Col>
       <Col md={3}><Text>Amount</Text></Col>
       <Col md={2}><Text>Bank</Text></Col>
-      <Col md={3}>
+      <Col md={2}>
         <ButtonSort
           name="Date"
           desc={desc}
           onClick={onChange}
         />
       </Col>
+      <Col md={1}><Text>Action</Text></Col>
     </Row>
   </Wrapper>
 )

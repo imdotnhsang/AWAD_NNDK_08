@@ -57,7 +57,7 @@ const InfoDepositModal = ({
 	onClose,
 }) => {
 	return (
-		<Template name='Deposit Information' onClose={onClose}>
+		<Template name='Deposit information' onClose={onClose}>
 			<InfoDeposit>
 				<StyledRow>
 					<StyledCol md={7}>
