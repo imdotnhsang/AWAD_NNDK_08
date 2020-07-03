@@ -43,7 +43,7 @@ const Text = styled.span`
 `
 const Progress = ({ service, term, endTime, loading, empty }) => (
 	<Wrapper loading={loading} empty={empty}>
-		{!(loading || empty) && (
+		{!loading && (
 			<>
 				<BorderComplete>
 					<Complete
