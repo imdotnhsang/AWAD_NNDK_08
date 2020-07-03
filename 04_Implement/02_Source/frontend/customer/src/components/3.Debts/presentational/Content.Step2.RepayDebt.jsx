@@ -8,6 +8,7 @@ import RepayButton from '../../common/presentational/Button.Loading'
 import {
 	spaceSeparating,
 	// getEmailFromStorage,
+	commaSeparating,
 	aliasFullname,
 } from '../../../utils/utils'
 import api from '../../../api/api'
@@ -167,7 +168,7 @@ class Step2RepayDebt extends Component {
 							<Text>Amount:</Text>
 						</StyledCol>
 						<StyledCol md={10}>
-							<Text>{`${spaceSeparating(amount, 3)} VND`}</Text>
+							<Text>{`${commaSeparating(amount, 3)} VND`}</Text>
 						</StyledCol>
 					</StyledRow>
 					<StyledRow>
