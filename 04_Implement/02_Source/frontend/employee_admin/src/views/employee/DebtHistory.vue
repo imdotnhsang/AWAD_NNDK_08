@@ -8,25 +8,25 @@
 
                         </th>
                         <th>
-                            Sender Account
+                            Lender/Borrower
                         </th>
                         <th>
                             Amount
                         </th>
                         <th>
-                            Bank
+                            Type
                         </th>
                         <th>
-                            Type
+                            Status
                         </th>
                         <th>
                             Date
                         </th>
                     </tr>
                 </thead>
-                <tbody v-if="listReceiveTransactionToShow[0]">
-                    <tr v-for="(value,index) in listReceiveTransactionToShow" :key="index">
-                        <td width="5%">{{start + index}}</td>
+                <tbody v-if="listDebtTransactionToShow[0]">
+                    <tr v-for="(value,index) in listDebtTransactionToShow" :key="index">
+                        <td width="5%">{{start + index}}</td> 
                         <td>
                             <span>{{value.from_fullname}}</span><br>
                             <span>{{value.from_account_id}}</span>
@@ -35,14 +35,22 @@
                            {{value.transaction_amount}}
                         </td>
                         <td>
-                            {{value.from_bank_id}}
+                            <div v-if="value.transaction_type == 'REPAYMENT'">
+                                <h5><CBadge color="success">REPAYMENT</CBadge></h5>
+                            </div>
+                            <div v-else>
+                                 <h5><CBadge color="danger">{{value.transaction_type}}</CBadge></h5>
+                            </div>
                         </td>
                         <td>
-                            <div v-if="value.transaction_type == 'RECEIVE'">
-                                <h5><CBadge color="danger">RECEIVE</CBadge></h5>
+                           <div v-if="value.transaction_status == 'SUCCESS'">
+                                <h5><CBadge color="success">SUCCESS</CBadge></h5>
                             </div>
-                            <div v-if="value.transaction_type == 'RECHARGE'">
-                                 <h5><CBadge color="success">RECHARGE</CBadge></h5>
+                            <div v-else-if="value.transaction_status == 'FAILED'">
+                                 <h5><CBadge color="danger">{{value.transaction_status}}</CBadge></h5>
+                            </div>
+                            <div v-else>
+                                <h5><CBadge color="warning" style="color:white;">{{value.transaction_status}}</CBadge></h5>
                             </div>
                         </td>
                         <td>
@@ -86,14 +94,16 @@
 </template>
 
 <script>
-import {mapState,mapGetters} from "vuex"
+import {mapState} from "vuex"
+import { mapGetters } from 'vuex';
 import {getDateFromTimeStamp,formatMoney} from "@/utils/convert"
 export default {
-    name: "ReceiveHistory",
+    name: "DebtHistory",
     computed: {
         // ...mapState({
         //     listTransaction: state => state.employee.listTransaction
         // }),
+        ...mapGetters(['listDebtTransactionToShow'])
         // listTransactionToRender() {
         //     if (!this.listTransaction || this.listTransaction == null || this.listTransaction.length == 0) {
         //         return []
@@ -107,7 +117,6 @@ export default {
         //     }
         //     return result
         // }
-        ...mapGetters(["listReceiveTransactionToShow"])
     },
     data:function(){
         return {
@@ -120,7 +129,7 @@ export default {
         }
     } ,
     async mounted() {
-        await this.loadData()
+        //await this.loadData()
     },
     methods:{
         async loadData() {
@@ -132,7 +141,7 @@ export default {
                 data: {
                     historyAccountId: this.accountId
                 },
-                type: 'receive',
+                type: 'debt-paying',
                 index: this.index,
                 limit: this.limit,
                 getTotal:true

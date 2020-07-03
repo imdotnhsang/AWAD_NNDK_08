@@ -98,7 +98,7 @@
                                         :last-button-text="'&#187;'"
                                         :first-button-text="'&#171;'"
                                         :click-handler="onPaginationClick"
-                                        v-model="this.index"
+                                        v-model="index"
                                         :hide-prev-next="true">        
                                         </paginate>
                                 </div>
@@ -123,14 +123,10 @@
                                     <TransferHistory ref="transferHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
                                 </CTab>
                                 <CTab>
-                                    <template slot="title">
-                                    <CIcon name="cil-chart-pie"/> Home
-                                    </template>
-                                    3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore
-                                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                                    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                                    officia deserunt mollit anim id est laborum.
+                                   <div slot="title" @click="clickOnTabDebt">
+                                        <CIcon name="cil-basket"/> Debt repaying
+                                    </div>
+                                    <DebtHistory ref="debtHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
                                 </CTab>
                             </CTabs>
                         </div>
@@ -147,7 +143,8 @@ export default {
     name: "History",
     components: {
         ReceiveHistory: () => import("@/views/employee/ReceiveHistory.vue"),
-        TransferHistory: () => import("@/views/employee/TransferHistory.vue")
+        TransferHistory: () => import("@/views/employee/TransferHistory.vue"),
+        DebtHistory: () => import("@/views/employee/DebtHistory.vue")
     },
     computed: {
         ...mapState({
@@ -218,16 +215,19 @@ export default {
         async backToCustomerFilter(e) {
             e.preventDefault()
             this.isClickedOnRow = false
-            this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+          //  this.$store.commit('employee/SET_LIST_TRANSACTION',[])
             await this.loadData()
         },
         async clickOnTabReceive() {
-              this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+           //   this.$store.commit('employee/SET_LIST_TRANSACTION',[])
             await this.$refs.receiveHistory.loadData()
         },
         async clickOnTabTransfer() {
-              this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+           //   this.$store.commit('employee/SET_LIST_TRANSACTION',[])
             await this.$refs.transferHistory.loadData()
+        },
+        async clickOnTabDebt() {
+            await this.$refs.debtHistory.loadData()
         }
     }
 }

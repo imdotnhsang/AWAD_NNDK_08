@@ -8,7 +8,7 @@
 
                         </th>
                         <th>
-                            Sender Account
+                            Receiver Account
                         </th>
                         <th>
                             Amount
@@ -17,19 +17,19 @@
                             Bank
                         </th>
                         <th>
-                            Type
+                            Status
                         </th>
                         <th>
                             Date
                         </th>
                     </tr>
                 </thead>
-                <tbody v-if="listTransactionToShow[0]">
-                    <tr v-for="(value,index) in listTransactionToShow" :key="index">
+                <tbody v-if="listTransferTransactionToShow[0]">
+                    <tr v-for="(value,index) in listTransferTransactionToShow" :key="index">
                         <td width="5%">{{start + index}}</td>
                         <td>
-                            <span>{{value.from_fullname}}</span><br>
-                            <span>{{value.from_account_id}}</span>
+                            <span>{{value.to_fullname}}</span><br>
+                            <span>{{value.to_account_id}}</span>
                         </td>
                         <td>
                            {{value.transaction_amount}}
@@ -38,11 +38,14 @@
                             {{value.from_bank_id}}
                         </td>
                         <td>
-                            <div v-if="value.transaction_type == 'RECEIVE'">
-                                <h5><CBadge color="danger">RECEIVE</CBadge></h5>
+                            <div v-if="value.transaction_status == 'SUCCESS'">
+                                <h5><CBadge color="success">SUCCESS</CBadge></h5>
                             </div>
-                            <div v-if="value.transaction_type == 'RECHARGE'">
-                                 <h5><CBadge color="success">RECHARGE</CBadge></h5>
+                            <div v-else-if="value.transaction_status == 'FAILED'">
+                                 <h5><CBadge color="danger">{{value.transaction_status}}</CBadge></h5>
+                            </div>
+                            <div v-else>
+                                <h5><CBadge color="warning" style="color:white;">{{value.transaction_status}}</CBadge></h5>
                             </div>
                         </td>
                         <td>
@@ -76,7 +79,7 @@
                     :last-button-text="'&#187;'"
                     :first-button-text="'&#171;'"
                     :click-handler="onPaginationClick"
-                    v-model="this.index"
+                    v-model="index"
                     :hide-prev-next="true">
                     </paginate>
                 </div>
@@ -95,7 +98,7 @@ export default {
         // ...mapState({
         //     listTransaction: state => state.employee.listTransaction
         // }),
-        ...mapGetters(['listTransactionToShow'])
+        ...mapGetters(['listTransferTransactionToShow'])
         // listTransactionToRender() {
         //     if (!this.listTransaction || this.listTransaction == null || this.listTransaction.length == 0) {
         //         return []
@@ -121,7 +124,7 @@ export default {
         }
     } ,
     async mounted() {
-        await this.loadData()
+        //await this.loadData()
     },
     methods:{
         async loadData() {

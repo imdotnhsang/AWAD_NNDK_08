@@ -12,7 +12,9 @@ import store from "@/store"
 const state = {
     listCustomer: [],
     customerDetail: null,
-    listTransaction: []
+    listReceiveTransaction: [],
+    listTransferTransaction: [],
+    listDebtTransaction: []
 }
 
 const mutations = {
@@ -25,8 +27,14 @@ const mutations = {
     SET_EXPIRED(state,data) {
       store.commit('SET_EXPIRED',data)
     },
-    SET_LIST_TRANSACTION(state,data) {
-      state.listTransaction = data
+    SET_LIST_RECEIVE_TRANSACTION(state,data) {
+      state.listReceiveTransaction = data
+    },
+    SET_LIST_TRANSFER_TRANSACTION(state,data) {
+      state.listTransferTransaction = data
+    },
+    SET_LIST_DEBT_TRANSACTION(state,data) {
+      state.listDebtTransaction = data
     }
 }
 
@@ -87,16 +95,29 @@ const actions = {
     },
     getTransactionHistory(ctx,payload) {
       return new Promise((resolve,reject) => {
+        if (payload.type == 'receive') {
+          ctx.commit('SET_LIST_RECEIVE_TRANSACTION',[])
+        } else if (payload.type == 'transfer') {
+          ctx.commit('SET_LIST_TRANSFER_TRANSACTION',[])
+        } else {
+          ctx.commit('SET_LIST_DEBT_TRANSACTION',[])
+        }
         getTransactionHistory(payload).then(response => {
           if (response && !response.error) {
-            ctx.commit('SET_LIST_TRANSACTION',response.data.data)
+            if (payload.type == 'receive') {
+              ctx.commit('SET_LIST_RECEIVE_TRANSACTION',response.data.data)
+            } else if (payload.type == 'transfer') {
+              ctx.commit('SET_LIST_TRANSFER_TRANSACTION',response.data.data)
+            } else {
+              ctx.commit('SET_LIST_DEBT_TRANSACTION',response.data.data)
+            }
           } else {
             if (checkIsExpired(response)) {
               ctx.commit('SET_EXPIRED',true)
               resolve(response)
               return
             }else {
-              ctx.commit('SET_LIST_TRANSACTION',[])
+             // ctx.commit('SET_LIST_TRANSACTION',[])
             }
           }
           resolve(response)
