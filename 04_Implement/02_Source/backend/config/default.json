@@ -6,5 +6,7 @@
 	"jwtSecret": "eightsjwtsecret",
 	"jwtAccessExpiration": 180,
 	"jwtRefreshExpiration": 600000,
-	"mongoURISuperFast": "mongodb://admin3:admin456@35.197.154.219:27017/eight-db-test?authSource=admin"
+	"mongoURISuperFast": "mongodb://admin3:admin456@35.197.154.219:27017/eight-db-test?authSource=admin",
+	"mongoURISuperFast_test": "mongodb://admin3:admin456@35.197.154.219:27017/eight-db-test?authSource=admin",
+	"mongoURISuperFast_demo": "mongodb://admin3:admin456@35.197.154.219:27017/eightonlinebanking?authSource=admin"
 }
