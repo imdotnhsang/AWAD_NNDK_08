@@ -105,28 +105,28 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-else>
+                        <div :class="{'hidden': !isClickedOnRow}">
                             <div style="margin-bottom:20px;">
-                                <span><b>Account:</b> {{currentAccount.full_name}} / {{currentAccount.default_account_id}} / {{currentAccount.email}}</span>
+                                <span v-if="currentAccount"><b>Account:</b> {{currentAccount.full_name}} / {{currentAccount.default_account_id}} / {{currentAccount.email}}</span>
                             </div>
-                            <CTabs add-tab-classes="mt-1">
-                                <CTab active>
-                                    <div slot="title" @click="clickOnTabReceive">
+                            <CTabs add-tab-classes="mt-1" :active-tab.sync="activeTab" @update:activeTab="clickTab">
+                                <CTab>
+                                    <div slot="title" style="height:100%;" >
                                         <CIcon name="cil-calculator"/> Receive
                                     </div>
-                                    <ReceiveHistory ref="receiveHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
+                                    <ReceiveHistory ref="receiveHistory" :class="{'hidden':!activeReceiveTab}"/>
                                 </CTab>
                                 <CTab >
-                                    <div slot="title" @click="clickOnTabTransfer">
+                                    <div slot="title">
                                         <CIcon name="cil-basket"/> Transfer
                                     </div>
-                                    <TransferHistory ref="transferHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
+                                    <TransferHistory ref="transferHistory" :class="{'hidden':!activeTranferTab}"/>
                                 </CTab>
-                                <CTab>
-                                   <div slot="title" @click="clickOnTabDebt">
+                                <CTab >
+                                   <div slot="title">
                                         <CIcon name="cil-basket"/> Debt repaying
                                     </div>
-                                    <DebtHistory ref="debtHistory" v-if="currentAccount.default_account_id" :accountId="currentAccount.default_account_id"/>
+                                    <DebtHistory ref="debtHistory" :class="{'hidden':!activeDebtTab}" />
                                 </CTab>
                             </CTabs>
                         </div>
@@ -138,13 +138,17 @@
 </template>
 
 <script>
+import ReceiveHistory from "@/views/employee/ReceiveHistory.vue"
+import TransferHistory from "@/views/employee/TransferHistory.vue"
+import DebtHistory from  "@/views/employee/DebtHistory.vue"
 import {mapState} from "vuex"
+import {getPageInUrl, getLimitInUrl,setUrlDefault,getSearchTextInUrl,setUrlWithSearch,setUrlDefaultWithTransactionType,getAccountIdInUrl,getTransactionTypeInUrl} from "@/utils/getInfo"
 export default {
     name: "History",
     components: {
-        ReceiveHistory: () => import("@/views/employee/ReceiveHistory.vue"),
-        TransferHistory: () => import("@/views/employee/TransferHistory.vue"),
-        DebtHistory: () => import("@/views/employee/DebtHistory.vue")
+        ReceiveHistory,
+        TransferHistory,
+        DebtHistory
     },
     computed: {
         ...mapState({
@@ -152,7 +156,46 @@ export default {
         })
     },
     async mounted() {
-        await this.loadData()
+        this.index = getPageInUrl()
+        this.limit = getLimitInUrl()
+        this.emailOrCardNumber  = getSearchTextInUrl()
+
+        let accountId = getAccountIdInUrl()
+        if (accountId != "") {
+            let payload = {
+                index: 1,
+                limit: 1,
+                getTotal: false,
+                reverse: false,
+                search: accountId,
+                noCommitState: true
+            }
+            let response = await this.$store.dispatch("employee/getAllCustomer",payload)
+            if (!response || response.error) {
+                alert("Not found any match accountId")
+                this.index = 1
+                await this.loadData()
+                return
+            }
+            this.currentAccount =  response.data.data[0]
+            this.currentAccount.default_account_id = accountId
+            this.isClickedOnRow = true
+            let transactionType = getTransactionTypeInUrl()
+            if (transactionType == "receive" || transactionType == "transfer" || transactionType == "debt-paying") {
+                if (transactionType == "receive") {
+                    await this.clickOnTabReceive()
+                } else if (transactionType == "transfer") {
+                    await this.clickOnTabTransfer()
+                } else {
+                    await this.clickOnTabDebt()
+                }
+            } else {
+                transactionType = "receive"
+                await this.clickOnTabReceive()
+            }
+        } else {
+            await this.loadData()
+        }
     },
     data: function() {
         return {
@@ -164,16 +207,22 @@ export default {
             isClickedOnRow:false,
             limit:10,
             total:0,
-            currentAccount:null
+            currentAccount:null,
+            activeReceiveTab: false,
+            activeTranferTab:false,
+            activeDebtTab:false,
+            activeTab: 0
         }
     },
     methods: {
         async onPaginationClick(pageNum) {
             this.index = pageNum
+            setUrlDefault(this.index,this.limit)
             await this.loadData()
         },
         async searchCustomer() {
             this.index = 1
+            setUrlWithSearch(this.index,this.limit,this.emailOrCardNumber)
             await this.loadData()
         },
         async loadData() {
@@ -209,8 +258,11 @@ export default {
             })
         },
         async onClickRow(value) {
+            this.activeReceiveTab = true
+            this.activeTranferTab = this.activeDebtTab = false
             this.currentAccount = value
             this.isClickedOnRow = true
+            await this.clickOnTabReceive()
         },
         async backToCustomerFilter(e) {
             e.preventDefault()
@@ -220,14 +272,36 @@ export default {
         },
         async clickOnTabReceive() {
            //   this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+          // setUrlDefaultWithTransactionType()
+           this.activeReceiveTab = true
+           this.activeTranferTab = this.activeDebtTab = false
+           this.activeTab = 0
+           this.$refs.receiveHistory.setAccountId(this.currentAccount.default_account_id)
             await this.$refs.receiveHistory.loadData()
         },
         async clickOnTabTransfer() {
+            this.activeTranferTab = true
+            this.activeReceiveTab = this.activeDebtTab = false
            //   this.$store.commit('employee/SET_LIST_TRANSACTION',[])
+           this.activeTab = 1
+             this.$refs.transferHistory.setAccountId(this.currentAccount.default_account_id)
             await this.$refs.transferHistory.loadData()
         },
         async clickOnTabDebt() {
+            this.activeDebtTab = true
+            this.activeReceiveTab = this.activeTranferTab = false
+            this.activeTab = 2
+            this.$refs.debtHistory.setAccountId(this.currentAccount.default_account_id)
             await this.$refs.debtHistory.loadData()
+        },
+        async clickTab() {
+           if (this.activeTab == 0) {
+               await this.clickOnTabReceive()
+           } else if (this.activeTab == 1) {
+               await this.clickOnTabTransfer()
+           } else {
+               await this.clickOnTabDebt()
+           }
         }
     }
 }
@@ -259,6 +333,10 @@ export default {
 
     .tab-pane {
         margin-top: 0px !important;
+    }
+
+    .hidden {
+        display:none;
     }
 
 </style>

@@ -89,7 +89,7 @@
                                     :last-button-text="'&#187;'"
                                     :first-button-text="'&#171;'"
                                     :click-handler="onPaginationClick"
-                                    v-model="this.index"
+                                    v-model="index"
                                     :hide-prev-next="true">
                                     
                                     </paginate>
@@ -109,6 +109,7 @@
 <script>
 import {mapState} from "vuex"
 import {getDateFromTimeStamp,formatMoney} from "@/utils/convert"
+import {getPageInUrl, getLimitInUrl,setUrlDefault,getSearchTextInUrl,setUrlWithSearch,getAccountIdInUrl,getTransactionTypeInUrl} from "@/utils/getInfo"
 export default {
     name: "Accounts",
     data() {
@@ -134,6 +135,9 @@ export default {
         })
     },
     async mounted() {
+        this.index = getPageInUrl()
+        this.limit = getLimitInUrl()
+        this.emailOrCardNumber = getSearchTextInUrl()
         await this.loadData()
     },
     methods: {
@@ -235,11 +239,13 @@ export default {
         },
         async onPaginationClick(pageNum) {
             this.index = pageNum
+            setUrlDefault(this.index, this.limit)
             await this.loadData()
         },
         async searchCustomer(e) {
             e.preventDefault()
             this.index = 1
+            setUrlWithSearch(this.index,this.limit,this.emailOrCardNumber)
             await this.loadData()
         }
     }

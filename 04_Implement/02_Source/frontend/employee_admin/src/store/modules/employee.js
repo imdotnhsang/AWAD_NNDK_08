@@ -43,7 +43,9 @@ const actions = {
       return new Promise((resolve,reject) => {
         getCustomer(payload).then(response => {
           if (response && !response.error) {
-            ctx.commit('SET_LIST_CUSTOMER',response.data.data)
+            if (!payload.noCommitState) {
+              ctx.commit('SET_LIST_CUSTOMER',response.data.data)
+            }
           } else {
             if (checkIsExpired(response)) {
               ctx.commit('SET_LIST_CUSTOMER',[])
@@ -51,7 +53,9 @@ const actions = {
               resolve(response)
               return
             } else {
-            ctx.commit('SET_LIST_CUSTOMER',[])
+              if (!payload.noCommitState) {
+                ctx.commit('SET_LIST_CUSTOMER',[])
+              }
             }
           }
           resolve(response)
