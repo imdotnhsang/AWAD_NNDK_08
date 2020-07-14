@@ -155,6 +155,7 @@
 </template>
 
 <script>
+import {getDateFromTimeStamp} from "@/utils/convert.js"
 export default {
     name: "CreateAccount",
     components: {
@@ -212,9 +213,26 @@ export default {
         }
     },
     watch: {
-        step: function(val) {
+        step: async function(val) {
             if (val != 4) {
                 this.title = "Add an account"
+
+                if (val == 3) {
+                    let payload = {
+                        data: {
+                            fullName: this.name,
+                            email: this.email,
+                            phoneNumber: this.phone,
+                            balance: this.balance
+                        }
+                    }
+                    let response = await this.$store.dispatch("employee/registerCustomer", payload)
+                    if (response && !response.error) {
+                        this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
+                    } else {
+                        alert("ERROR")
+                    }
+                }
             } else {
                 this.title = "Success!"
             }

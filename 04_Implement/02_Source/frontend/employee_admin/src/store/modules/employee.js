@@ -3,7 +3,8 @@ import {
   getCustomer,
   getCustomerWithBalance,
   rechargeMoney,
-  getTransactionHistory
+  getTransactionHistory,
+  registerCustomer
 } from "@/api/employee.js"
 
 import {checkIsExpired} from "@/utils/check.js"
@@ -124,6 +125,13 @@ const actions = {
              // ctx.commit('SET_LIST_TRANSACTION',[])
             }
           }
+          resolve(response)
+        }).catch(err => reject(err))
+      })
+    },
+    registerCustomer(ctx, payload) {
+      return new Promise((resolve, reject) => {
+        registerCustomer(payload).then(response => {
           resolve(response)
         }).catch(err => reject(err))
       })
