@@ -4,7 +4,7 @@
 	"mongoURI_demo": "mongodb://admin:Sang1608@ds019472.mlab.com:19472/eightonlinebanking",
 	"redisURI": "redis://3Rwfoaj3wxzVVC4vjKOGMstcj7j5ha3s@redis-19614.c10.us-east-1-4.ec2.cloud.redislabs.com:19614",
 	"jwtSecret": "eightsjwtsecret",
-	"jwtAccessExpiration": 180,
+	"jwtAccessExpiration": 1800,
 	"jwtRefreshExpiration": 600000,
 	"mongoURISuperFast": "mongodb://admin3:admin456@35.197.154.219:27017/eight-db-test?authSource=admin",
 	"mongoURISuperFast_test": "mongodb://admin3:admin456@35.197.154.219:27017/eight-db-test?authSource=admin",

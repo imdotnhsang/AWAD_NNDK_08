@@ -219,6 +219,8 @@ router.post(
 				data: {
 					'access-token': accessToken,
 					'refresh-token': refreshTokenInfo.refresh_token,
+					'full_name': staff.full_name,
+					'position': staff.position
 				},
 			}
 			return res.status(200).json(response)

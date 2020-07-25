@@ -34,8 +34,8 @@ router.get('/all-customers', [auth, employee], async (req, res) => {
 			result = await CustomerAction.getCustomer(
 				{
 					$or: [
-						{email:search},
-						{default_account_id:search}
+						{email:new RegExp(search, "i")},
+						{default_account_id:new RegExp(search, "i")}
 					]
 				},
 				null,

@@ -10,19 +10,58 @@ const administrator = require('../../middlewares/administrator')
 
 const Transaction = require('../../models/Transaction')
 const Staff = require('../../models/Staff')
+const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
+const { GetQuery } = require('../../utils/GetQuery.js')
+const DBModel = require('../../utils/DBModel.js')
+const StaffAction = require('../../action/staff')
 
+const DBModelInstance = new DBModel()
 // @route     GET /administrators/all-staffs
 // @desc      Get all information administrator page
 // @access    Private (administrator)
 router.get('/all-staffs', [auth, administrator], async (req, res) => {
 	try {
-		const allStaffs = await Staff.find({}, { _id: 0, __v: 0 })
 
-		const response = {
-			msg: 'All staffs successfully got.',
-			data: allStaffs,
+		const offset = GetQuery('offset', req)
+		const limit = GetQuery('limit', req)
+		const reverse = GetQuery('reverse', req)
+		const getTotal = GetQuery('getTotal', req)
+		const search = GetQuery('search',req)
+
+		let result = []
+		if (search && search != '') {
+			result = await StaffAction.getStaff(
+				{
+					$or: [
+						{email:new RegExp(search, "i")},
+						{full_name: new RegExp(search, "i")},
+						{phone_number: new RegExp(search, "i")}
+					]
+				},
+				null,
+				offset,
+				limit,
+				reverse,
+				getTotal
+			)
+		} else {
+			result = await StaffAction.getStaff(
+				{},
+				null,
+				offset,
+				limit,
+				reverse,
+				getTotal
+			)
 		}
-		return res.status(200).json(response)
+		// const allStaffs = await Staff.find({}, { _id: 0, __v: 0 })
+
+		// const response = {
+		// 	msg: 'All staffs successfully got.',
+		// 	data: allStaffs,
+		// }
+		// return res.status(200).json(response)
+		return MakeResponse(req, res, result)
 	} catch (error) {
 		console.log(error)
 		return res.status(500).json({ msg: 'Server error...' })
