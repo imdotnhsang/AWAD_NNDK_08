@@ -92,6 +92,7 @@
 import {mapState} from "vuex"
 import { mapGetters } from 'vuex';
 import {getDateFromTimeStamp,formatMoney} from "@/utils/convert"
+import {getPageInUrl, getLimitInUrl,setUrlDefault,getSearchTextInUrl,setUrlWithSearch,setUrlDefaultWithTransactionType,getAccountIdInUrl,getTransactionTypeInUrl} from "@/utils/getInfo"
 export default {
     name: "TransferHistory",
     computed: {
@@ -120,14 +121,18 @@ export default {
             start:1,
             end: 10,
             total: 10,
-            lastIndex: 1
+            lastIndex: 1,
+            accountId: ''
         }
     } ,
     async mounted() {
+        this.index = getPageInUrl()
+        this.limit = getLimitInUrl()
         //await this.loadData()
     },
     methods:{
         async loadData() {
+            setUrlDefaultWithTransactionType(this.index,this.limit,this.accountId,'transfer')
             this.$store.commit("LOADING_REDIRECT",{
                 isLoadingRedirect: true,
                 time: 0
@@ -165,11 +170,11 @@ export default {
         async onPaginationClick(pageNum) {
             this.index = pageNum
             await this.loadData()
+        },
+        setAccountId(value) {
+            this.accountId = value
         }
-    },
-    props: [
-        'accountId'
-    ]
+    }
 }
 </script>
 <style scoped>

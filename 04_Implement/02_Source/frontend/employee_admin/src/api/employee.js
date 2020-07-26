@@ -28,3 +28,11 @@ export function getTransactionHistory(payload) {
         method: 'get'
     })
 }
+
+export function registerCustomer(payload) {
+    return request({
+        url: "/register-customer",
+        method: "post",
+        data: payload.data
+    })
+}
