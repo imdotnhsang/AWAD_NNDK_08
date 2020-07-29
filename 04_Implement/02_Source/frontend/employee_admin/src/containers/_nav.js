@@ -33,6 +33,16 @@ export default [
         }
       },
       {
+        _name: 'CSidebarNavItem',
+        name: 'Manage Employee',
+        to: '/admin/manage-employee',
+        icon: 'cil-cursor',
+        badge: {
+          color: 'danger',
+          text: 'ADMIN'
+        }
+      },
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Theme']
       },

@@ -8,7 +8,7 @@ import {
 
 // export const host = 'https://mock-api-eight-bank.herokuapp.com'
 
-export const host = 'http://localhost:5000'
+export const host = 'http://34.87.97.142'
 export const apiHost = `${host}/`
 // const authType = 'Bearer'
 
