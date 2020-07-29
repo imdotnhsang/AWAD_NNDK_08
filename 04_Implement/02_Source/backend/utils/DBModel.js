@@ -46,7 +46,7 @@ class DBModel {
 					data: Array.isArray(docs) ? docs : [docs],
 					message: `Find ${modelName} successfully`,
 				}))
-			}).sort({ _id: reverse ? 1 : -1 })
+			}).sort({ _id: reverse ? -1 : 1 })
 		})
 	}
 
