@@ -68,7 +68,7 @@
                                             <button class="btn my-btn-primary" >
                                                 <span><i class="fas fa-cog"></i></span>
                                             </button>
-                                            <button class="btn btn-primary" style="margin-left:5px;">
+                                            <button class="btn btn-primary" style="margin-left:5px;" @click="showModalResetPassword(value)">
                                                 <span><i class="fas fa-undo-alt"></i></span>
                                             </button>
                                         </td>
@@ -112,6 +112,7 @@
             </CCol>
         </CRow>
         <CreateStaff ref="modalCreateStaff" />
+        <ResetPassword ref="resetPassword"/>
     </div>
 </template>
 <script>
@@ -131,7 +132,8 @@ export default {
         }
     },
     components: {
-        CreateStaff: () => import("@/views/admin/CreateStaff")
+        CreateStaff: () => import("@/views/admin/CreateStaff"),
+        ResetPassword: () => import("@/views/admin/ResetPassword")
     },
     computed: {
         ...mapState({
@@ -212,6 +214,9 @@ export default {
                 alert("Something went wrong")
             }
 
+        },
+        showModalResetPassword(value) {
+            this.$refs.resetPassword.showModal(value)
         }
     }
 }

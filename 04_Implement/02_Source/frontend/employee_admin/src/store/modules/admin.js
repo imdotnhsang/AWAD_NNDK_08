@@ -1,5 +1,5 @@
 import store from "@/store"
-import {getEmployee,createStaff,activeStaff,deactiveStaff} from "@/api/admin.js"
+import {getEmployee,createStaff,activeStaff,deactiveStaff,resetPassword} from "@/api/admin.js"
 import {checkIsExpired} from "@/utils/check.js"
 const state = {
     listEmployee: []
@@ -71,6 +71,22 @@ const actions = {
     deactiveStaff(ctx, payload) {
         return new Promise((resolve, reject) => {
             deactiveStaff(payload).then(response => {
+            if (response && !response.error) {
+  
+            } else {
+              if (checkIsExpired(response)) {
+                ctx.commit('SET_EXPIRED',true)
+                resolve(response)
+                return
+              }
+            }
+            resolve(response)
+          }).catch(err => reject(err))
+        })
+    },
+    resetPassword(ctx, payload) {
+        return new Promise((resolve, reject) => {
+            resetPassword(payload).then(response => {
             if (response && !response.error) {
   
             } else {

@@ -1,4 +1,5 @@
 import request from "@/request/admin.js"
+import staffRequest from "@/request/staff.js"
 
 export function getEmployee(payload) {
     return request({
@@ -27,6 +28,14 @@ export function deactiveStaff(payload) {
     return request({
         url: "/deactivate-staff",
         method: 'put',
+        data: payload.data
+    })
+}
+
+export function resetPassword(payload) {
+    return staffRequest({
+        url: "/reset-password",
+        method: "put",
         data: payload.data
     })
 }
