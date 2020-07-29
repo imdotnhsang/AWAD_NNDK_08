@@ -397,11 +397,7 @@ import store from '@/store'
 
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || "EIGHT BANK"
-  store.commit("LOADING_REDIRECT",{
-    isLoadingRedirect: true,
-    time: 0
-  })
-
+  
   if (to.meta) {
     if (to.meta.authorize) {
       const position = window.localStorage.getItem('position')
@@ -412,6 +408,11 @@ router.beforeEach((to, from, next) => {
       }
     }
   }
+
+  store.commit("LOADING_REDIRECT",{
+    isLoadingRedirect: true,
+    time: 0
+  })
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!localStorage['wnc_access_token'] || localStorage['wnc_access_token'] === '') {

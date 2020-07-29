@@ -103,15 +103,11 @@ const actions = {
   logout(ctx) {
     return new Promise((resolve,reject) => {
       logOut().then(response => {
-        if (response && !response.error) {
-          let data = {
-            access_token: '',
-            refresh_token: ''
-          }
-          ctx.commit('LOGIN',data)
-        } else {
-
+        let data = {
+          access_token: '',
+          refresh_token: ''
         }
+        ctx.commit('LOGIN',data)
         resolve(response)
       })
     })
