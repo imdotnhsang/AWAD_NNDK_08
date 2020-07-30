@@ -39,3 +39,11 @@ export function resetPassword(payload) {
         data: payload.data
     })
 }
+
+export function updateStaffInfo(payload) {
+    return request({
+        url: "/update-staff",
+        method: "put",
+        data: payload.data
+    })
+}

@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div class="modal fade" id="modal-reset-password" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modal-update-info" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Reset password</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Update info</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -15,13 +15,11 @@
                                 label="Email"
                                 v-model="email"
                                 style="margin-bottom:10px;"
-                                disabled
                             />
                             <CInput
                                 label="Full name"
                                 v-model="fullName"
                                 style="margin-bottom:10px;"
-                                disabled
                             />
                             <CInput
                                 label="Phone number"
@@ -40,12 +38,7 @@
                             <div>
                                 <CRow>
                                     <CCol lg="12">
-                                        <CInput
-                                            label="Reset password successfully. New password is: "
-                                            v-model="newPassword"
-                                            style="margin-bottom:10px;"
-                                            disabled
-                                        />
+                                        <span style="font-size: 18px;">Update info successfully</span>
                                     </CCol>
                                 </CRow>
                             </div>
@@ -53,7 +46,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary"  v-if="step==1" @click="hideModal">Cancel</button>
-                        <button type="button" class="btn btn-success" v-if="step==1" @click="doAction">Confirm reset password</button>
+                        <button type="button" class="btn btn-success" v-if="step==1" @click="doAction">Update</button>
                         <button type="button" class="btn btn-success" v-else @click="hideModal">OK</button>
                     </div>
                 </div>
@@ -63,7 +56,7 @@
 </template>
 <script>
 export default {
-    name: "ResetPassword",
+    name: "UpdateStaff",
     data: function() {
         return {
             step: 1,
@@ -76,7 +69,8 @@ export default {
             username: '',
             password: '',
             newPassword:'',
-            position: ''
+            backUpEmail: '',
+            backUpFullName: ''
         }
     },
     methods: {
@@ -87,7 +81,11 @@ export default {
             this.phoneNumber = value.phone_number
             this.position = value.position
             this.username = value.username
-            $("#modal-reset-password").modal('show')
+
+            this.backUpEmail = this.email
+            this.backUpFullName = this.fullName
+
+            $("#modal-update-info").modal('show')
         },
         async doAction() {
             let payload = {
@@ -95,17 +93,34 @@ export default {
                     username: this.username
                 }
             }
-            let response = await this.$store.dispatch("admin/resetPassword", payload)
-            if (response && !response.error) {
-                this.newPassword = response.data.data.password
-                this.step++
-            } else {
-                alert("Something went wrong :)")
+
+            let needUpdate = false
+
+            if (this.email != this.backUpEmail) {
+                payload.data.email = this.email
+                needUpdate = true
             }
 
+            if (this.fullName != this.backUpFullName) {
+                payload.data.fullName = this.fullName
+                needUpdate = true
+            }
+
+            if (needUpdate) {
+                let response = await this.$store.dispatch("admin/updateStaffInfo", payload)
+                if (response && !response.error) {
+                    // this.newPassword = response.data.data.password
+                    this.step++
+                    return
+                } else {
+                    alert("Something went wrong :)")
+                }
+            }
+            this.step++
         },
         hideModal() {
-            $("#modal-reset-password").modal('hide')
+            $("#modal-update-info").modal('hide')
+            this.$emit("reloadDataAfterUpdateInfo")
         },
     }
 }

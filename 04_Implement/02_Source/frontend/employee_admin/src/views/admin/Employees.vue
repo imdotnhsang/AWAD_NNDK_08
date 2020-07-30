@@ -65,10 +65,10 @@
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td> -->
                                         <td>
-                                            <button class="btn my-btn-primary" >
+                                            <button class="btn my-btn-primary" :class="{'disabled': !value.is_active}" @click.prevent="!value.is_active ? {} : showModalUpdateInfo(value)">
                                                 <span><i class="fas fa-cog"></i></span>
                                             </button>
-                                            <button class="btn btn-primary" style="margin-left:5px;" @click="showModalResetPassword(value)">
+                                            <button class="btn btn-primary" :class="{'disabled': !value.is_active}" style="margin-left:5px;" @click.prevent="!value.is_active ? {} : showModalResetPassword(value)">
                                                 <span><i class="fas fa-undo-alt"></i></span>
                                             </button>
                                         </td>
@@ -113,6 +113,7 @@
         </CRow>
         <CreateStaff ref="modalCreateStaff" />
         <ResetPassword ref="resetPassword"/>
+        <UpdateStaff ref="updateStaff" @reloadDataAfterUpdateInfo="loadData"/>
     </div>
 </template>
 <script>
@@ -133,7 +134,8 @@ export default {
     },
     components: {
         CreateStaff: () => import("@/views/admin/CreateStaff"),
-        ResetPassword: () => import("@/views/admin/ResetPassword")
+        ResetPassword: () => import("@/views/admin/ResetPassword"),
+        UpdateStaff: () => import("@/views/admin/UpdateStaff")
     },
     computed: {
         ...mapState({
@@ -217,6 +219,9 @@ export default {
         },
         showModalResetPassword(value) {
             this.$refs.resetPassword.showModal(value)
+        },
+        showModalUpdateInfo(value) {
+            this.$refs.updateStaff.showModal(value)
         }
     }
 }
