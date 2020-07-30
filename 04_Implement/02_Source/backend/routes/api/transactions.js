@@ -17,8 +17,15 @@ const Transaction = require('../../models/Transaction')
 const LinkedBank = require('../../models/LinkedBank')
 const AccessedApiHistory = require('../../models/AccessedApiHistory')
 const DBModel = require('../../utils/DBModel')
+const PartnerBank = require('../../models/PartnerBank')
+const RestClient = require("../../utils/HttpRequest")
+const APIResponse = require('../../utils/APIResponse')
 
 const DBModelInstance = new DBModel()
+
+const client = new RestClient()
+
+const S2QClient = client.newRestClient("https://s2q-ibanking.herokuapp.com",15000,3,3000,DBModelInstance)
 
 // @route     POST /transactions/transferring-within-bank
 // @desc      Transfer internal bank
@@ -302,6 +309,54 @@ router.post(
 		}
 	}
 )
+
+router.get("/transferring-internal-banking",async (req,res) => {
+	try {
+
+		const accountId = req.query.accountId
+		const bankId = req.query.bankId
+
+		if (!accountId || !bankId) {
+			return MakeResponse(req,res,{
+				status: APIStatus.Invalid,
+				message: "Require accountId and bankId"
+			})
+		}
+
+		let result = await DBModelInstance.Query(PartnerBank, {
+			bank_id: bankId
+		},null,0,1,false)
+
+		if (result.status != APIStatus.Ok) {
+			return MakeResponse(req,res,result)
+		}
+
+		if (result.data[0].encrypt_type == "RSA") {
+			let timestamp = Math.round(new Date().getTime() / 1)
+			let securityKey = result.data[0].secret_key
+			let data = JSON.stringify(accountId)
+
+			if (result.data[0].bank_id == "S2Q") {
+				let response = await S2QClient.makeHTTPRequest("GET",{
+					timestamp,
+					security_key:securityKey,
+					hash: crypto.createHash('sha256').update(timestamp + data + securityKey).digest('hex')
+				},{},{},`/public/query/${accountId}`,null)
+
+				console.log(response.data)
+				return res.status(200).json(response.data)
+				
+			}
+		}
+
+		return MakeResponse(res,req,{
+			status: APIStatus.Ok,
+			message: "Ok"
+		})
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
 
 // @route     GET /transactions/receiver-receiver-internal-banking
 // @desc      Get full name from account id internal banking

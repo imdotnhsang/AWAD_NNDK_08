@@ -2,8 +2,8 @@
 /* eslint-disable no-undef */
 const mongoose = require('mongoose')
 
-const LinkedBankSchema = new mongoose.Schema({
-	bank_id: {
+const PartnerBankSchema =new mongoose.Schema({
+    bank_id: {
 		type: String,
 		required: true,
 		unique: true,
@@ -19,16 +19,8 @@ const LinkedBankSchema = new mongoose.Schema({
 	partner_public_key: {
 		type: String,
 		required: true,
-	},
-	encrypt_type: {
-		type: String,
-		required: true,
-	},
-	partner_code: {
-		type: String,
-		required: true,
-	},
-	secret_key: {
+    },
+    secret_key: {
 		type: String,
 		required: true,
 	},
@@ -42,7 +34,11 @@ const LinkedBankSchema = new mongoose.Schema({
 	},
 	passphrase: {
 		type: String,
+	},
+	encrypt_type: {
+		type: String,
+		required:true
 	}
 })
 
-module.exports = LinkedBank = mongoose.model('linked_bank', LinkedBankSchema)
+module.exports = PartnerBank =  mongoose.model('partner_bank', PartnerBankSchema)
