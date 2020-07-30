@@ -6,7 +6,7 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
 		host: 'smtp.gmail.com',
 		auth: {
 			user: 'eightbank2406@gmail.com',
-			pass: 'EIGHTbank2406',
+			pass: 'HOANGsang1608',
 		},
 	})
 
