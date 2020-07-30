@@ -7,18 +7,18 @@
                         <CRow>
                             <CCol col="12" lg="9" xl="9">
                                 <CInput
-                                    label="Email/Card number"
-                                    placeholder="Enter email or card number"
-                                    v-model="emailOrCardNumber"
+                                    label="Email/Name"
+                                    placeholder="Enter email or name"
+                                    v-model="emailOrName"
                                     style="margin-bottom:10px;"
                                 >
                                  <template #append>
-                                    <CButton color="info" @click="searchCustomer"><i class="fas fa-search"></i></CButton>
+                                    <CButton color="info" @click="searchEmployee"><i class="fas fa-search"></i></CButton>
                                 </template>
                                 </CInput>
                             </CCol>
                             <CCol col="12" lg="3" xl="3">
-                                 <CButton class="add-account" pressed block color="danger" aria-pressed="true" @click="showModalCreateAccount">New account</CButton>
+                                 <CButton class="add-account" pressed block color="danger" aria-pressed="true" @click="showModalCreateStaff">New staff</CButton>
                             </CCol>
                         </CRow>
                     </CCardHeader>
@@ -31,41 +31,52 @@
 
                                         </th>
                                         <th>
-                                            Account
+                                            Email
                                         </th>
                                         <th>
                                             Phone
                                         </th>
                                         <th>
-                                            Email
+                                            Fullname
                                         </th>
+                                        <th>Status</th>
                                         <th>
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="listCustomer && listCustomer.length != 0">
-                                    <tr v-for="(value,index) in listCustomer" :key="index">
+                                <tbody v-if="listEmployee && listEmployee.length != 0">
+                                    <tr v-for="(value,index) in listEmployee" :key="index">
                                         <td width="5%">{{start + index}}</td>
                                         <td>
-                                            <span>{{value.full_name}}</span><br>
-                                            <span>{{value.default_account_id}}</span>
+                                            {{value.email}}
                                         </td>
                                         <td>
                                             {{value.phone_number}}
                                         </td>
                                         <td>
-                                            {{value.email}}
+                                            {{value.full_name}}
                                         </td>
-                                          <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount(value)"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail(value)"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                        <td>
+                                            <CSwitch class="mx-1" color="success" @update:checked="doActionWithStatus(value)" :checked="value.is_active" variant="3d" />
+                                        </td>
+                                        <!-- <td>
+                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                        </td> -->
+                                        <td>
+                                            <button class="btn my-btn-primary" >
+                                                <span><i class="fas fa-cog"></i></span>
+                                            </button>
+                                            <button class="btn btn-primary" style="margin-left:5px;" @click="showModalResetPassword(value)">
+                                                <span><i class="fas fa-undo-alt"></i></span>
+                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>
                                 <tbody v-else>
                                     <tr>
-                                        <td colspan="5" style="padding:20px;text-align:center;">Not found any customer</td>
+                                        <td colspan="6" style="padding:20px;text-align:center;">Not found any employee</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -100,111 +111,42 @@
                 </CCard>
             </CCol>
         </CRow>
-        <CreateAccount ref="modalCreateAccount"/>
-        <RechargeAccount ref="rechargeAccount"/>
-        <AccountDetail ref="accountDetail"/>
+        <CreateStaff ref="modalCreateStaff" />
+        <ResetPassword ref="resetPassword"/>
     </div>
 </template>
-
 <script>
 import {mapState} from "vuex"
-import {getDateFromTimeStamp,formatMoney} from "@/utils/convert"
 import {getPageInUrl, getLimitInUrl,setUrlDefault,getSearchTextInUrl,setUrlWithSearch,getAccountIdInUrl,getTransactionTypeInUrl} from "@/utils/getInfo"
 export default {
-    name: "Accounts",
-    data() {
+    name:"Employees",
+    data: function() {
         return {
-            emailOrCardNumber: "",
-            index:1,
-            limit:10,
+            emailOrName: '',
             start: 0,
             end: 0,
-            total: 0,
-            lastIndex: 1
+            lastIndex: 1,
+            index: 1,
+            limit: 10,
+            total: 0
         }
     },
     components: {
-        CreateAccount: () => import("@/views/employee/CreateAccount.vue"),
-        RechargeAccount: () => import("@/views/employee/RechargeAccount.vue"),
-        AccountDetail: () => import("@/views/employee/AccountDetail.vue")
+        CreateStaff: () => import("@/views/admin/CreateStaff"),
+        ResetPassword: () => import("@/views/admin/ResetPassword")
     },
     computed: {
         ...mapState({
-            listCustomer: state => state.employee.listCustomer,
-            customerDetail: state => state.employee.customerDetail
+            listEmployee: state => state.admin.listEmployee,
         })
     },
     async mounted() {
         this.index = getPageInUrl()
         this.limit = getLimitInUrl()
-        this.emailOrCardNumber = getSearchTextInUrl()
+        this.emailOrName = getSearchTextInUrl()
         await this.loadData()
     },
     methods: {
-        showModalCreateAccount() {
-            this.$refs.modalCreateAccount.showModal()
-        },
-        async showModalRechareAccount(value) {
-            this.$store.commit("LOADING_REDIRECT",{
-                isLoadingRedirect: true,
-                time: 0
-            })
-            const payload = {
-                q: {
-                    email:value.email
-                }
-            }
-            const response = await this.$store.dispatch("employee/getCustomerWithBalance",payload)
-            if (this.customerDetail != null) {
-                const props = {
-                    name: this.customerDetail.full_name,
-                    cardNumber: this.customerDetail.default_account_id,
-                    balance: formatMoney(this.customerDetail.balance),
-                    email: this.customerDetail.email,
-                    createdAt: getDateFromTimeStamp(this.customerDetail.created_at),
-                    phone: this.customerDetail.phone_number
-                }
-                this.$refs.rechargeAccount.showModal(props)
-               
-            } else {
-                alert("Something went wrong. Please try again.")
-            } 
-            this.$store.commit("LOADING_REDIRECT",{
-                isLoadingRedirect: false,
-                time: 0
-            })
-
-        },
-        async showModalAccountDetail(value) {
-            this.$store.commit("LOADING_REDIRECT",{
-                isLoadingRedirect: true,
-                time: 0
-            })
-            const payload = {
-                q: {
-                    email:value.email
-                }
-            }
-            const response = await this.$store.dispatch("employee/getCustomerWithBalance",payload)
-            if (this.customerDetail != null) {
-                const props = {
-                    name: this.customerDetail.full_name,
-                    cardNumber: this.customerDetail.default_account_id,
-                    balance: formatMoney(this.customerDetail.balance),
-                    email: this.customerDetail.email,
-                    createdAt: getDateFromTimeStamp(this.customerDetail.created_at),
-                    phone: this.customerDetail.phone_number
-                }
-                this.$refs.accountDetail.showModal(props)
-            } else {
-                alert("Something went wrong. Please try again.")
-            }
-            this.$store.commit("LOADING_REDIRECT",{
-                isLoadingRedirect: false,
-                time: 0
-            })
-           
-        },
         async loadData() {
             this.$store.commit("LOADING_REDIRECT",{
                 isLoadingRedirect: true,
@@ -215,9 +157,9 @@ export default {
                 limit: this.limit,
                 getTotal: true,
                 reverse: true,
-                search: this.emailOrCardNumber
+                search: this.emailOrName
             }
-            let response = await this.$store.dispatch("employee/getAllCustomer",payload)
+            let response = await this.$store.dispatch("admin/getAllEmployee",payload)
             if (response && !response.error) {
                 this.total = response.data.total
                 if ((this.total % this.limit) == 0) {
@@ -237,16 +179,44 @@ export default {
                 time: 200
             })
         },
+        async searchEmployee(e) {
+            e.preventDefault()
+            this.index = 1
+            setUrlWithSearch(this.index,this.limit,this.emailOrName)
+            await this.loadData()
+        },
+        showModalCreateStaff() {
+            this.$refs.modalCreateStaff.showModal()
+        },
         async onPaginationClick(pageNum) {
             this.index = pageNum
             setUrlDefault(this.index, this.limit)
             await this.loadData()
         },
-        async searchCustomer(e) {
-            e.preventDefault()
-            this.index = 1
-            setUrlWithSearch(this.index,this.limit,this.emailOrCardNumber)
-            await this.loadData()
+        async doActionWithStatus(value) {
+            let payload = {
+                data: {
+                    username: value.username
+                }
+            }
+
+            let actionName = ""
+            if (value.is_active) {
+                actionName = "admin/deactiveStaff"
+            } else {
+                actionName = "admin/activeStaff"
+            }
+
+            let response = await this.$store.dispatch(actionName,payload)
+            if (response && !response.error) {
+                value.is_active = !value.is_active
+            } else {
+                alert("Something went wrong")
+            }
+
+        },
+        showModalResetPassword(value) {
+            this.$refs.resetPassword.showModal(value)
         }
     }
 }
@@ -320,6 +290,14 @@ export default {
         .btn-recharge-money {
             font-size: 15px;
         }
+    }
+
+    .my-btn-primary {
+        background-color:#ff8300;color:white;
+    }
+
+    .my-btn-primary:hover {
+        background-color: #e47a0a;
     }
 
 </style>

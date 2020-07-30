@@ -15,6 +15,7 @@ const CustomerAction = require('../../action/customer')
 const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 const { GetQuery } = require('../../utils/GetQuery.js')
 const DBModel = require('../../utils/DBModel.js')
+const { sendOTPCode } = require('../../utils/OTP/sendOTP.js')
 
 const DBModelInstance = new DBModel()
 
@@ -191,6 +192,8 @@ router.post(
 
 			const salt = await bcrypt.genSalt(10)
 			customer.password = await bcrypt.hash(password, salt)
+
+			await sendOTPCode(customer.email, customer.full_name, customer.password, 'forgotPassword')
 
 			const responseCustomer = await customer.save()
 

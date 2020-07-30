@@ -67,6 +67,10 @@ const StaffLogin = () => import("@/views/login/Login")
 
 const History = () => import('@/views/employee/History')
 
+const Employees = () => import("@/views/admin/Employees")
+
+const Page403 = () => import("@/views/pages/Page403")
+
 Vue.use(Router)
 
 const router =  new Router({
@@ -93,13 +97,28 @@ function configRoutes () {
           path: '/employee/accounts',
           name: 'Accounts',
           component: Accounts,
-          meta: {title: 'Manage accounts'}
+          meta: {
+            title: 'Manage accounts',
+            authorize: ['EMPLOYEE']
+          }
         },
         {
           path: '/employee/history',
           name: 'History',
           component: History,
-          meta:{title: 'Manage history'}
+          meta:{
+            title: 'Manage history',
+            authorize: ['EMPLOYEE']
+          }
+        },
+        {
+          path: '/admin/manage-employee',
+          name: 'Manage Employee',
+          component: Employees,
+          meta: {
+            title: 'Manage employee',
+            authorize: ['ADMINISTRATOR']
+          }
         },
         {
           path: 'theme',
@@ -336,6 +355,12 @@ function configRoutes () {
       meta: {title: 'Login'}
     },
     {
+      path:'/no-access',
+      name: 'Page403',
+      component: Page403,
+      meta: {title: 'No access'}
+    },
+    {
       path: '/pages',
       redirect: '/pages/404',
       name: 'Pages',
@@ -372,10 +397,23 @@ import store from '@/store'
 
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || "EIGHT BANK"
+  
+  if (to.meta) {
+    if (to.meta.authorize) {
+      const position = window.localStorage.getItem('position')
+      const listAuthorize = to.meta.authorize
+      let isAccess = listAuthorize.some(i => position == i)
+      if (!isAccess) {
+        return redirectNoAccessPage()
+      }
+    }
+  }
+
   store.commit("LOADING_REDIRECT",{
     isLoadingRedirect: true,
     time: 0
   })
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!localStorage['wnc_access_token'] || localStorage['wnc_access_token'] === '') {
       next({
@@ -398,6 +436,14 @@ router.afterEach((to, from) => {
       })
     }
 });
+
+let HOST_URL =  (window.location.protocol +"//" + window.location.hostname + ":" + (window.location.port != 80 ? window.location.port : ''))
+
+
+function redirectNoAccessPage() {
+  let no_access_path =  HOST_URL + "/no-access"
+  window.location.href = no_access_path;
+}
 
 
 

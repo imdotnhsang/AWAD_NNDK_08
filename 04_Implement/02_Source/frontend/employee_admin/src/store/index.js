@@ -20,7 +20,8 @@ const state = {
   sidebarShow: 'responsive',
   sidebarMinimize: false,
   isLoadingRedirect: false,
-  expired: true
+  expired: true,
+  userInfo: []
 }
 
 const mutations = {
@@ -38,7 +39,11 @@ const mutations = {
   LOGIN(state,data) {
     window.localStorage.setItem('wnc_access_token',data['access_token'])
     window.localStorage.setItem('wnc_refresh_token',data['refresh_token'])
+    window.localStorage.setItem('fullName',data.fullName)
+    window.localStorage.setItem('position',data.position)
     document.cookie = `access_token=${window.localStorage.getItem("wnc_access_token")};refresh_token=${window.localStorage.getItem("wnc_refresh_token")}`;
+    state.userInfo.fullName = data.fullName
+    state.userInfo.position = data.position
    // document.cookie = `access_token=${window.localStorage.getItem("wnc_access_token")}`;
    if (window.localStorage.getItem('wnc_access_token') != '') {
      state.expired = false
@@ -79,7 +84,9 @@ const actions = {
         if (response && !response.error) {
           let data = {
             access_token: response.data.data['access-token'],
-            refresh_token: response.data.data['refresh-token']
+            refresh_token: response.data.data['refresh-token'],
+            fullName: response.data.data.full_name,
+            position: response.data.data.position
           }
           ctx.commit('LOGIN',data)
         } else {
@@ -96,15 +103,11 @@ const actions = {
   logout(ctx) {
     return new Promise((resolve,reject) => {
       logOut().then(response => {
-        if (response && !response.error) {
-          let data = {
-            access_token: '',
-            refresh_token: ''
-          }
-          ctx.commit('LOGIN',data)
-        } else {
-
+        let data = {
+          access_token: '',
+          refresh_token: ''
         }
+        ctx.commit('LOGIN',data)
         resolve(response)
       })
     })
