@@ -50,8 +50,7 @@ const TransactionSchema = new mongoose.Schema({
 	},
 	transaction_payer: {
 		// TRANSFERER, RECEIVER
-		type: String,
-		require: true,
+		type: String
 	},
 	transaction_balance_before: {
 		type: Number,

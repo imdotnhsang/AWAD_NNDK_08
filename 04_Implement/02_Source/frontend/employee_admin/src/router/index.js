@@ -71,6 +71,8 @@ const Employees = () => import("@/views/admin/Employees")
 
 const Page403 = () => import("@/views/pages/Page403")
 
+const ManageTransaction = () => import("@/views/admin/ManageTransaction")
+
 Vue.use(Router)
 
 const router =  new Router({
@@ -117,6 +119,15 @@ function configRoutes () {
           component: Employees,
           meta: {
             title: 'Manage employee',
+            authorize: ['ADMINISTRATOR']
+          }
+        },
+        {
+          path: '/admin/manage-transaction',
+          name: "Manage Transaction",
+          component: ManageTransaction,
+          meta: {
+            title: 'Manage Transaction',
             authorize: ['ADMINISTRATOR']
           }
         },

@@ -1,4 +1,6 @@
 const express = require('express')
+const moment = require('moment')
+var hash = require('object-hash');
 
 const router = express.Router()
 // const { customAlphabet } = require('nanoid')
@@ -20,12 +22,15 @@ const DBModel = require('../../utils/DBModel')
 const PartnerBank = require('../../models/PartnerBank')
 const RestClient = require("../../utils/HttpRequest")
 const APIResponse = require('../../utils/APIResponse')
+const { time } = require('console');
+const customer = require('../../action/customer');
 
 const DBModelInstance = new DBModel()
 
 const client = new RestClient()
 
 const S2QClient = client.newRestClient("https://s2q-ibanking.herokuapp.com",15000,3,3000,DBModelInstance)
+const BaoSonClient = client.newRestClient("https://ptwncinternetbanking.herokuapp.com/banks",15000,3,3000,DBModelInstance)
 
 // @route     POST /transactions/transferring-within-bank
 // @desc      Transfer internal bank
@@ -310,53 +315,6 @@ router.post(
 	}
 )
 
-router.get("/transferring-internal-banking",async (req,res) => {
-	try {
-
-		const accountId = req.query.accountId
-		const bankId = req.query.bankId
-
-		if (!accountId || !bankId) {
-			return MakeResponse(req,res,{
-				status: APIStatus.Invalid,
-				message: "Require accountId and bankId"
-			})
-		}
-
-		let result = await DBModelInstance.Query(PartnerBank, {
-			bank_id: bankId
-		},null,0,1,false)
-
-		if (result.status != APIStatus.Ok) {
-			return MakeResponse(req,res,result)
-		}
-
-		if (result.data[0].encrypt_type == "RSA") {
-			let timestamp = Math.round(new Date().getTime() / 1)
-			let securityKey = result.data[0].secret_key
-			let data = JSON.stringify(accountId)
-
-			if (result.data[0].bank_id == "S2Q") {
-				let response = await S2QClient.makeHTTPRequest("GET",{
-					timestamp,
-					security_key:securityKey,
-					hash: crypto.createHash('sha256').update(timestamp + data + securityKey).digest('hex')
-				},{},{},`/public/query/${accountId}`,null)
-
-				console.log(response.data)
-				return res.status(200).json(response.data)
-				
-			}
-		}
-
-		return MakeResponse(res,req,{
-			status: APIStatus.Ok,
-			message: "Ok"
-		})
-	} catch (error) {
-		return res.status(500).json({ msg: 'Server error...' })
-	}
-})
 
 // @route     GET /transactions/receiver-receiver-internal-banking
 // @desc      Get full name from account id internal banking
@@ -656,18 +614,20 @@ router.get('/receiver-interbank', async (req, res) => {
 
 // @route     POST /transactions/transferring-interbank
 // @desc      Transfer interbank
-// @access    Public
+// @access    Private
 router.post(
 	'/transferring-interbank',
 	[
-		auth,
+		// auth,
 		check('entryTime', 'Entry time is required').not().notEmpty(),
 		check('toAccountId', 'Receiver account is required').not().notEmpty(),
 		check('toFullName', 'Receiver full name is required').not().notEmpty(),
 		check('toBankId', 'Receiver bank ID is required').not().notEmpty(),
+		check('transactionPayer', 'transactionPayer is required').not().notEmpty(),
 		check('transactionAmount', 'Amount Transaction is 50000 or more').isInt({
 			min: 50000,
 		}),
+
 	],
 	async (req, res) => {
 		const errors = validationResult(req)
@@ -682,13 +642,43 @@ router.post(
 			toFullName,
 			toBankId,
 			transactionAmount,
+			transactionPayer,
+			transactionMessage
 		} = req.body
 
 		try {
-			const customer = await Customer.findById(req.user.id)
 
-			if (!customer) {
+			if (
+				transactionPayer !== 'TRANSFERER' &&
+				transactionPayer !== 'RECEIVER'
+			) {
 				return res.status(400).json({
+					errors: [{ msg: 'Please include a valid transaction payer' }],
+				})
+			}
+
+
+
+			// const customer = await Customer.findById(req.user.id)
+
+			// if (!customer) {
+			// 	return res.status(400).json({
+			// 		errors: [
+			// 			{
+			// 				msg: 'Customer not exists.',
+			// 			},
+			// 		],
+			// 	})
+			// }
+
+			// const fromFullName = customer.full_name
+
+			const findCustomerResp = await DBModelInstance.Query(Customer,{
+				default_account_id: fromAccountId
+			},null,0,1,false)
+
+			if (findCustomerResp.status != APIStatus.Ok) {
+				return res.status(404).json({
 					errors: [
 						{
 							msg: 'Customer not exists.',
@@ -697,7 +687,7 @@ router.post(
 				})
 			}
 
-			const fromFullName = customer.full_name
+			const fromFullName = findCustomerResp.data[0].full_name
 
 			const account = await Account.findOne({ account_id: fromAccountId })
 
@@ -711,7 +701,13 @@ router.post(
 				})
 			}
 
-			if (account.balance - transactionAmount < 0) {
+			let realTransactionAmount = transactionAmount
+
+			if (transactionPayer == "TRANSFERER") {
+				realTransactionAmount = realTransactionAmount - 5000
+			}
+
+			if (account.balance - realTransactionAmount < 0) {
 				return res.status(400).json({
 					errors: [
 						{
@@ -720,6 +716,8 @@ router.post(
 					],
 				})
 			}
+
+			
 
 			const transactionTransferer = new Transaction({
 				entry_time: entryTime,
@@ -733,32 +731,185 @@ router.post(
 				transaction_amount: transactionAmount,
 				transaction_balance_before: account.balance,
 				transaction_balance_after: account.balance - transactionAmount,
+				transaction_message: transactionMessage,
+				transaction_payer: transactionPayer
 			})
 
 			// Kiểm tra ngân hàng người nhận có đúng mã id
 			// ...
+			let result = await DBModelInstance.Query(PartnerBank,{
+				bank_id: toBankId
+			},null,0,1,false)
 
-			// Gọi api chuyển  khoản vào ngân hàng khác
-			// ...
+			if (result.status != APIStatus.Ok) {
+				return res.status(404).json({
+					errors: [
+						{
+							msg: 'Not found any matched bankId',
+						},
+					],
+				})
+			}
 
-			const accountTransfererResponse = await Account.findOneAndUpdate(
-				{ account_id: fromAccountId },
-				{ $inc: { balance: -transactionAmount } },
-				{
-					new: true,
+			let allowToDoAction = false
+
+			if (result.data[0].encrypt_type == "PGP") {
+				if (result.data[0].bank_id == "baoson") {
+					const { keys: [privateKey] } = await openpgp.key.readArmored(result.data[0].our_private_key)
+					await privateKey.decrypt("123456");
+					const { data: cleartext } = await openpgp.sign({
+						message: openpgp.cleartext.fromText("NHÓM 6"), // CleartextMessage or Message object
+						privateKeys: [privateKey]                     // for signing
+					});
+
+					let data = {
+						Id: toAccountId,
+						ToName: toFullName,
+						Amount: transactionAmount,
+						Content: transactionMessage,
+						Fromaccount: fromAccountId,
+						FromName:	fromFullName 
+					};
+
+					let response = await BaoSonClient.makeHTTPRequest("POST",{
+						nameBank: 'Eight Bank',
+						ts: moment().unix(),
+						sig: hash(moment().unix() + data + "secretkey"),
+						sigpgp: JSON.stringify(cleartext)
+					},{},data,"/transfers",null)
+
+					let sign = ""
+					if (response.status == 200) {
+						sign = response.data.sign
+					}
+
+					if (sign != "") {
+						const verified = await openpgp.verify({
+							message: await openpgp.cleartext.readArmored(sign), // parse armored message
+							publicKeys: (
+								await openpgp.key.readArmored(result.data[0].partner_public_key)
+							).keys, // for verification
+						})
+						const { valid } = verified.signatures[0]
+						if (!valid) {
+							return res.status(500).json({
+								errors: [
+									{
+										msg: 'Signature from partner is wrong',
+									},
+								],
+							})
+						} else {
+							allowToDoAction = true
+						}
+					} else {
+						return res.status(500).json({
+							errors: [
+								{
+									msg: 'Signature from partner is wrong',
+								},
+							],
+						})
+					}
+
+
+
 				}
-			)
+			}
 
-			const transactionTransfererResponse = await transactionTransferer.save()
-
-			return res
+			if (allowToDoAction) {
+				const accountTransfererResponse = await Account.findOneAndUpdate(
+					{ account_id: fromAccountId },
+					{ $inc: { balance: -realTransactionAmount } },
+					{
+						new: true,
+					}
+				)
+				const transactionTransfererResponse = await transactionTransferer.save()
+				return res
 				.status(200)
 				.json({ transactionTransfererResponse, accountTransfererResponse })
+			} else {
+				return res.status(500).json({
+					errors: [
+						{
+							msg: 'Something error',
+						},
+					],
+				})
+			}
+
+			
 		} catch (error) {
 			return res.status(500).json({ msg: 'Server error...' })
 		}
 	}
 )
+
+// @route     GET /transactions/transferring-interbank
+// @desc      Get infomation from accountId in another bank
+// @access    Private
+router.get("/transferring-interbank",async (req,res) => {
+	try {
+
+		const accountId = req.query.accountId
+		const bankId = req.query.bankId
+
+		if (!accountId || !bankId) {
+			return MakeResponse(req,res,{
+				status: APIStatus.Invalid,
+				message: "Require accountId and bankId"
+			})
+		}
+
+		let result = await DBModelInstance.Query(PartnerBank, {
+			bank_id: bankId
+		},null,0,1,false)
+
+		if (result.status != APIStatus.Ok) {
+			return MakeResponse(req,res,result)
+		}
+
+		if (result.data[0].encrypt_type == "RSA") {
+			let timestamp = moment().unix()
+			let securityKey = result.data[0].secret_key
+			let data = JSON.stringify(accountId)
+
+			if (result.data[0].bank_id == "S2Q") {
+				let response = await S2QClient.makeHTTPRequest("GET",{
+					timestamp,
+					security_key:securityKey,
+					hash: crypto.createHash('sha256').update(timestamp + data + securityKey).digest('hex')
+				},{},{},`/public/${accountId}`,null)
+
+				console.log(response.data)
+				return res.status(200).json(response.data)
+				
+			}
+		} else if (result.data[0].encrypt_type == "PGP") {
+			let timestamp = moment().unix()
+			if (result.data[0].bank_id == "baoson") {
+				let response = await BaoSonClient.makeHTTPRequest("POST", {
+					nameBank: "Eight Bank",
+					ts:timestamp,
+					sig: hash(moment().unix() + accountId + result.data[0].secret_key)
+				},{},{
+					Id: accountId
+				},"/detail",null)
+				console.log(response.data)
+				return res.status(200).json(response.data)
+			}
+		}
+
+		return MakeResponse(res,req,{
+			status: APIStatus.Ok,
+			message: "Ok"
+		})
+	} catch (error) {
+		return res.status(500).json({ msg: 'Server error...' })
+	}
+})
+
 
 // @route     POST /transactions/receiving-interbank
 // @desc      Receive transferring interbank

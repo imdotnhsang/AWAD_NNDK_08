@@ -43,6 +43,16 @@ export default [
         }
       },
       {
+        _name: 'CSidebarNavItem',
+        name: 'Manage Transaction',
+        to: '/admin/manage-transaction',
+        icon: 'cil-puzzle',
+        badge: {
+          color: 'danger',
+          text: 'ADMIN'
+        }
+      },
+      {
         _name: 'CSidebarNavTitle',
         _children: ['Theme']
       },

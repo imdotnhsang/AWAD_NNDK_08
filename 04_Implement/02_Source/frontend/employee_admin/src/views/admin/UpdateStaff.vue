@@ -70,7 +70,8 @@ export default {
             password: '',
             newPassword:'',
             backUpEmail: '',
-            backUpFullName: ''
+            backUpFullName: '',
+            position: ''
         }
     },
     methods: {
