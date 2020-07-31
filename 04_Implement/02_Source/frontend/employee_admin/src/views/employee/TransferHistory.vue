@@ -35,7 +35,7 @@
                            {{value.transaction_amount}}
                         </td>
                         <td>
-                            {{value.from_bank_id}}
+                            {{value.to_bank_id}}
                         </td>
                         <td>
                             <div v-if="value.transaction_status == 'SUCCESS'">

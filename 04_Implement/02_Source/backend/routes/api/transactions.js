@@ -619,7 +619,6 @@ router.post(
 	'/transferring-interbank',
 	[
 		// auth,
-		check('entryTime', 'Entry time is required').not().notEmpty(),
 		check('toAccountId', 'Receiver account is required').not().notEmpty(),
 		check('toFullName', 'Receiver full name is required').not().notEmpty(),
 		check('toBankId', 'Receiver bank ID is required').not().notEmpty(),
@@ -636,7 +635,6 @@ router.post(
 		}
 
 		const {
-			entryTime,
 			fromAccountId,
 			toAccountId,
 			toFullName,
@@ -656,22 +654,6 @@ router.post(
 					errors: [{ msg: 'Please include a valid transaction payer' }],
 				})
 			}
-
-
-
-			// const customer = await Customer.findById(req.user.id)
-
-			// if (!customer) {
-			// 	return res.status(400).json({
-			// 		errors: [
-			// 			{
-			// 				msg: 'Customer not exists.',
-			// 			},
-			// 		],
-			// 	})
-			// }
-
-			// const fromFullName = customer.full_name
 
 			const findCustomerResp = await DBModelInstance.Query(Customer,{
 				default_account_id: fromAccountId
@@ -704,10 +686,10 @@ router.post(
 			let realTransactionAmount = transactionAmount
 
 			if (transactionPayer == "TRANSFERER") {
-				realTransactionAmount = realTransactionAmount - 5000
+				realTransactionAmount = realTransactionAmount + 5000
 			}
 
-			if (account.balance - realTransactionAmount < 0) {
+			if (account.balance - realTransactionAmount < 50000) {
 				return res.status(400).json({
 					errors: [
 						{
@@ -717,10 +699,9 @@ router.post(
 				})
 			}
 
-			
-
+	
 			const transactionTransferer = new Transaction({
-				entry_time: entryTime,
+				entry_time: Date.now(),
 				from_account_id: fromAccountId,
 				from_fullname: fromFullName,
 				to_account_id: toAccountId,
@@ -732,7 +713,8 @@ router.post(
 				transaction_balance_before: account.balance,
 				transaction_balance_after: account.balance - transactionAmount,
 				transaction_message: transactionMessage,
-				transaction_payer: transactionPayer
+				transaction_payer: transactionPayer,
+				transaction_status: "SUCCESS"
 			})
 
 			// Kiểm tra ngân hàng người nhận có đúng mã id
@@ -754,7 +736,7 @@ router.post(
 			let allowToDoAction = false
 
 			if (result.data[0].encrypt_type == "PGP") {
-				if (result.data[0].bank_id == "baoson") {
+				if (result.data[0].bank_id == "BaoSonBank") {
 					const { keys: [privateKey] } = await openpgp.key.readArmored(result.data[0].our_private_key)
 					await privateKey.decrypt("123456");
 					const { data: cleartext } = await openpgp.sign({
@@ -811,9 +793,6 @@ router.post(
 							],
 						})
 					}
-
-
-
 				}
 			}
 
@@ -888,7 +867,7 @@ router.get("/transferring-interbank",async (req,res) => {
 			}
 		} else if (result.data[0].encrypt_type == "PGP") {
 			let timestamp = moment().unix()
-			if (result.data[0].bank_id == "baoson") {
+			if (result.data[0].bank_id == "BaoSonBank") {
 				let response = await BaoSonClient.makeHTTPRequest("POST", {
 					nameBank: "Eight Bank",
 					ts:timestamp,
