@@ -26,7 +26,7 @@
                         <div v-if="!isClickedOnRow">
                             <div class="table-responsive">
                                 <table class="table table-striped border-table">
-                                    <thead>
+                                    <thead style="background-color: #eeeee;">
                                         <tr>
                                             <th width="5%">
 
@@ -42,7 +42,7 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody v-if="listCustomer && listCustomer.length != 0">
+                                    <tbody class="tbody" v-if="listCustomer && listCustomer.length != 0">
                                         <tr style="cursor:pointer;" @click="onClickRow(value)" v-for="(value,index) in listCustomer" :key="index">
                                             <td width="5%">{{start + index}}</td>
                                             <td>
@@ -337,6 +337,14 @@ export default {
 
     .hidden {
         display:none;
+    }
+
+    .tbody>tr:nth-child(odd) {
+        background-color: #fff0e1
+    }
+
+    .tbody>tr:hover {
+        background-color: #f5f5f5;
     }
 
 </style>

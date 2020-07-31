@@ -25,7 +25,7 @@
                     <CCardBody>
                         <div class="table-responsive">
                             <table class="table table-striped border-table">
-                                <thead>
+                                <thead style="background-color: #EEEEEE;">
                                     <tr>
                                         <th width="5%">
 
@@ -39,12 +39,12 @@
                                         <th>
                                             Email
                                         </th>
-                                        <th>
+                                        <th style="width:15%;">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="listCustomer && listCustomer.length != 0">
+                                <tbody class="tbody" v-if="listCustomer && listCustomer.length != 0">
                                     <tr v-for="(value,index) in listCustomer" :key="index">
                                         <td width="5%">{{start + index}}</td>
                                         <td>
@@ -57,9 +57,17 @@
                                         <td>
                                             {{value.email}}
                                         </td>
-                                          <td>
-                                            <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount(value)"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail(value)"><i class="fas fa-info-circle btn-account-info"></i></span>
+                                        <td>
+                                            <button class="btn my-btn-primary responsive-btn" :class="{'disabled': !value.is_active}" @click="showModalRechareAccount(value)">
+                                            <!-- <span><i class="fas fa-cog"></i></span> -->
+                                                Recharge Account
+                                            </button><br>
+                                            <button class="btn my-btn-blue" :class="{'disabled': !value.is_active}" style="margin-top: 10px;"  @click="showModalAccountDetail(value)">
+                                                <!-- <span><i class="fas fa-undo-alt"></i></span> -->
+                                                View Account Detail
+                                            </button>
+                                            <!-- <span style="cursor:pointer;" title="Recharge this account" @click="showModalRechareAccount(value)"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
+                                            <span class="btn-account-info-container" title="Account detail" @click="showModalAccountDetail(value)"><i class="fas fa-info-circle btn-account-info"></i></span> -->
                                         </td>
                                     </tr>
                                 </tbody>
@@ -283,6 +291,10 @@ export default {
        float: right;
    }
 
+    .responsive-btn {
+       width: 167.58px;
+   }
+
 
     @media screen and (max-width: 992px) {
         .add-account {
@@ -306,6 +318,10 @@ export default {
             margin-top: 10px;
         }
 
+        .responsive-btn {
+            width:auto
+        }
+
     }
 
     @media screen and (max-width: 1027px)  {
@@ -320,6 +336,35 @@ export default {
         .btn-recharge-money {
             font-size: 15px;
         }
+
+        .responsive-btn {
+            width:auto
+        }
+    }
+
+    .tbody>tr:nth-child(odd) {
+        background-color: #fff0e1
+    }
+
+    .tbody>tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .my-btn-primary {
+        background-color:#ff8300;color:white;
+    }
+
+    .my-btn-primary:hover {
+        background-color: #e47a0a;
+    }
+
+    .my-btn-blue {
+        background-color: #0057a1;
+        color:white;
+    }
+    
+    .my-btn-blue:hover {
+        background-color: #003B6E;
     }
 
 </style>

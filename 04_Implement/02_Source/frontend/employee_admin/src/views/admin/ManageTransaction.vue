@@ -5,17 +5,30 @@
                 <CCard>
                     <CCardHeader>
                         <CRow>
-                            <CCol col="12" lg="9" xl="9">
-                               <CustomSelect :options="options" :chooseIndex="0"/>
+                            <CCol lg="4" xl="4" sm="12">
+                                <CSelect
+                                    label="Choose banks:"
+                                    :options="optionsBank"
+                                    placeholder="Please select"
+                                />
                             </CCol>
-                            <CCol col="12" lg="3" xl="3">
-                                 <CButton class="add-account" pressed block color="danger" aria-pressed="true" @click="showModalCreateStaff">New staff</CButton>
+                            <CCol  lg="4" xl="4" sm="12">
+                                <CInput
+                                    label="From date"
+                                    type="date"
+                                />
+                            </CCol>
+                            <CCol lg="4" xl="4" sm="12">
+                                <CInput
+                                    label="To date"
+                                    type="date"
+                                />
                             </CCol>
                         </CRow>
                     </CCardHeader>
                     <CCardBody>
                         <div class="table-responsive">
-                            <table class="table table-striped border-table">
+                            <table class="table border-table">
                                 <thead>
                                     <tr>
                                         <th width="5%">
@@ -121,22 +134,13 @@ export default {
             index: 1,
             limit: 10,
             total: 0,
-            options: [
-                {
-                    text: "S2Q",
-                    value: {
-                        bank_id: "S2Q",
-                        bank_name: "S2Q Bank"
-                    }
-                }
-            ]
+            optionsBank: ["All","S2Q","BaoSonBank"] 
         }
     },
     components: {
         CreateStaff: () => import("@/views/admin/CreateStaff"),
         ResetPassword: () => import("@/views/admin/ResetPassword"),
         UpdateStaff: () => import("@/views/admin/UpdateStaff"),
-        CustomSelect: () => import("@/components/CustomSelect")
     },
     computed: {
         ...mapState({

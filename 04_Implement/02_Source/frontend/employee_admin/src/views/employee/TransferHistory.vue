@@ -2,7 +2,7 @@
     <div class="border-container" style="padding:20px;">
         <div class="table-responsive">
             <table class="table table-striped border-table">
-                <thead>
+                <thead style="background-color: #eee;">
                     <tr>
                         <th width="5%">
 
@@ -24,7 +24,7 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody v-if="listTransferTransactionToShow[0]">
+                <tbody class="tbody" v-if="listTransferTransactionToShow[0]">
                     <tr v-for="(value,index) in listTransferTransactionToShow" :key="index">
                         <td width="5%">{{start + index}}</td>
                         <td>
@@ -206,5 +206,14 @@ export default {
     @media screen and (max-width: 1027px)  {
          
     }
+
+     .tbody>tr:nth-child(odd) {
+        background-color: #fff0e1
+    }
+
+    .tbody>tr:hover {
+        background-color: #f5f5f5;
+    }
+
 
 </style>

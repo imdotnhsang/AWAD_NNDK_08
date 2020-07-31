@@ -24,8 +24,8 @@
                     </CCardHeader>
                     <CCardBody>
                         <div class="table-responsive">
-                            <table class="table table-striped border-table">
-                                <thead>
+                            <table class="table border-table">
+                                <thead style="background-color: #EEEEEE;">
                                     <tr>
                                         <th width="5%">
 
@@ -40,12 +40,12 @@
                                             Fullname
                                         </th>
                                         <th>Status</th>
-                                        <th>
+                                        <th style="width:15%;">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="listEmployee && listEmployee.length != 0">
+                                <tbody class="tbody" v-if="listEmployee && listEmployee.length != 0">
                                     <tr v-for="(value,index) in listEmployee" :key="index">
                                         <td width="5%">{{start + index}}</td>
                                         <td>
@@ -65,12 +65,17 @@
                                             <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
                                         </td> -->
                                         <td>
-                                            <button class="btn my-btn-primary" :class="{'disabled': !value.is_active}" @click.prevent="!value.is_active ? {} : showModalUpdateInfo(value)">
-                                                <span><i class="fas fa-cog"></i></span>
-                                            </button>
-                                            <button class="btn btn-primary" :class="{'disabled': !value.is_active}" style="margin-left:5px;" @click.prevent="!value.is_active ? {} : showModalResetPassword(value)">
-                                                <span><i class="fas fa-undo-alt"></i></span>
-                                            </button>
+                                            <div>
+                                                <button class="btn my-btn-primary responsive-btn-update-info" :class="{'disabled': !value.is_active}" @click.prevent="!value.is_active ? {} : showModalUpdateInfo(value)">
+                                                <!-- <span><i class="fas fa-cog"></i></span> -->
+                                                    Update Info
+                                                </button><br>
+                                                <button class="btn my-btn-blue" :class="{'disabled': !value.is_active}" style="margin-top: 10px;" @click.prevent="!value.is_active ? {} : showModalResetPassword(value)">
+                                                    <!-- <span><i class="fas fa-undo-alt"></i></span> -->
+                                                    Reset Password
+                                                </button>
+                                            </div>
+                                           
                                         </td>
                                     </tr>
                                 </tbody>
@@ -258,6 +263,10 @@ export default {
        float: right;
    }
 
+   .responsive-btn-update-info {
+       width: 136.69px;
+   }
+
 
     @media screen and (max-width: 992px) {
         .add-account {
@@ -280,6 +289,9 @@ export default {
             float: left;
             margin-top: 10px;
         }
+         .responsive-btn-update-info {
+            width: auto;
+        }
 
     }
 
@@ -295,6 +307,9 @@ export default {
         .btn-recharge-money {
             font-size: 15px;
         }
+          .responsive-btn-update-info {
+            width: auto;
+        }
     }
 
     .my-btn-primary {
@@ -303,6 +318,23 @@ export default {
 
     .my-btn-primary:hover {
         background-color: #e47a0a;
+    }
+
+    .my-btn-blue {
+        background-color: #0057a1;
+        color:white;
+    }
+    
+    .my-btn-blue:hover {
+        background-color: #003B6E;
+    }
+
+   .tbody>tr:nth-child(odd) {
+        background-color: #fff0e1
+    }
+
+    .tbody>tr:hover {
+        background-color: #f5f5f5;
     }
 
 </style>
