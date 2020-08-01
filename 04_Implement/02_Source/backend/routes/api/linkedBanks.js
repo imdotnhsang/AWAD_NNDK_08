@@ -10,7 +10,7 @@ const DBModelInstance = new DBModel()
 // @route     POST /linked-banks/all-linked-banks
 // @desc      Get all linked banks
 // @access    Public
-router.get('/all-linked-banks', auth, async (req, res) => {
+router.get('/all-linked-banks', async (req, res) => {
 	try {
 		// const data = await LinkedBank.find()
 

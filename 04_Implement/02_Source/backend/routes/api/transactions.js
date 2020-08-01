@@ -761,7 +761,7 @@ router.post(
 					},{},data,"/transfers",null)
 
 					let sign = ""
-					if (response.status == 200) {
+					if (response.status && response.status == 200) {
 						sign = response.data.sign
 					}
 
@@ -793,6 +793,61 @@ router.post(
 							],
 						})
 					}
+				}
+			} else if (result.data[0].encrypt_type == "RSA") {
+				if (result.data[0].bank_id == "S2Q") {
+					let timestamp = moment().unix()
+					let securityKey = result.data[0].secret_key
+					let feePayBySender = false
+					if (transactionPayer == "TRANSFERER") {
+						feePayBySender = true
+					}
+
+					let data = {
+						source_account: fromAccountId,
+						destination_account: toAccountId,
+						source_bank: 'Eight',
+						description: transactionMessage,
+						feePayBySender,
+						fee: 5000,
+						amount: transactionAmount
+					}
+
+					let _data = JSON.stringify(data)
+
+					let privateKey = result.data[0].our_private_key.replace(/\\n/g, '\n');
+					let signer = crypto.createSign('sha256');
+					signer.update(_data);
+					let signature = signer.sign(privateKey, 'hex');
+
+					let response= await S2QClient.makeHTTPRequest("POST",{
+						timestamp,
+						security_key:securityKey,
+						hash: crypto.createHash('sha256').update(timestamp + _data + securityKey).digest('hex')
+					},{},{
+						data,
+						signature
+					},"/public/transfer",null)
+
+					let sign = ""
+					if (response.status && response.status == 200) {
+						sign = response.data.signature
+					}
+
+					if (sign != "") {
+						allowToDoAction = true
+					} else {
+						return res.status(500).json({
+							errors: [
+								{
+									msg: 'Signature from partner is wrong',
+								},
+							],
+						})
+					}
+
+					console.log(response.data)
+
 				}
 			}
 
@@ -861,8 +916,19 @@ router.get("/transferring-interbank",async (req,res) => {
 					hash: crypto.createHash('sha256').update(timestamp + data + securityKey).digest('hex')
 				},{},{},`/public/${accountId}`,null)
 
-				console.log(response.data)
-				return res.status(200).json(response.data)
+				if (response && response.status && response.status == 200) {
+					return res.status(200).json({
+						fullName: response.data.full_name
+					})
+				} else {
+					return res.status(500).json({
+						errors: [
+							{
+								msg: 'Call to partner bank fail',
+							},
+						],
+					})
+				}
 				
 			}
 		} else if (result.data[0].encrypt_type == "PGP") {
@@ -875,8 +941,21 @@ router.get("/transferring-interbank",async (req,res) => {
 				},{},{
 					Id: accountId
 				},"/detail",null)
-				console.log(response.data)
-				return res.status(200).json(response.data)
+
+
+				if (response && response.status && response.status == 200) {
+					return res.status(200).json({
+						fullName: response.data.result.Fullname
+					})
+				} else {
+					return res.status(500).json({
+						errors: [
+							{
+								msg: 'Call to partner bank fail',
+							},
+						],
+					})
+				}
 			}
 		}
 
@@ -1099,7 +1178,7 @@ router.post(
 				from_fullname: dataDecryptedObject.fromFullName,
 				to_account_id: dataDecryptedObject.toAccountId,
 				to_fullname: dataDecryptedObject.toFullName,
-				from_bank_id: dataDecryptedObject.fromBankId,
+				from_bank_id: bankInfo.bank_id,
 				to_bank_id: 'EIGHT.Bank',
 				transaction_type: 'RECEIVE',
 				transaction_amount: dataDecryptedObject.transactionAmount,
