@@ -73,7 +73,7 @@ class Table extends Component {
 	render() {
 		const { desc } = this.state
 		const { data, loading, onOpenMessageModal } = this.props
-		console.log(data)
+
 		let sortedData = data
 		if (desc !== null) {
 			sortedData = sortedData.sort((a, b) =>

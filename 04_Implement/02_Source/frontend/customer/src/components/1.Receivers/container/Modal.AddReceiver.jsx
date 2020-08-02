@@ -90,9 +90,8 @@ class AddReceiverModal extends Component {
 		if (bankID === 'EIGHT.Bank') {
 			res = await api.get('/transactions/receiver-internal-banking', data)
 		} else {
-			//  API get full name interbank
-			// data.bankID= ...
-			// res = await api.get('...', data)
+			data.bankId= bankID
+			res = await api.get('/transactions/transferring-interbank', data)
 		}
 		if (res.error) {
 			const { error } = res
@@ -102,7 +101,7 @@ class AddReceiverModal extends Component {
 				accountIDLoading: false,
 			})
 		} else {
-			const { full_name: accountName } = res
+			const { fullName: accountName } = res
 			if (accountName) {
 				this.setState({
 					accountIDValid: true,

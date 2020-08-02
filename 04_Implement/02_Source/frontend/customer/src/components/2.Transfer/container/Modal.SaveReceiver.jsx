@@ -74,7 +74,6 @@ class SaveReceiverModal extends Component {
 		} = this.props
 		// eslint-disable-next-line react/destructuring-assignment
 		const { accountID, bankID, accountName } = this.props.data
-		console.log(this.props.data)
 		// Validate account ID
 		const data = {
 			fullName: accountName,
@@ -188,8 +187,8 @@ SaveReceiverModal.propTypes = {
 		bankName: PropTypes.string,
 	}),
 	onClose: PropTypes.func,
-	onSuccess: (f) => f,
-	onFailure: (f) => f,
+	// onSuccess: (f) => f,
+	// onFailure: (f) => f,
 	//
 	// invalidateData: PropTypes.func,
 	onAddAReceiver: PropTypes.func,
