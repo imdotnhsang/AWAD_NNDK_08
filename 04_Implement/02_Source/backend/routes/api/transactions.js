@@ -1081,12 +1081,16 @@ router.post(
 			}
 
 			// Kiểm tra gói tin có bị chỉnh sửa hay không
+			let hashedData = crypto
+			.createHmac('SHA1', bankInfo.secret_key)
+			.update(JSON.stringify(dataDecryptedObject))
+			.digest('hex')
+
+			console.log(hashedData)
+			console.log(req.body.data_hashed)
+
 			if (
-				req.body.data_hashed !=
-				crypto
-					.createHmac(bankInfo.hash_algorithm, bankInfo.secret_key)
-					.update(JSON.stringify(dataDecryptedObject))
-					.digest('hex')
+				req.body.data_hashed != hashedData
 			) {
 				return MakeResponse(req, res, {
 					status: APIStatus.Invalid,
@@ -1172,25 +1176,56 @@ router.post(
 				})
 			}
 
+			const customerInfoResp = await DBModelInstance.Query(Customer,{
+				default_account_id: dataDecryptedObject.toAccountId
+			},null,0,1,false)
+
+			if (customerInfoResp.status != APIStatus.Ok) {
+				return customerInfoResp
+			}
+
+			let transactionMessage = "Empty"
+			if (dataDecryptedObject.transactionMessage && dataDecryptedObject.transactionMessage != "") {
+				transactionMessage = dataDecryptedObject.transactionMessage
+			}
+
+			let feePayBySender = true
+
+			if (dataDecryptedObject.feeBySender != undefined && dataDecryptedObject.feeBySender != null) {
+				feePayBySender = dataDecryptedObject.feeBySender
+			}
+
+			let transactionPayer = "TRANSFERER"
+			if (feePayBySender == false) {
+				transactionPayer = "RECEIVER"
+			}
+
 			const transactionReceiver = new Transaction({
 				entry_time: dataDecryptedObject.entryTime,
 				from_account_id: dataDecryptedObject.fromAccountId,
 				from_fullname: dataDecryptedObject.fromFullName,
 				to_account_id: dataDecryptedObject.toAccountId,
-				to_fullname: dataDecryptedObject.toFullName,
+				to_fullname: customerInfoResp.data[0].full_name,
 				from_bank_id: bankInfo.bank_id,
 				to_bank_id: 'EIGHT.Bank',
 				transaction_type: 'RECEIVE',
 				transaction_amount: dataDecryptedObject.transactionAmount,
 				transaction_balance_before: account.balance,
+				transaction_message: transactionMessage,
+				transaction_payer: transactionPayer,
 				transaction_balance_after:
 					Number(account.balance) +
 					Number(dataDecryptedObject.transactionAmount),
 			})
 
+			let realAmount = dataDecryptedObject.transactionAmount
+			if (!feePayBySender) {
+				realAmount = realAmount + 5000
+			}
+
 			const accountReceiverResponse = await Account.findOneAndUpdate(
 				{ account_id: dataDecryptedObject.toAccountId },
-				{ $inc: { balance: dataDecryptedObject.transactionAmount } },
+				{ $inc: { balance: realAmount } },
 				{
 					new: true,
 				}

@@ -38,6 +38,19 @@ const getters = {
           result[i].entry_time = getDateFromTimeStamp(result[i].entry_time)
       }
       return result
+    },
+    listTransactionInterbank(state) {
+      if (state.admin.listTransactionInterbank.length == 0) {
+        return []
+      }
+      const n = state.admin.listTransactionInterbank.length
+      let result = []
+      for (let i=0;i<n;i++) {
+        result.push(state.admin.listTransactionInterbank[i])
+        result[i].transaction_amount = formatMoney(result[i].transaction_amount)
+        result[i].entry_time = getDateFromTimeStamp(result[i].entry_time)
+      }
+      return result
     }
 }
 

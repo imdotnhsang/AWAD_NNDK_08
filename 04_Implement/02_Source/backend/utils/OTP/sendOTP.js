@@ -139,7 +139,59 @@ const sendOTPCode = (email, fullName, otpCode, typeVerify) => {
       </div>
     </div>`
 		break
-	default:
+  case 'firstRegister':
+    subject = `Welcome to Eight Bank`
+		html = `
+    <div
+      style="
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        width: 100%;
+      "
+    >
+      <div
+        style="
+          max-width: 450px;
+          max-height: 570px;
+          padding: 36px 24px;
+          background: linear-gradient(180deg, #2b2e34 0%, #16181c 100%);
+          color: #fff;
+          border-radius: 16px;
+          margin: auto;
+        "
+      >
+      <img src="https://i.ibb.co/w0CNFNB/Logo.png" alt="Logo" border="0">
+      <div style="height:16px"></div>
+        <p style="margin: 0;color: #fff; padding-top: 16px; font-size: 16px;border-top: 1px solid #7C7F87;">
+          Hi, ${fullName}
+        </p>
+        <p
+          style="
+            margin: 0;
+            padding-top: 16px;
+            padding-bottom: 16px;
+            font-size: 16px;
+            color: #fff;
+          "
+        >
+         Welcome to EIGHT Bank. Here is your password:
+        </p>
+        <p
+          style="
+            font-size: 16px;
+            margin: 0;
+            background-color: #111111;
+            padding: 10px 24px;
+            width: fit-content;
+            border-bottom: 1px solid #7c7f87;
+          "
+        >
+          ${otpCode}
+        </p>
+      </div>
+    </div>`
+    break
+    default:
 		break
 	}
 

@@ -10,71 +10,84 @@
                                     label="Choose banks:"
                                     :options="optionsBank"
                                     placeholder="Please select"
+                                    @update:value="onChangeBank"
                                 />
                             </CCol>
-                            <CCol  lg="4" xl="4" sm="12">
+                            <CCol  lg="3" xl="3" sm="12">
                                 <CInput
                                     label="From date"
                                     type="date"
+                                    v-model="fromDate"
                                 />
                             </CCol>
-                            <CCol lg="4" xl="4" sm="12">
+                            <CCol lg="3" xl="3" sm="12">
                                 <CInput
                                     label="To date"
                                     type="date"
+                                    v-model="toDate"
                                 />
+                            </CCol>
+                            <CCol  lg="2" xl="2" sm="12">
+                                <button class="btn my-btn-primary my-custom-btn" @click="getData">
+                                    Get Data
+                                </button>
                             </CCol>
                         </CRow>
                     </CCardHeader>
                     <CCardBody>
                         <div class="table-responsive">
                             <table class="table border-table">
-                                <thead>
+                                <thead style="background-color:#eee;">
                                     <tr>
                                         <th width="5%">
 
                                         </th>
                                         <th>
-                                            Email
+                                            Date
                                         </th>
                                         <th>
-                                            Phone
+                                            Sender info
+                                        </th>
+                                       
+                                        <th>
+                                            Receiver info
                                         </th>
                                         <th>
-                                            Fullname
+                                            Transaction type
                                         </th>
-                                        <th>Status</th>
                                         <th>
-                                            Actions
+                                            Amount
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="listEmployee && listEmployee.length != 0">
-                                    <tr v-for="(value,index) in listEmployee" :key="index">
+                                <tbody class="tbody" v-if="listTransactionInterbank && listTransactionInterbank.length != 0">
+                                    <tr v-for="(value,index) in listTransactionInterbank" :key="index">
                                         <td width="5%">{{start + index}}</td>
                                         <td>
-                                            {{value.email}}
+                                            <span>
+                                                {{value.entry_time}}
+                                            </span>
                                         </td>
                                         <td>
-                                            {{value.phone_number}}
+                                            <span>{{value.from_fullname}}</span><br>
+                                            <span>{{value.from_account_id}}</span><br>
+                                            <span>{{value.from_bank_id}}</span>
+                                        </td> 
+                                        <td>
+                                            <span>{{value.to_fullname}}</span><br>
+                                            <span>{{value.to_account_id}}</span><br>
+                                             <span>{{value.to_bank_id}}</span>
                                         </td>
                                         <td>
-                                            {{value.full_name}}
+                                           <div v-if="value.transaction_type == 'RECEIVE'">
+                                                <h5><CBadge color="success">RECEIVE</CBadge></h5>
+                                            </div>
+                                            <div v-if="value.transaction_type == 'TRANSFER'">
+                                                <h5><CBadge color="danger">TRANSFER</CBadge></h5>
+                                            </div>
                                         </td>
                                         <td>
-                                            <CSwitch class="mx-1" color="success" @update:checked="doActionWithStatus(value)" :checked="value.is_active" variant="3d" />
-                                        </td>
-                                        <!-- <td>
-                                            <span style="cursor:pointer;" title="Recharge this account"><i class="fas fa-money-bill-wave btn-recharge-money"></i></span>
-                                            <span class="btn-account-info-container" title="Account detail"><i class="fas fa-info-circle btn-account-info"></i></span>
-                                        </td> -->
-                                        <td>
-                                            <button class="btn my-btn-primary" :class="{'disabled': !value.is_active}" @click.prevent="!value.is_active ? {} : showModalUpdateInfo(value)">
-                                                <span><i class="fas fa-cog"></i></span>
-                                            </button>
-                                            <button class="btn btn-primary" :class="{'disabled': !value.is_active}" style="margin-left:5px;" @click.prevent="!value.is_active ? {} : showModalResetPassword(value)">
-                                                <span><i class="fas fa-undo-alt"></i></span>
-                                            </button>
+                                            <span>{{value.transaction_amount}}</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -121,7 +134,7 @@
     </div>
 </template>
 <script>
-import {mapState} from "vuex"
+import {mapState,mapGetters} from "vuex"
 import {getPageInUrl, getLimitInUrl,setUrlDefault,getSearchTextInUrl,setUrlWithSearch,getAccountIdInUrl,getTransactionTypeInUrl} from "@/utils/getInfo"
 export default {
     name:"ManageTransaction",
@@ -132,9 +145,13 @@ export default {
             end: 0,
             lastIndex: 1,
             index: 1,
-            limit: 10,
+            limit: 1000,
             total: 0,
-            optionsBank: ["All","S2Q","BaoSonBank"] 
+            optionsBank: ["All","S2Q","BaoSonBank"],
+            bank:'ALL',
+            fromDate: '',
+            toDate: '',
+            q: {}
         }
     },
     components: {
@@ -145,12 +162,27 @@ export default {
     computed: {
         ...mapState({
             listEmployee: state => state.admin.listEmployee,
-        })
+        }),
+        ...mapGetters(['listTransactionInterbank'])
     },
     async mounted() {
         this.index = getPageInUrl()
         this.limit = getLimitInUrl()
-        this.emailOrName = getSearchTextInUrl()
+        let q = {
+            $or: [
+                {
+                    transaction_type: 'TRANSFER',
+                    to_bank_id: { $ne: 'EIGHT.Bank' },
+                    from_bank_id: 'EIGHT.Bank',
+                },
+                {
+                    transaction_type: 'RECEIVE',
+                    to_bank_id: 'EIGHT.Bank',
+                    from_bank_id: { $ne: 'EIGHT.Bank' },
+                },
+            ],
+        }
+        this.q = q
         await this.loadData()
     },
     methods: {
@@ -160,13 +192,13 @@ export default {
                 time: 0
             })
             let payload = {
+                q: this.q,
                 index: this.index,
                 limit: this.limit,
                 getTotal: true,
                 reverse: true,
-                search: this.emailOrName
             }
-            let response = await this.$store.dispatch("admin/getAllEmployee",payload)
+            let response = await this.$store.dispatch("admin/getTransactionInterbank",payload)
             if (response && !response.error) {
                 this.total = response.data.total
                 if ((this.total % this.limit) == 0) {
@@ -227,6 +259,56 @@ export default {
         },
         showModalUpdateInfo(value) {
             this.$refs.updateStaff.showModal(value)
+        },
+        async getData() {
+
+            let fromDateIndex =  Math.round((new Date()).getTime() / 1)
+
+            if (this.fromDate != "") {
+                fromDateIndex =  Math.round((new Date(this.fromDate)).getTime() / 1)
+            }
+
+            let toDateIndex =  Math.round((new Date()).getTime() / 1)
+            if (this.toDate != "") {
+                toDateIndex = Math.round((new Date(this.toDate)).getTime() / 1)
+            }
+
+            let q = {
+                $or: [
+                    {
+                        transaction_type: 'TRANSFER',
+                        to_bank_id: { $ne: 'EIGHT.Bank' },
+                        from_bank_id: 'EIGHT.Bank',
+                    },
+                    {
+                        transaction_type: 'RECEIVE',
+                        to_bank_id: 'EIGHT.Bank',
+                        from_bank_id: { $ne: 'EIGHT.Bank' },
+                    },
+                ]
+            }
+            if (this.bank != "ALL" && this.bank != "") {
+                q.$or[0].to_bank_id.$eq = this.bank
+                q.$or[1].from_bank_id.$eq = this.bank
+            }
+
+            if (this.fromDate != "" || this.toDate != "") {
+                q.entry_time = {}
+            }
+
+            if (this.fromDate != "") {
+                q.entry_time.$gte = fromDateIndex
+            }
+
+            if (this.toDate != "") {
+                q.entry_time.$lte = toDateIndex
+            }
+
+            this.q = q
+            await this.loadData()
+        },
+        onChangeBank(value) {
+            this.bank = value
         }
     }
 }
@@ -262,6 +344,9 @@ export default {
     .paginate-container {
        float: right;
    }
+    .my-custom-btn {
+        margin-top:31px;
+    }
 
 
     @media screen and (max-width: 992px) {
@@ -285,6 +370,10 @@ export default {
             float: left;
             margin-top: 10px;
         }
+        .my-custom-btn {
+            margin-top:1px;
+            width: 100%;
+        }
 
     }
 
@@ -300,14 +389,18 @@ export default {
         .btn-recharge-money {
             font-size: 15px;
         }
+        .my-custom-btn {
+            margin-top:1px;
+             width: 100%;
+        }
     }
 
-    .my-btn-primary {
-        background-color:#ff8300;color:white;
+       .tbody>tr:nth-child(odd) {
+        background-color: #fff0e1
     }
 
-    .my-btn-primary:hover {
-        background-color: #e47a0a;
+    .tbody>tr:hover {
+        background-color: #f5f5f5;
     }
 
 </style>

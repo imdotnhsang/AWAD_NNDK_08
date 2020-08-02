@@ -362,30 +362,32 @@ router.get(
 	'/all-interbank-transactions',
 	[auth, administrator],
 	async (req, res) => {
+		const q = GetQuery("q",req)
+		const offset = GetQuery('offset', req)
+		const limit = GetQuery('limit', req)
+		const reverse = GetQuery('reverse', req)
+		const getTotal = GetQuery('getTotal', req)
+
 		try {
 			const allInterbankTransactions = await Transaction.find(
-				{
-					$or: [
-						{
-							transaction_type: 'TRANSFER',
-							to_bank_id: { $ne: 'EIGHT.Bank' },
-							from_bank_id: 'EIGHT.Bank',
-						},
-						{
-							transaction_type: 'RECEIVE',
-							to_bank_id: 'EIGHT.Bank',
-							from_bank_id: { $ne: 'EIGHT.Bank' },
-						},
-					],
-				},
+				JSON.parse(q),
 				{ _id: 0, __v: 0 }
 			)
 
-			const response = {
-				msg: 'All interbank transactions successfully got.',
-				data: allInterbankTransactions,
+			const response = await DBModelInstance.Query(Transaction,JSON.parse(q),null,offset,limit,reverse)
+			if (response.status != APIStatus.Ok) {
+				return MakeResponse(req,res,response)
 			}
-			return res.status(200).json(response)
+
+			if (getTotal) {
+				const countResp = await DBModelInstance.Count(Transaction,JSON.parse(q))
+				if (countResp.status == APIStatus.Ok) {
+					response.total = countResp.total
+				}
+			}
+			
+			return MakeResponse(req,res,response)
+		
 		} catch (error) {
 			return res.status(500).json({
 				msg: 'Server error...',

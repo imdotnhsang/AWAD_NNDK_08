@@ -47,3 +47,10 @@ export function updateStaffInfo(payload) {
         data: payload.data
     })
 }
+
+export function getTransactionInterbank(payload) {
+    return request({
+        url: `/all-interbank-transactions?q=${JSON.stringify(payload.q)}&offset=${(payload.index-1)*payload.limit}&limit=${payload.limit}&getTotal=${payload.getTotal}&reverse=${payload.reverse}`,
+        method: 'get'
+    })
+}

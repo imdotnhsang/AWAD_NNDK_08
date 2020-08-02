@@ -193,7 +193,7 @@ router.post(
 			const salt = await bcrypt.genSalt(10)
 			customer.password = await bcrypt.hash(password, salt)
 
-			await sendOTPCode(customer.email, customer.full_name, customer.password, 'forgotPassword')
+			await sendOTPCode(customer.email, customer.full_name, password, 'firstRegister')
 
 			const responseCustomer = await customer.save()
 

@@ -24,7 +24,7 @@ export function rechargeMoney(payload) {
 
 export function getTransactionHistory(payload) {
     return request({
-        url: `/transaction-history/${payload.type}?historyAccountId=${payload.data.historyAccountId}&offset=${(payload.index-1)*payload.limit}&limit=${payload.limit}&getTotal=${payload.getTotal}`,
+        url: `/transaction-history/${payload.type}?historyAccountId=${payload.data.historyAccountId}&offset=${(payload.index-1)*payload.limit}&limit=${payload.limit}&getTotal=${payload.getTotal}&reverse=true`,
         method: 'get'
     })
 }

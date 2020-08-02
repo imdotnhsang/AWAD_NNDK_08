@@ -1,8 +1,9 @@
 import store from "@/store"
-import {getEmployee,createStaff,activeStaff,deactiveStaff,resetPassword,updateStaffInfo} from "@/api/admin.js"
+import {getEmployee,createStaff,activeStaff,deactiveStaff,resetPassword,updateStaffInfo,getTransactionInterbank} from "@/api/admin.js"
 import {checkIsExpired} from "@/utils/check.js"
 const state = {
-    listEmployee: []
+    listEmployee: [],
+    listTransactionInterbank: []
 }
 
 const mutations = {
@@ -12,6 +13,9 @@ const mutations = {
     SET_EXPIRED(state,data) {
         store.commit('SET_EXPIRED',data)
     },
+    SET_LIST_TRANSACTION_INTERBANK(state,data) {
+      state.listTransactionInterbank = data
+    }
 }
 
 const actions = {
@@ -116,6 +120,29 @@ const actions = {
           }).catch(err => reject(err))
         })
     },
+    getTransactionInterbank(ctx, payload) {
+      return new Promise((resolve,reject) => {
+        getTransactionInterbank(payload).then(response => {
+              if (response && !response.error) {
+                  if (!payload.noCommitState) {
+                    ctx.commit('SET_LIST_TRANSACTION_INTERBANK',response.data.data)
+                  }
+              } else {
+                  if (checkIsExpired(response)) {
+                      ctx.commit('SET_LIST_TRANSACTION_INTERBANK',[])
+                      ctx.commit('SET_EXPIRED',true)
+                      resolve(response)
+                      return
+                  } else {
+                      if (!payload.noCommitState) {
+                          ctx.commit('SET_LIST_TRANSACTION_INTERBANK',[])
+                      }
+                  }
+              }
+              resolve(response)
+          }).catch(err => reject(err))
+      })
+  }
 }
 
 export default ({
