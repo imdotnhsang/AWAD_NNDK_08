@@ -8,6 +8,7 @@ import {
 
 // export const host = 'https://mock-api-eight-bank.herokuapp.com'
 
+// http://34.87.97.142
 export const host = 'http://34.87.97.142'
 export const apiHost = `${host}/`
 // const authType = 'Bearer'

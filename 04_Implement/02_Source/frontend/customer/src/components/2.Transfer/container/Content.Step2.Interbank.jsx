@@ -141,11 +141,14 @@ class Step2Content extends Component {
 		})
 	}
 
-	handleSelect(value) {
+	handleSelect(value, text) {
 		this.setState((prevState) => ({
+			tab2Input:'',
 			newReceiver: {
-				...prevState.newReceiver,
+				accountID:'',
+				accountName:'',
 				bankID: value,
+				bankName: text,
 				errorSelect: '',
 			},
 		}))
@@ -177,10 +180,10 @@ class Step2Content extends Component {
 		})
 		// API get full name interbank
 		const data = {
-			accountID: tab2Input,
-			bankID,
+			accountId: tab2Input,
+			bankId: bankID,
 		}
-		const res = await api.get('...', data)
+		const res = await api.get('/transactions/transferring-interbank', data)
 		if (res.error) {
 			const { error } = res
 			this.setState({
@@ -188,13 +191,18 @@ class Step2Content extends Component {
 				loading: false,
 			})
 		} else {
-			const { valid } = res
-			if (valid) {
+			const { fullName } = res
+			if (fullName) {
+				// newReceiver.accountName = fullName
 				this.setState({
 					loading: false,
-					newReceiver: res.data,
+					newReceiver: {
+						...newReceiver,
+						accountName: fullName,
+						accountID: tab2Input,
+					},
 				})
-				this.handleOnChange(res.data)
+				this.handleOnChange(this.state.newReceiver)
 			} else {
 				this.setState({
 					error: 'Invalid card number',
@@ -290,7 +298,9 @@ class Step2Content extends Component {
 							<Select
 								associated
 								disabled={loading}
-								value={newReceiver.bankID}
+								value={newReceiver && newReceiver.bankID}
+								data={newReceiver}
+								text
 								error={errorSelect}
 								onChange={this.handleSelect}
 							/>
@@ -307,9 +317,9 @@ class Step2Content extends Component {
 							<SearchButton disabled={loading} onClick={this.handleSearch} />
 						</SearchWrapper>
 						<Display
-							name={newReceiver.accountName}
-							bankName={newReceiver.bankName}
-							cardNumber={newReceiver.accountID}
+							name={newReceiver && newReceiver.accountName}
+							bankName={newReceiver && newReceiver.bankName}
+							cardNumber={newReceiver && newReceiver.accountID}
 							loading={loading}
 						/>
 					</>
