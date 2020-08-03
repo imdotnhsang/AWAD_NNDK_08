@@ -51,6 +51,12 @@ const getters = {
         result[i].entry_time = getDateFromTimeStamp(result[i].entry_time)
       }
       return result
+    },
+    totalTransfer(state) {
+      return formatMoney(state.admin.totalTransfer)
+    },
+    totalReceive(state) {
+      return formatMoney(state.admin.totalReceive)
     }
 }
 

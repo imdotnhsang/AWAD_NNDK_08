@@ -87,8 +87,18 @@
                             </table>
                         </div>
                         <div class="row" style="margin-bottom:-20px;">
-                            <div class="col-lg-6" style="padding-top:8px;">
-                                <span>Show <b>{{start}}</b> - <b>{{end}}</b> accounts</span>
+                            <div class="col-lg-6">
+                              <span>Show <b>{{start}} - {{end}}</b> in <b>{{total}}</b> staff. Maximum
+                                    <div class="form-group" style="display:inline-block;" @change="onChangeLimit($event)">
+                                        <select class="form-control" v-model="currentLimit">
+                                            <option>10</option>
+                                            <option>20</option>
+                                            <option>50</option>
+                                            <option>100</option>
+                                        </select>
+                                    </div>
+                                    staff each page
+                                </span>
                             </div>
                             <div class="col-lg-6">
                                <div class="paginate-container">
@@ -134,7 +144,8 @@ export default {
             lastIndex: 1,
             index: 1,
             limit: 10,
-            total: 0
+            total: 0,
+            currentLimit: 10
         }
     },
     components: {
@@ -227,6 +238,12 @@ export default {
         },
         showModalUpdateInfo(value) {
             this.$refs.updateStaff.showModal(value)
+        },
+        async onChangeLimit(event) {
+            this.limit = parseInt(event.target.value);
+            this.index = 1
+            setUrlDefault(this.index, this.limit)
+            await this.loadData()
         }
     }
 }

@@ -35,6 +35,18 @@
                         </CRow>
                     </CCardHeader>
                     <CCardBody>
+                        <CRow style="margin-bottom:10px;" v-if="listTransactionInterbank && listTransactionInterbank.length != 0">
+                            <CCol lg="6" xl="6" md="12" sm="12">
+                                <div>
+                                    <span><b>Total transfer:</b> {{totalTransfer}}</span>
+                                </div>
+                            </CCol>
+                            <CCol lg="6" xl="6" md="12" sm="12">
+                                <div style="float:right;">
+                                    <span><b>Total receive:</b> {{totalReceive}}</span>
+                                </div>
+                            </CCol>
+                        </CRow>
                         <div class="table-responsive">
                             <table class="table border-table">
                                 <thead style="background-color:#eee;">
@@ -98,9 +110,20 @@
                                 </tbody>
                             </table>
                         </div>
+
                         <div class="row" style="margin-bottom:-20px;">
-                            <div class="col-lg-6" style="padding-top:8px;">
-                                <span>Show <b>{{start}}</b> - <b>{{end}}</b> accounts</span>
+                            <div class="col-lg-6">
+                                <span>Show <b>{{start}} - {{end}}</b> in <b>{{total}}</b> transactions. Maximum
+                                    <div class="form-group" style="display:inline-block;" @change="onChangeLimit($event)">
+                                        <select class="form-control" v-model="currentLimit">
+                                            <option>10</option>
+                                            <option>50</option>
+                                            <option>100</option>
+                                            <option>1000</option>
+                                        </select>
+                                    </div>
+                                    transactions each page
+                                </span>
                             </div>
                             <div class="col-lg-6">
                                <div class="paginate-container">
@@ -148,10 +171,11 @@ export default {
             limit: 1000,
             total: 0,
             optionsBank: ["All","S2Q","BaoSonBank"],
-            bank:'ALL',
+            bank:'All',
             fromDate: '',
             toDate: '',
-            q: {}
+            q: {},
+            currentLimit: 10
         }
     },
     components: {
@@ -163,7 +187,7 @@ export default {
         ...mapState({
             listEmployee: state => state.admin.listEmployee,
         }),
-        ...mapGetters(['listTransactionInterbank'])
+        ...mapGetters(['listTransactionInterbank','totalTransfer','totalReceive'])
     },
     async mounted() {
         this.index = getPageInUrl()
@@ -218,59 +242,22 @@ export default {
                 time: 200
             })
         },
-        async searchEmployee(e) {
-            e.preventDefault()
-            this.index = 1
-            setUrlWithSearch(this.index,this.limit,this.emailOrName)
-            await this.loadData()
-        },
-        showModalCreateStaff() {
-            this.$refs.modalCreateStaff.showModal()
-        },
         async onPaginationClick(pageNum) {
             this.index = pageNum
             setUrlDefault(this.index, this.limit)
             await this.loadData()
         },
-        async doActionWithStatus(value) {
-            let payload = {
-                data: {
-                    username: value.username
-                }
-            }
-
-            let actionName = ""
-            if (value.is_active) {
-                actionName = "admin/deactiveStaff"
-            } else {
-                actionName = "admin/activeStaff"
-            }
-
-            let response = await this.$store.dispatch(actionName,payload)
-            if (response && !response.error) {
-                value.is_active = !value.is_active
-            } else {
-                alert("Something went wrong")
-            }
-
-        },
-        showModalResetPassword(value) {
-            this.$refs.resetPassword.showModal(value)
-        },
-        showModalUpdateInfo(value) {
-            this.$refs.updateStaff.showModal(value)
-        },
         async getData() {
-
-            let fromDateIndex =  Math.round((new Date()).getTime() / 1)
+            this.index = 1
+            let fromDateIndex =  Math.round((new Date()) / 1)
 
             if (this.fromDate != "") {
-                fromDateIndex =  Math.round((new Date(this.fromDate)).getTime() / 1)
+                fromDateIndex =  Math.round((new Date(this.fromDate)) / 1)
             }
 
-            let toDateIndex =  Math.round((new Date()).getTime() / 1)
+            let toDateIndex =  Math.round((new Date())/ 1)
             if (this.toDate != "") {
-                toDateIndex = Math.round((new Date(this.toDate)).getTime() / 1)
+                toDateIndex = Math.round((new Date(this.toDate)) / 1)
             }
 
             let q = {
@@ -287,7 +274,7 @@ export default {
                     },
                 ]
             }
-            if (this.bank != "ALL" && this.bank != "") {
+            if (this.bank != "All" && this.bank != "") {
                 q.$or[0].to_bank_id.$eq = this.bank
                 q.$or[1].from_bank_id.$eq = this.bank
             }
@@ -309,7 +296,13 @@ export default {
         },
         onChangeBank(value) {
             this.bank = value
-        }
+        },
+        async onChangeLimit(event) {
+            this.limit = parseInt(event.target.value);
+            this.index = 1
+            setUrlDefault(this.index, this.limit)
+            await this.loadData()
+        },
     }
 }
 </script>

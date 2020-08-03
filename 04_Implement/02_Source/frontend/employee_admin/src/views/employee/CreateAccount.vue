@@ -32,7 +32,12 @@
                             label="Email"
                             placeholder="Enter the sign-in email"
                             v-model="email"
+                            type="email"
                             style="margin-bottom:5px;margin-top:10px;"
+                            invalid-feedback="Please enter a valid email"
+                            autocomplete="email"
+                            required
+                            was-validated
                         />
                     </div>
                     <div v-else-if="step==2">
@@ -64,13 +69,21 @@
                             placeholder="Enter the account's name"
                             v-model="name"
                             style="margin-bottom:5px;margin-top:10px;"
-                           
+                            invalid-feedback="Name is required"
+                            required
+                             was-validated
                         />
                         <CInput
                             label="Phone"
                             placeholder="Enter the account's phone number"
                             v-model="phone"
                             style="margin-bottom:5px;margin-top:10px;"
+                            required
+                            autocomplete="tel"
+                            type="tel"
+                            invalid-feedback="Phone number is invalid"
+                            was-validated
+                            
                         />
                     </div>
                     <div v-else-if="step==3">
@@ -145,7 +158,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary"  v-if="step==1" @click="hideModal">Cancel</button>
                     <button type="button" class="btn btn-secondary" v-else-if="step!=4" @click="step--">Back</button>
-                    <button type="button" class="btn btn-success" v-if="step!=4" @click="step++">Next</button>
+                    <button type="button" class="btn btn-success" v-if="step!=4" @click="verifyNextStep">Next</button>
                      <button type="button" class="btn btn-success" v-else @click="hideModal">OK</button>
                 </div>
                 </div>
@@ -156,6 +169,7 @@
 
 <script>
 import {getDateFromTimeStamp} from "@/utils/convert.js"
+import {validateEmail} from "@/utils/check.js"
 export default {
     name: "CreateAccount",
     components: {
@@ -192,6 +206,15 @@ export default {
                 this.isChosen1000k =  false
                 this.isChosen5000k= false
                 this.isChosen10000k = true
+            }
+        },
+        verifyNextStep() {
+            if (this.step == 1) {
+                if (validateEmail(this.email)) {
+                    this.step++
+                }
+            } else {
+                this.step++
             }
         }
     },

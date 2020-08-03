@@ -3,7 +3,9 @@ import {getEmployee,createStaff,activeStaff,deactiveStaff,resetPassword,updateSt
 import {checkIsExpired} from "@/utils/check.js"
 const state = {
     listEmployee: [],
-    listTransactionInterbank: []
+    listTransactionInterbank: [],
+    totalReceive: 0,
+    totalTransfer: 0
 }
 
 const mutations = {
@@ -15,6 +17,12 @@ const mutations = {
     },
     SET_LIST_TRANSACTION_INTERBANK(state,data) {
       state.listTransactionInterbank = data
+    },
+    SET_TOTAL_RECEIVE(state, data) {
+      state.totalReceive = data
+    },
+    SET_TOTAL_TRANSFER(state,data) {
+      state.totalTransfer = data
     }
 }
 
@@ -125,17 +133,23 @@ const actions = {
         getTransactionInterbank(payload).then(response => {
               if (response && !response.error) {
                   if (!payload.noCommitState) {
-                    ctx.commit('SET_LIST_TRANSACTION_INTERBANK',response.data.data)
+                    ctx.commit('SET_LIST_TRANSACTION_INTERBANK',response.data.data.listTransaction)
+                    ctx.commit('SET_TOTAL_RECEIVE',response.data.data.totalReceive)
+                    ctx.commit('SET_TOTAL_TRANSFER',response.data.data.totalTransfer)
                   }
               } else {
                   if (checkIsExpired(response)) {
                       ctx.commit('SET_LIST_TRANSACTION_INTERBANK',[])
+                      ctx.commit('SET_TOTAL_RECEIVE',0)
+                      ctx.commit('SET_TOTAL_TRANSFER',0)
                       ctx.commit('SET_EXPIRED',true)
                       resolve(response)
                       return
                   } else {
                       if (!payload.noCommitState) {
                           ctx.commit('SET_LIST_TRANSACTION_INTERBANK',[])
+                          ctx.commit('SET_TOTAL_RECEIVE',0)
+                          ctx.commit('SET_TOTAL_TRANSFER',0)
                       }
                   }
               }

@@ -25,11 +25,8 @@
                     <template #prepend-content><CIcon name="cil-lock-locked"/></template>
                   </CInput>
                   <CRow>
-                    <CCol col="6" class="text-left">
-                      <button class="btn btn-primary px-4"  @click="login">Login</button>
-                    </CCol>
-                    <CCol col="6" class="text-right">
-                      <CButton color="link" class="px-0">Forgot password?</CButton>
+                    <CCol col="12" class="text-left">
+                      <button style="width:100%;" class="btn btn-primary px-4"  @click="login">Login</button>
                     </CCol>
                   </CRow>
                 </CForm>

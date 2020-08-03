@@ -3,7 +3,7 @@ import axios from 'axios'
 // create an axios instance
 const service = axios.create({
     baseURL: "http://34.87.97.142/employees", // url = base url + request url
-    //baseURL: "http://localhost:5000/employees",
+   // baseURL: "http://localhost:5000/employees",
     timeout: 15000, // request timeout,
     withCredentials:true
 })

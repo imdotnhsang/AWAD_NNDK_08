@@ -14,6 +14,7 @@ const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 const { GetQuery } = require('../../utils/GetQuery.js')
 const DBModel = require('../../utils/DBModel.js')
 const StaffAction = require('../../action/staff')
+const { count } = require('../../models/Transaction')
 
 const DBModelInstance = new DBModel()
 // @route     GET /administrators/all-staffs
@@ -369,24 +370,48 @@ router.get(
 		const getTotal = GetQuery('getTotal', req)
 
 		try {
-			const allInterbankTransactions = await Transaction.find(
-				JSON.parse(q),
-				{ _id: 0, __v: 0 }
-			)
-
-			const response = await DBModelInstance.Query(Transaction,JSON.parse(q),null,offset,limit,reverse)
-			if (response.status != APIStatus.Ok) {
-				return MakeResponse(req,res,response)
+	
+			let result = await DBModelInstance.Query(Transaction,JSON.parse(q),null,offset,limit,reverse)
+			if (result.status != APIStatus.Ok) {
+				return MakeResponse(req,res,result)
 			}
 
 			if (getTotal) {
 				const countResp = await DBModelInstance.Count(Transaction,JSON.parse(q))
 				if (countResp.status == APIStatus.Ok) {
-					response.total = countResp.total
+					result.total = countResp.total
 				}
 			}
+
+			let totalTransfer = 0
+			let totalReceive = 0
+
+			let countData = await DBModelInstance.Query(Transaction,JSON.parse(q),null,0,0,true)
+			if (countData.status == APIStatus.Ok) {
+				const n = countData.data.length
+				for (let i=0;i<n;i++) {
+					if (countData.data[i].transaction_type == "TRANSFER") {
+						totalTransfer = totalTransfer + countData.data[i].transaction_amount
+					} else if (countData.data[i].transaction_type == "RECEIVE") {
+						totalReceive = totalReceive + countData.data[i].transaction_amount
+					}
+				}
+			}
+
+
+
 			
-			return MakeResponse(req,res,response)
+			return MakeResponse(req,res,{
+				status: APIStatus.Ok,
+				data: 
+					{
+						listTransaction: result.data,
+						totalTransfer,
+						totalReceive
+					}
+				,
+				total: result.total
+			})
 		
 		} catch (error) {
 			return res.status(500).json({
