@@ -82,7 +82,7 @@
                             autocomplete="tel"
                             type="tel"
                             invalid-feedback="Phone number is invalid"
-                            was-validated
+                             :is-valid="verifyPhone"
                             
                         />
                     </div>
@@ -169,7 +169,7 @@
 
 <script>
 import {getDateFromTimeStamp} from "@/utils/convert.js"
-import {validateEmail} from "@/utils/check.js"
+import {validateEmail,isVietnamesePhoneNumber} from "@/utils/check.js"
 export default {
     name: "CreateAccount",
     components: {
@@ -197,7 +197,7 @@ export default {
                 this.isChosen5000k= false
                 this.isChosen10000k = false
             } else if (value == 5000000) {
-                    this.isChosen500k = false
+                this.isChosen500k = false
                 this.isChosen1000k =  false
                 this.isChosen5000k= true
                 this.isChosen10000k = false
@@ -208,14 +208,38 @@ export default {
                 this.isChosen10000k = true
             }
         },
-        verifyNextStep() {
+        async verifyNextStep() {
             if (this.step == 1) {
                 if (validateEmail(this.email)) {
                     this.step++
                 }
-            } else {
-                this.step++
+            } else if (this.step == 2 ) {
+                if (this.name != "" && isVietnamesePhoneNumber(this.phone)) {
+                    this.step++
+                }
+            } 
+            else if (this.step == 3) {
+                let payload = {
+                    data: {
+                        fullName: this.name,
+                        email: this.email,
+                        phoneNumber: this.phone,
+                        balance: this.balance
+                    }
+                }
+                let response = await this.$store.dispatch("employee/registerCustomer", payload)
+                if (response && !response.error) {
+                    this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
+                    this.title = "Success!"
+                    this.step++
+                } else {
+                    alert(response.error.response.data.errors[0].msg)
+                   
+                }
             }
+        },
+        verifyPhone(val) {
+            return isVietnamesePhoneNumber(val)
         }
     },
     data: function() {
@@ -232,34 +256,12 @@ export default {
             title: "Add an account",
             password: '123456',
             cardNumber: '5670 1234 6578 9182',
-            createdAt: '13:00 23/05/2020'
+            createdAt: '13:00 23/05/2020',
+
         }
     },
     watch: {
-        step: async function(val) {
-            if (val != 4) {
-                this.title = "Add an account"
-
-                if (val == 3) {
-                    let payload = {
-                        data: {
-                            fullName: this.name,
-                            email: this.email,
-                            phoneNumber: this.phone,
-                            balance: this.balance
-                        }
-                    }
-                    let response = await this.$store.dispatch("employee/registerCustomer", payload)
-                    if (response && !response.error) {
-                        this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
-                    } else {
-                        alert("ERROR")
-                    }
-                }
-            } else {
-                this.title = "Success!"
-            }
-        }
+       
     }
 }
 </script>
