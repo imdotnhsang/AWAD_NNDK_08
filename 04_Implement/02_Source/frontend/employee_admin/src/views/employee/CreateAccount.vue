@@ -108,6 +108,9 @@
                             type="number"
                             v-model="balance"
                             style="margin-bottom:5px;margin-top:10px;"
+                            min="50000"
+                            invalid-feedback="Please enter a valid money"
+                            :is-valid="verifyMoney"
                         />
                         <label style="margin-top:5px;">Or select an amount of money below:</label><br>
                         <CRow>
@@ -240,6 +243,16 @@ export default {
         },
         verifyPhone(val) {
             return isVietnamesePhoneNumber(val)
+        },
+        verifyMoney(val) {
+            if (val.length < 1) {
+                return false
+            }
+
+            if (val < 0 || val < 50000) {
+                return false
+            }
+
         }
     },
     data: function() {
