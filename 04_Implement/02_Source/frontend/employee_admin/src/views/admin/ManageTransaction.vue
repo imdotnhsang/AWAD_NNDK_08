@@ -252,12 +252,12 @@ export default {
             let fromDateIndex =  Math.round((new Date()) / 1)
 
             if (this.fromDate != "") {
-                fromDateIndex =  Math.round((new Date(this.fromDate)) / 1)
+                fromDateIndex =  Math.round((new Date(this.fromDate + " 00:00:00")) / 1)
             }
 
             let toDateIndex =  Math.round((new Date())/ 1)
             if (this.toDate != "") {
-                toDateIndex = Math.round((new Date(this.toDate)) / 1)
+                toDateIndex = Math.round((new Date(this.toDate + " 23:59:59")) / 1)
             }
 
             let q = {
@@ -283,9 +283,11 @@ export default {
                 q.entry_time = {}
             }
 
+          
             if (this.fromDate != "") {
                 q.entry_time.$gte = fromDateIndex
             }
+            
 
             if (this.toDate != "") {
                 q.entry_time.$lte = toDateIndex
