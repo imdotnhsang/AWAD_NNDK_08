@@ -6,7 +6,7 @@ const config = require('config')
 
 const connectDB = async () => {
 	try {
-		await mongoose.connect(config.get('mongoURISuperFast'), {
+		await mongoose.connect(config.get('mongoURISuperFast_demo'), {
 			useNewUrlParser: true,
 			useUnifiedTopology: true,
 			useFindAndModify: false,

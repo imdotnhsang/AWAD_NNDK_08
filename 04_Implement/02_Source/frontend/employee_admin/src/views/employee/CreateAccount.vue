@@ -5,7 +5,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{title}}</h5>
+                    <h5 class="modal-title" style="padding-top:5px;" id="exampleModalLabel">{{title}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -103,7 +103,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <CInput
+                        <!-- <CInput
                             label="Balance"
                             type="number"
                             v-model="balance"
@@ -111,7 +111,10 @@
                             min="50000"
                             invalid-feedback="Please enter a valid money"
                             :is-valid="verifyMoney"
-                        />
+                        /> -->
+                        <label style="margin-top:10px;">Balance</label>
+                        <InputMoney ref="inputMoney"/>
+
                         <label style="margin-top:5px;">Or select an amount of money below:</label><br>
                         <CRow>
                             <CCol lg="3" sm="12">
@@ -141,10 +144,10 @@
                                     </div>
 
                                     <label style="margin-top:15px;margin-bottom:5px;">Card information</label>
-                                    <div style="background-color:#ddd;height:100px;padding:10px;">
+                                    <div style="background-color:#ddd;height:110px;padding:10px;">
                                         <label><span>Card number:</span><span style="margin-left:25px;">{{cardNumber}}</span></label><br>
-                                        <label><span>Balance:</span><span style="margin-left:58px;">{{balance}}</span></label><br>
-                                        <label><span>Created at:</span><span style="margin-left:40px">{{createdAt}}</span></label>
+                                        <label><span>Balance:</span><span style="margin-left:62px;">{{formatedBalance}} VND</span></label><br>
+                                        <label><span>Created at:</span><span style="margin-left:46px">{{createdAt}}</span></label>
                                     </div>
 
                                     <label style="margin-top:5px;margin-bottom:5px;">Personal information</label>
@@ -171,12 +174,13 @@
 </template>
 
 <script>
-import {getDateFromTimeStamp} from "@/utils/convert.js"
+import {getDateFromTimeStamp,formatMoney} from "@/utils/convert.js"
 import {validateEmail,isVietnamesePhoneNumber} from "@/utils/check.js"
 export default {
     name: "CreateAccount",
     components: {
-        Money: () => import("@/views/employee/Money.vue")
+        Money: () => import("@/views/employee/Money.vue"),
+        InputMoney: () => import("@/views/employee/InputMoney.vue")
     },
     methods: {
         showModal() {
@@ -188,7 +192,7 @@ export default {
             $("#modal-create-account").modal('hide')
         },
         chooseValue(value) {
-            this.balance = value
+            this.$refs.inputMoney.setRealValue(value)
             if (value == 500000) {
                 this.isChosen500k = true
                 this.isChosen1000k =  false
@@ -222,23 +226,30 @@ export default {
                 }
             } 
             else if (this.step == 3) {
-                let payload = {
-                    data: {
-                        fullName: this.name,
-                        email: this.email,
-                        phoneNumber: this.phone,
-                        balance: this.balance
+                this.balance = this.$refs.inputMoney.getRealValue()
+                let valid = this.$refs.inputMoney.verifyMoney()
+                if (valid) {
+                    let payload = {
+                        data: {
+                            fullName: this.name,
+                            email: this.email,
+                            phoneNumber: this.phone,
+                            balance: this.balance
+                        }
                     }
-                }
-                let response = await this.$store.dispatch("employee/registerCustomer", payload)
-                if (response && !response.error) {
-                    this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
-                    this.title = "Success!"
-                    this.step++
-                } else {
-                    alert(response.error.response.data.errors[0].msg)
-                   
-                }
+                    let response = await this.$store.dispatch("employee/registerCustomer", payload)
+                    console.log(response)
+                    if (response && !response.error) {
+                        this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
+                        this.cardNumber = response.data.data.card_info.default_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')
+                        this.password = response.data.data.login_info.password
+                        this.title = "Success!"
+                        this.formatedBalance = formatMoney(this.balance)
+                        this.step++
+                    } else {
+                        alert(response.error.response.data.errors[0].msg)
+                    }
+                }   
             }
         },
         verifyPhone(val) {
@@ -267,9 +278,10 @@ export default {
             isChosen5000k:false,
             isChosen10000k: false,
             title: "Add an account",
-            password: '123456',
-            cardNumber: '5670 1234 6578 9182',
+            password: '',
+            cardNumber: '',
             createdAt: '13:00 23/05/2020',
+            formatedBalance: ''
 
         }
     },
