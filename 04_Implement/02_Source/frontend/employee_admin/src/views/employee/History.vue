@@ -11,6 +11,7 @@
                                     placeholder="Enter email or card number"
                                     v-model="emailOrCardNumber"
                                     style="margin-bottom:10px;"
+                                     @keyup="onSearchKeyUp"
                                 >
                                  <template #append>
                                     <CButton color="info" @click="searchCustomer"><i class="fas fa-search"></i></CButton>
@@ -222,7 +223,8 @@ export default {
             activeTranferTab:false,
             activeDebtTab:false,
             activeTab: 0,
-            currentLimit: 10
+            currentLimit: 10,
+            backUpSearchData: ""
         }
     },
     methods: {
@@ -319,6 +321,15 @@ export default {
             this.index = 1
             setUrlDefault(this.index, this.limit)
             await this.loadData()
+        },
+        async onSearchKeyUp(e) {
+            if (e.keyCode == 13 && this.backUpSearchData != "") {
+                await this.searchCustomer(e)
+            } else if (this.emailOrCardNumber == "" && this.backUpSearchData != "") {
+                this.index = 1
+                await this.loadData()
+            }
+            this.backUpSearchData = this.emailOrCardNumber
         }
     }
 }
