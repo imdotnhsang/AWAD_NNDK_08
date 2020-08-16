@@ -24,9 +24,10 @@
                   >
                     <template #prepend-content><CIcon name="cil-lock-locked"/></template>
                   </CInput>
+                   <vue-recaptcha ref="recaptcha" @verify="onVerify" :sitekey="sitekey" :loadRecaptchaScript="true"></vue-recaptcha>
                   <CRow>
                     <CCol col="12" class="text-left">
-                      <button style="width:100%;" class="btn btn-primary px-4"  @click="login">Login</button>
+                      <button style="width:100%;margin-top:10px;" class="btn btn-primary px-4"  @click="login">Login</button>
                     </CCol>
                   </CRow>
                 </CForm>
@@ -57,13 +58,21 @@
 </template>
 
 <script>
+import VueRecaptcha from "vue-recaptcha";
 export default {
   name: 'Login',
   data: function() {
     return {
       password: '',
-      username: ''
+      username: '',
+      sitekey: "6Ld9lb8ZAAAAAGOD6N3AI0ECFmQQqZ8QI5fAnILG",
+      secretkey: "6Ld9lb8ZAAAAAHbPZnbIQQdAabLJrx_lHVpV4dWZ",
+      responseCaptcha: "",
+      isWrongCatcha: false,
     }
+  },
+  components: {
+    VueRecaptcha
   },
   mounted() {
     if (localStorage.getItem('wnc_access_token') && localStorage.getItem('wnc_access_token') != '') {
@@ -73,6 +82,12 @@ export default {
   methods: {
     async login(e) {
       e.preventDefault()
+
+      if (this.responseCaptcha == "") {
+        alert("Please verify captcha")
+        return
+      }
+
       const payload = {
         data: {
           username: this.username,
@@ -94,6 +109,12 @@ export default {
         })
         alert("Login fail!!!")
       }
+
+      this.responseCaptcha = ""
+
+    },
+    onVerify(response) {
+      this.responseCaptcha = response;
     }
   }
 }
