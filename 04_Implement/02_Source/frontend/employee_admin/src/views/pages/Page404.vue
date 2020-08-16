@@ -8,15 +8,9 @@
           <h4 class="pt-3">Oops! You're lost.</h4>
           <p class="text-muted">The page you are looking for was not found.</p>
         </div>
-        <CInput
-          class="mb-3"
-          placeholder="What are you looking for?"
-        >
-          <template #prepend-content><CIcon name="cil-magnifying-glass"/></template>
-          <template #append>
-            <CButton color="info">Search</CButton>
-          </template>
-        </CInput>
+        <CButton style="width:100%;" color="primary" @click="$router.push('/')">
+          Go to Homepage
+        </CButton>
       </div>
       </CCol>
     </CRow>
