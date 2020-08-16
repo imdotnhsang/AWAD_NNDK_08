@@ -92,7 +92,7 @@ export default {
           isLoadingRedirect: false,
           time: 500
         })
-        alert("Đăng nhập thất bại")
+        alert("Login fail!!!")
       }
     }
   }

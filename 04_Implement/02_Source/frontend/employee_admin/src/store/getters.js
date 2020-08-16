@@ -57,6 +57,9 @@ const getters = {
     },
     totalReceive(state) {
       return formatMoney(state.admin.totalReceive)
+    },
+    sidebarContent(state) {
+      return state.sidebarContent
     }
 }
 

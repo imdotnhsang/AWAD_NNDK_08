@@ -29,7 +29,7 @@
       </div>
     </CSidebarBrand>
 
-    <CRenderFunction flat :content-to-render="$options.nav"/>
+    <CRenderFunction flat :content-to-render="sidebarContent"/>
     <CSidebarMinimizer
       class="d-md-down-none"
       @click.native="$store.commit('set', ['sidebarMinimize', !minimize])"
@@ -38,18 +38,23 @@
 </template>
 
 <script>
-import nav from './_nav'
+//import nav from './_nav'
+import {mapGetters} from "vuex"
 
 export default {
   name: 'TheSidebar',
-  nav,
+  //nav,
   computed: {
     show () {
       return this.$store.state.sidebarShow 
     },
     minimize () {
       return this.$store.state.sidebarMinimize 
-    }
+    },
+     ...mapGetters(['sidebarContent'])
+  },
+  mounted() {
+    this.$store.commit('LOAD_SIDEBAR')
   }
 }
 </script>

@@ -11,6 +11,7 @@
                                     placeholder="Enter email or name"
                                     v-model="emailOrName"
                                     style="margin-bottom:10px;"
+                                    @keyup="onSearchKeyUp"
                                 >
                                  <template #append>
                                     <CButton color="info" @click="searchEmployee"><i class="fas fa-search"></i></CButton>
@@ -145,7 +146,8 @@ export default {
             index: 1,
             limit: 10,
             total: 0,
-            currentLimit: 10
+            currentLimit: 10,
+            backUpSearchData: ''
         }
     },
     components: {
@@ -244,6 +246,16 @@ export default {
             this.index = 1
             setUrlDefault(this.index, this.limit)
             await this.loadData()
+        },
+        async onSearchKeyUp(e) {
+     
+            if (e.keyCode == 13 && this.backUpSearchData != "") {
+                await this.searchEmployee(e)
+            } else if (this.emailOrName == "" && this.backUpSearchData != "") {
+                this.index = 1
+                await this.loadData()
+            }
+            this.backUpSearchData = this.emailOrName
         }
     }
 }

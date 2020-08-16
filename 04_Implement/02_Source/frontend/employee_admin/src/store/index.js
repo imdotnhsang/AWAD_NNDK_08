@@ -21,7 +21,8 @@ const state = {
   sidebarMinimize: false,
   isLoadingRedirect: false,
   expired: true,
-  userInfo: []
+  userInfo: [],
+  sidebarContent: []
 }
 
 const mutations = {
@@ -36,6 +37,57 @@ const mutations = {
   set (state, [variable, value]) {
     state[variable] = value
   },
+  LOAD_SIDEBAR(state) {
+    if (window.localStorage.getItem('position') == "ADMINISTRATOR") {
+      state.sidebarContent =  [
+        {
+          _name: 'CSidebarNav',
+          _children: [
+            {
+              _name: 'CSidebarNavTitle',
+              _children: ['ADMIN']
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'Manage Employee',
+              to: '/admin/manage-employee',
+              icon: 'cil-cursor'
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'Manage Transaction',
+              to: '/admin/manage-transaction',
+              icon: 'cil-puzzle'
+            }
+          ]
+        }
+      ]
+    } else {
+      state.sidebarContent =  [
+        {
+          _name: 'CSidebarNav',
+          _children: [
+            {
+              _name: 'CSidebarNavTitle',
+              _children: ['EMPLOYEE']
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'Accounts',
+              to: '/employee/accounts',
+              icon: 'cil-cursor'
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'History',
+              to: '/employee/history',
+              icon: 'cil-calculator'
+            },
+          ]
+        }
+      ]
+    }
+  },
   LOGIN(state,data) {
     window.localStorage.setItem('wnc_access_token',data['access_token'])
     window.localStorage.setItem('wnc_refresh_token',data['refresh_token'])
@@ -44,10 +96,59 @@ const mutations = {
     document.cookie = `access_token=${window.localStorage.getItem("wnc_access_token")};refresh_token=${window.localStorage.getItem("wnc_refresh_token")}`;
     state.userInfo.fullName = data.fullName
     state.userInfo.position = data.position
-   // document.cookie = `access_token=${window.localStorage.getItem("wnc_access_token")}`;
-   if (window.localStorage.getItem('wnc_access_token') != '') {
-     state.expired = false
-   }
+    // document.cookie = `access_token=${window.localStorage.getItem("wnc_access_token")}`;
+    if (window.localStorage.getItem('wnc_access_token') != '') {
+      state.expired = false
+    }
+    if (data.position == "ADMINISTRATOR") {
+      state.sidebarContent =  [
+        {
+          _name: 'CSidebarNav',
+          _children: [
+            {
+              _name: 'CSidebarNavTitle',
+              _children: ['ADMIN']
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'Manage Employee',
+              to: '/admin/manage-employee',
+              icon: 'cil-cursor'
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'Manage Transaction',
+              to: '/admin/manage-transaction',
+              icon: 'cil-puzzle'
+            }
+          ]
+        }
+      ]
+    } else {
+      state.sidebarContent =  [
+        {
+          _name: 'CSidebarNav',
+          _children: [
+            {
+              _name: 'CSidebarNavTitle',
+              _children: ['EMPLOYEE']
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'Accounts',
+              to: '/employee/accounts',
+              icon: 'cil-cursor'
+            },
+            {
+              _name: 'CSidebarNavItem',
+              name: 'History',
+              to: '/employee/history',
+              icon: 'cil-calculator'
+            },
+          ]
+        }
+      ]
+    }
   },
   LOADING_REDIRECT(state, {isLoadingRedirect, time}) {
     if (isLoadingRedirect) {
