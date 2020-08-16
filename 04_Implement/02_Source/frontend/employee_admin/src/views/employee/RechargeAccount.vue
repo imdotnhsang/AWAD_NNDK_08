@@ -4,7 +4,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{title}}</h5>
+                    <h5 class="modal-title" style="padding-top:5px;" id="exampleModalLabel">{{title}}</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -13,17 +13,12 @@
                    <CRow>
                        <CCol lg="12" md="12" sm="12" v-if="step==1">
                             <div>
-                                <label><span>Name:</span><span style="margin-left:72px">{{props.name}}</span></label><br>
+                                <label><span>Name:</span><span style="margin-left:76px">{{props.name}}</span></label><br>
                                 <label><span>Card number:</span><span style="margin-left:25px;">{{props.cardNumber}}</span></label><br>
-                                <label><span>Balance:</span><span style="margin-left:60px;">{{props.balance}}</span></label>
+                                <label><span>Balance:</span><span style="margin-left:63px;">{{props.balance}}</span></label>
                             </div>
-                            <CInput
-                                label="Total amount:"
-                                type="number"
-                                v-model="balance"
-                                placeholder="Enter the amount of money"
-                                style="margin-bottom:5px;margin-top:10px;"
-                            />
+                            <label style="margin-top:10px;">Total amount: </label>
+                            <InputMoney ref="inputMoney"/>
                              <label style="margin-top:5px;">Or select an amount of money below:</label><br>
                             <CRow>
                                 <CCol lg="3" sm="12">
@@ -60,7 +55,8 @@
 export default {
     name: "RechargeAccount",
     components: {
-         Money: () => import("@/views/employee/Money.vue")
+        Money: () => import("@/views/employee/Money.vue"),
+        InputMoney: () => import("@/views/employee/InputMoney.vue")
     },
     methods: {
         hideModal() {
@@ -72,7 +68,8 @@ export default {
             $("#modal-recharge-account").modal('show')
         },
          chooseValue(value) {
-            this.balance = value
+            //this.balance = value
+            this.$refs.inputMoney.setRealValue(value)
             if (value == 500000) {
                 this.isChosen500k = true
                 this.isChosen1000k =  false
@@ -98,6 +95,7 @@ export default {
         async doNextStep() {
             if (this.step == 1) {
                 // this.step ++
+                this.balance = this.$refs.inputMoney.getRealValue()
                  this.$store.commit("LOADING_REDIRECT",{
                     isLoadingRedirect: true,
                     time: 0

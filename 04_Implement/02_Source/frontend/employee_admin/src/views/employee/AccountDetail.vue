@@ -4,7 +4,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Account Detail</h5>
+                    <h5 class="modal-title" style="padding-top:5px;" id="exampleModalLabel">Account Detail</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
@@ -13,12 +13,12 @@
                    <CRow>
                        <CCol lg="12" md="12" sm="12">
                             <div>
-                                <label><span style="font-weight:bold;">Name:</span><span style="margin-left:72px">{{props.name}}</span></label><br>
-                                <label><span style="font-weight:bold;">Email:</span><span style="margin-left:76px;">{{props.email}}</span></label><br>
-                                <label><span style="font-weight:bold;">Phone:</span><span style="margin-left:70px;">{{props.phone}}</span></label><br>
+                                <label><span style="font-weight:bold;">Name:</span><span style="margin-left:79px">{{props.name}}</span></label><br>
+                                <label><span style="font-weight:bold;">Email:</span><span style="margin-left:81px;">{{props.email}}</span></label><br>
+                                <label><span style="font-weight:bold;">Phone:</span><span style="margin-left:75px;">{{props.phone}}</span></label><br>
                                 <label><span style="font-weight:bold;">Card number:</span><span style="margin-left:26px">{{props.cardNumber}}</span></label><br>
-                                <label><span style="font-weight:bold;">Balance:</span><span style="margin-left:62px;">{{props.balance}}</span></label><br>
-                                <label><span style="font-weight:bold;">Created at:</span><span style="margin-left:44px;">{{props.createdAt}}</span></label>
+                                <label><span style="font-weight:bold;">Balance:</span><span style="margin-left:64px;">{{props.balance}}</span></label><br>
+                                <label><span style="font-weight:bold;">Created at:</span><span style="margin-left:46px;">{{props.createdAt}}</span></label>
                             </div>
                        </CCol>
                    </CRow>

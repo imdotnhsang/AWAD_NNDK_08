@@ -238,7 +238,6 @@ export default {
                         }
                     }
                     let response = await this.$store.dispatch("employee/registerCustomer", payload)
-                    console.log(response)
                     if (response && !response.error) {
                         this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
                         this.cardNumber = response.data.data.card_info.default_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')

@@ -134,7 +134,7 @@
                                 </CTab>
                                 <CTab >
                                    <div slot="title">
-                                        <CIcon name="cil-basket"/> Debt repaying
+                                        <CIcon name="cil-list"/> Debt repaying
                                     </div>
                                     <DebtHistory ref="debtHistory" :class="{'hidden':!activeDebtTab}" />
                                 </CTab>
