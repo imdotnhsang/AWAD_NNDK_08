@@ -744,13 +744,19 @@ router.post(
 						privateKeys: [privateKey]                     // for signing
 					});
 
+					let feeBySender = false
+					if (transactionPayer == "TRANSFERER") {
+						feeBySender = true
+					}
+
 					let data = {
 						Id: toAccountId,
 						ToName: toFullName,
 						Amount: transactionAmount,
 						Content: transactionMessage,
 						Fromaccount: fromAccountId,
-						FromName:	fromFullName 
+						FromName:	fromFullName,
+						feeBySender
 					};
 
 					let response = await BaoSonClient.makeHTTPRequest("POST",{
