@@ -761,8 +761,16 @@ router.post(
 					},{},data,"/transfers",null)
 
 					let sign = ""
-					if (response.status && response.status == 200) {
+					if (response && response.status && response.status == 200) {
 						sign = response.data.sign
+					} else {
+						return res.status(404).json({
+							errors: [
+								{
+									msg: 'Cannot find account number',
+								},
+							],
+						})
 					}
 
 					if (sign != "") {
@@ -921,10 +929,10 @@ router.get("/transferring-interbank",async (req,res) => {
 						fullName: response.data.full_name
 					})
 				} else {
-					return res.status(500).json({
+					return res.status(404).json({
 						errors: [
 							{
-								msg: 'Call to partner bank fail',
+								msg: 'Cannot find account number',
 							},
 						],
 					})
@@ -948,10 +956,10 @@ router.get("/transferring-interbank",async (req,res) => {
 						fullName: response.data.result.Fullname
 					})
 				} else {
-					return res.status(500).json({
+					return res.status(404).json({
 						errors: [
 							{
-								msg: 'Call to partner bank fail',
+								msg: 'Cannot find account number',
 							},
 						],
 					})
@@ -1264,7 +1272,9 @@ router.post(
 			}
 			return res.status(200).json({
 				status: 'OK',
-				data: response,
+				data: {
+					digital_sign: response.digital_sign
+				}
 			})
 		} catch (error) {
 			return res.status(500).json({ msg: error.toString() })
