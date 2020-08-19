@@ -127,7 +127,7 @@
                 </CCard>
             </CCol>
         </CRow>
-        <CreateStaff ref="modalCreateStaff" />
+        <CreateStaff ref="modalCreateStaff" @reloadAfterCreate="loadData" />
         <ResetPassword ref="resetPassword"/>
         <UpdateStaff ref="updateStaff" @reloadDataAfterUpdateInfo="loadData"/>
     </div>

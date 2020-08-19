@@ -8,14 +8,17 @@
 
                         </th>
                         <th>
-                            Lender/Borrower
+                            Sender
+                        </th>
+                        <th>
+                            Receiver
                         </th>
                         <th>
                             Amount
                         </th>
-                        <th>
+                        <!-- <th>
                             Type
-                        </th>
+                        </th> -->
                         <th>
                             Status
                         </th>
@@ -29,19 +32,23 @@
                         <td width="5%">{{start + index}}</td> 
                         <td>
                             <span>{{value.from_fullname}}</span><br>
-                            <span>{{value.from_account_id}}</span>
+                            <span>{{value.from_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span>
+                        </td>
+                        <td>
+                            <span>{{value.to_fullname}}</span><br>
+                            <span>{{value.to_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span>
                         </td>
                         <td>
                            {{value.transaction_amount}}
                         </td>
-                        <td>
+                        <!-- <td>
                             <div v-if="value.transaction_type == 'REPAYMENT'">
                                 <h5><CBadge color="success">REPAYMENT</CBadge></h5>
                             </div>
                             <div v-else>
                                  <h5><CBadge color="danger">{{value.transaction_type}}</CBadge></h5>
                             </div>
-                        </td>
+                        </td> -->
                         <td>
                            <div v-if="value.transaction_status == 'SUCCESS'">
                                 <h5><CBadge color="success">SUCCESS</CBadge></h5>

@@ -32,17 +32,23 @@
                                 placeholder="Enter the sign-in email"
                                 v-model="email"
                                 style="margin-bottom:10px;"
+                                  invalid-feedback="Please enter a valid email"
+                                autocomplete="email"
+                                required
+                                was-validated
                             />
                             <CInput
                                 label="Fullname"
                                 placeholder="Enter full name"
                                 v-model="fullName"
+                                 required
                                 style="margin-bottom:10px;"
                             />
                             <CInput
                                 label="Phone number"
                                 placeholder="Enter phone number"
                                 v-model="phoneNumber"
+                                 required
                                 style="margin-bottom:10px;"
                             />
                            <CRow style="margin-bottom: 5px;">
@@ -72,14 +78,14 @@
                                         <label style="margin-top:5px;margin-bottom:5px;">Sign-in information</label>
                                         <div style="background-color:#ddd;height:73px;padding:10px;">
                                             <label><span>Username:</span><span style="margin-left:73px;">{{username}}</span></label><br>
-                                            <label><span>Password:</span><span style="margin-left:76px;">{{password}}</span></label>
+                                            <label><span>Password:</span><span style="margin-left:78px;">{{password}}</span></label>
                                         </div>
                                         <label style="margin-top:15px;margin-bottom:5px;">Personal information</label>
-                                        <div style="background-color:#ddd;height:130px;padding:10px;">
+                                        <div style="background-color:#ddd;height:140px;padding:10px;">
                                             <label><span>Fullname:</span><span style="margin-left:80px;">{{fullName}}</span></label><br>
-                                            <label><span>Phone number:</span><span style="margin-left:44px;">{{phoneNumber}}</span></label><br>
-                                            <label><span>Email:</span><span style="margin-left:102px">{{email}}</span></label><br>
-                                            <label><span>Position:</span><span style="margin-left:85px">{{currentType}}</span></label>
+                                            <label><span>Phone number:</span><span style="margin-left:39px;">{{phoneNumber}}</span></label><br>
+                                            <label><span>Email:</span><span style="margin-left:106px">{{email}}</span></label><br>
+                                            <label><span>Position:</span><span style="margin-left:89px">{{currentType}}</span></label>
                                         </div>
                                     </CCol>
                                 </CRow>
@@ -97,6 +103,7 @@
     </div>
 </template>
 <script>
+import {validateEmail,isVietnamesePhoneNumber} from "@/utils/check.js"
 export default {
     name: "CreateStaff",
     data: function() {
@@ -118,6 +125,22 @@ export default {
             $("#modal-create-staff").modal('show')
         },
         async createStaff() {
+
+            if (this.fullName == "") {
+                alert("Please enter fullname")
+                return
+            }
+
+            if (this.email == "") {
+                alert("Please enter email")
+                return
+            }
+
+            if (this.phoneNumber == "") {
+                alert("Please enter phone number")
+                return
+            }
+
             let payload = {
                 data: {
                     fullName: this.fullName,
@@ -130,7 +153,7 @@ export default {
             let response = await this.$store.dispatch("admin/createStaff", payload)
             if (response && !response.error) {
                 this.step++
-                let data=  response.data.data
+                let data=  response.data.data.login_info
                 this.username = data.username
                 this.password = data.password
             } else {
@@ -140,6 +163,7 @@ export default {
         hideModal() {
             $("#modal-create-staff").modal('hide')
             this.step = 1
+            this.$emit('reloadAfterCreate');
         },
         onChangeType(value,e) {
             if (value == 'Employee') {

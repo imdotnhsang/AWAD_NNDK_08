@@ -110,7 +110,7 @@ export default {
         alert("Login fail!!!")
       }
 
-      this.responseCaptcha = ""
+     
 
     },
     onVerify(response) {

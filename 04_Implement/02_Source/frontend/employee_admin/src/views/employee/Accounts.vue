@@ -50,7 +50,7 @@
                                         <td width="5%">{{start + index}}</td>
                                         <td>
                                             <span>{{value.full_name}}</span><br>
-                                            <span>{{value.default_account_id}}</span>
+                                            <span>{{value.default_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span>
                                         </td>
                                         <td>
                                             {{value.phone_number}}

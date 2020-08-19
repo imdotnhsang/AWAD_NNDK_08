@@ -82,13 +82,17 @@
                                         </td>
                                         <td>
                                             <span>{{value.from_fullname}}</span><br>
-                                            <span>{{value.from_account_id}}</span><br>
+                                            <span v-if="value.from_bank_id=='EIGHT.Bank'">{{value.from_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br></span>
+                                            <span v-else>
+                                               {{value.from_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br>
+                                            </span>
                                             <span>{{value.from_bank_id}}</span>
                                         </td> 
                                         <td>
                                             <span>{{value.to_fullname}}</span><br>
-                                            <span>{{value.to_account_id}}</span><br>
-                                             <span>{{value.to_bank_id}}</span>
+                                            <span v-if="value.to_bank_id=='EIGHT.Bank'">{{value.to_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br></span>
+                                            <span v-else>{{value.to_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br></span>
+                                            <span>{{value.to_bank_id}}</span>
                                         </td>
                                         <td>
                                            <div v-if="value.transaction_type == 'RECEIVE'">
