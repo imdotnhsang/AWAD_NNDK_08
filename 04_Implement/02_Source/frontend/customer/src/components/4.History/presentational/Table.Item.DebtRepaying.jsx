@@ -67,7 +67,7 @@ const TableItem = ({
 			<StyledCol md={3}>
 				<Text>
 					{/* <sup style={{ fontSize: '11px', paddingRight: '2px' }}>₫</sup> */}
-					- {commaSeparating(amount, 3)}
+					{type === DebtType.LOAN ? '-' : '+'} {commaSeparating(amount, 3)}
 				</Text>
 			</StyledCol>
 			{/* <StyledCol md={2}>

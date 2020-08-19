@@ -27,7 +27,7 @@ const TableHeader = ({
   <Wrapper>
     <Row>
       <Col md={1} />
-      <Col md={3}><Text>Borrower</Text></Col>
+      <Col md={3}><Text>Lender/ Borrower</Text></Col>
       <Col md={3}><Text>Amount</Text></Col>
       {/* <Col md={2}>
         <TypeFilter
