@@ -253,16 +253,34 @@ export default {
         },
         async getData() {
             this.index = 1
-            let fromDateIndex =  Math.round((new Date()) / 1)
+            let now = new Date();
+            now.setHours(0,0,0,0);
+            now.setUTCHours(0,0,0,0);
+            let fromDateIndex =  Math.round(now / 1)
+            let tmp = fromDateIndex
 
             if (this.fromDate != "") {
                 fromDateIndex =  Math.round((new Date(this.fromDate + " 00:00:00")) / 1)
             }
 
-            let toDateIndex =  Math.round((new Date())/ 1)
+            let end = new Date();
+            end.setHours(23,59,59,999)
+            end.setUTCHours(23,59,59,999)
+            let toDateIndex =  Math.round(end/ 1)
             if (this.toDate != "") {
                 toDateIndex = Math.round((new Date(this.toDate + " 23:59:59")) / 1)
             }
+             if (fromDateIndex > tmp && this.fromDate != "") {
+                alert("start date must be less than current date")
+                return
+            }
+
+            if (toDateIndex < fromDateIndex && this.fromDate != "") {
+                alert("Start date must be less than or equal to end date")
+                return
+            }
+
+           
 
             let q = {
                 $or: [

@@ -253,6 +253,7 @@ export default {
                 await this.searchEmployee(e)
             } else if (this.emailOrName == "" && this.backUpSearchData != "") {
                 this.index = 1
+                setUrlDefault(this.index, this.limit)
                 await this.loadData()
             }
             this.backUpSearchData = this.emailOrName

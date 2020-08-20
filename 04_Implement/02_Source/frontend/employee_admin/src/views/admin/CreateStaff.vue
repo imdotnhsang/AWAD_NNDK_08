@@ -36,6 +36,7 @@
                                 autocomplete="email"
                                 required
                                 was-validated
+                                type="email"
                             />
                             <CInput
                                 label="Fullname"
@@ -138,6 +139,10 @@ export default {
 
             if (this.phoneNumber == "") {
                 alert("Please enter phone number")
+                return
+            }
+
+            if (!validateEmail(this.email)) {
                 return
             }
 

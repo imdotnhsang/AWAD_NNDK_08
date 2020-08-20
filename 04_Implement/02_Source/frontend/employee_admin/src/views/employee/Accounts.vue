@@ -280,6 +280,7 @@ export default {
                 await this.searchCustomer(e)
             } else if (this.emailOrCardNumber == "" && this.backUpSearchData != "") {
                 this.index = 1
+                setUrlDefault(this.index, this.limit)
                 await this.loadData()
             }
             this.backUpSearchData = this.emailOrCardNumber

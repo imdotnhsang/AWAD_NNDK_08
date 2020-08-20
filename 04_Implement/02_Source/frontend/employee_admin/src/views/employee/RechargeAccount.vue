@@ -96,6 +96,11 @@ export default {
             if (this.step == 1) {
                 // this.step ++
                 this.balance = this.$refs.inputMoney.getRealValue()
+
+                if (this.balance < 50000) {
+                    return;
+                }
+
                  this.$store.commit("LOADING_REDIRECT",{
                     isLoadingRedirect: true,
                     time: 0
