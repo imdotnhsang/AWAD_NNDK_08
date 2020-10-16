@@ -14,7 +14,7 @@
                        <CCol lg="12" md="12" sm="12" v-if="step==1">
                             <div>
                                 <label><span>Name:</span><span style="margin-left:76px">{{props.name}}</span></label><br>
-                                <label><span>Card number:</span><span style="margin-left:25px;">{{props.cardNumber}}</span></label><br>
+                                <label><span>Card number:</span><span style="margin-left:25px;" v-if="props.cardNumber">{{props.cardNumber.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span></label><br>
                                 <label><span>Balance:</span><span style="margin-left:63px;">{{props.balance}}</span></label>
                             </div>
                             <label style="margin-top:10px;">Total amount: </label>
@@ -96,6 +96,11 @@ export default {
             if (this.step == 1) {
                 // this.step ++
                 this.balance = this.$refs.inputMoney.getRealValue()
+
+                if (this.balance < 50000) {
+                    return;
+                }
+
                  this.$store.commit("LOADING_REDIRECT",{
                     isLoadingRedirect: true,
                     time: 0

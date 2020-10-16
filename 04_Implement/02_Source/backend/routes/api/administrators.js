@@ -14,7 +14,9 @@ const { MakeResponse, APIStatus } = require('../../utils/APIStatus.js')
 const { GetQuery } = require('../../utils/GetQuery.js')
 const DBModel = require('../../utils/DBModel.js')
 const StaffAction = require('../../action/staff')
-const { count } = require('../../models/Transaction')
+const { count, baseModelName } = require('../../models/Transaction')
+
+var ObjectId = require('mongoose').Types.ObjectId
 
 const DBModelInstance = new DBModel()
 // @route     GET /administrators/all-staffs
@@ -29,6 +31,21 @@ router.get('/all-staffs', [auth, administrator], async (req, res) => {
 		const getTotal = GetQuery('getTotal', req)
 		const search = GetQuery('search',req)
 
+
+		let resultFindCurrent = await StaffAction.getStaff({
+			_id: new ObjectId(req.user.id)
+		},null,0,1,false,false)
+
+		let email = ""
+
+		if (resultFindCurrent.status == APIStatus.Ok) {
+			email = resultFindCurrent.data[0].email
+		} else {
+			return MakeResponse(req, res, resultFindCurrent)
+		}
+
+		
+
 		let result = []
 		if (search && search != '') {
 			result = await StaffAction.getStaff(
@@ -37,7 +54,10 @@ router.get('/all-staffs', [auth, administrator], async (req, res) => {
 						{email:new RegExp(search, "i")},
 						{full_name: new RegExp(search, "i")},
 						{phone_number: new RegExp(search, "i")}
-					]
+					],
+					email: {
+						$ne: email
+					}
 				},
 				null,
 				offset,
@@ -47,7 +67,11 @@ router.get('/all-staffs', [auth, administrator], async (req, res) => {
 			)
 		} else {
 			result = await StaffAction.getStaff(
-				{},
+				{
+					email: {
+						$ne: email
+					}
+				},
 				null,
 				offset,
 				limit,

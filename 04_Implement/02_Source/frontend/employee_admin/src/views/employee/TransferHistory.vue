@@ -29,7 +29,8 @@
                         <td width="5%">{{start + index}}</td>
                         <td>
                             <span>{{value.to_fullname}}</span><br>
-                            <span>{{value.to_account_id}}</span>
+                            <span v-if="value.to_bank_id == 'EIGHT.Bank'">{{value.to_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span>
+                            <span v-else>{{value.to_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span>
                         </td>
                         <td>
                            {{value.transaction_amount}}

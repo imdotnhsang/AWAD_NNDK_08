@@ -82,13 +82,17 @@
                                         </td>
                                         <td>
                                             <span>{{value.from_fullname}}</span><br>
-                                            <span>{{value.from_account_id}}</span><br>
+                                            <span v-if="value.from_bank_id=='EIGHT.Bank'">{{value.from_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br></span>
+                                            <span v-else>
+                                               {{value.from_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br>
+                                            </span>
                                             <span>{{value.from_bank_id}}</span>
                                         </td> 
                                         <td>
                                             <span>{{value.to_fullname}}</span><br>
-                                            <span>{{value.to_account_id}}</span><br>
-                                             <span>{{value.to_bank_id}}</span>
+                                            <span v-if="value.to_bank_id=='EIGHT.Bank'">{{value.to_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br></span>
+                                            <span v-else>{{value.to_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}<br></span>
+                                            <span>{{value.to_bank_id}}</span>
                                         </td>
                                         <td>
                                            <div v-if="value.transaction_type == 'RECEIVE'">
@@ -249,16 +253,34 @@ export default {
         },
         async getData() {
             this.index = 1
-            let fromDateIndex =  Math.round((new Date()) / 1)
+            let now = new Date();
+            now.setHours(0,0,0,0);
+            now.setUTCHours(0,0,0,0);
+            let fromDateIndex =  Math.round(now / 1)
+            let tmp = fromDateIndex
 
             if (this.fromDate != "") {
                 fromDateIndex =  Math.round((new Date(this.fromDate + " 00:00:00")) / 1)
             }
 
-            let toDateIndex =  Math.round((new Date())/ 1)
+            let end = new Date();
+            end.setHours(23,59,59,999)
+            end.setUTCHours(23,59,59,999)
+            let toDateIndex =  Math.round(end/ 1)
             if (this.toDate != "") {
                 toDateIndex = Math.round((new Date(this.toDate + " 23:59:59")) / 1)
             }
+             if (fromDateIndex > tmp && this.fromDate != "") {
+                alert("start date must be less than current date")
+                return
+            }
+
+            if (toDateIndex < fromDateIndex && this.fromDate != "") {
+                alert("Start date must be less than or equal to end date")
+                return
+            }
+
+           
 
             let q = {
                 $or: [

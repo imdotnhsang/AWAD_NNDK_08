@@ -16,7 +16,7 @@
                                 <label><span style="font-weight:bold;">Name:</span><span style="margin-left:79px">{{props.name}}</span></label><br>
                                 <label><span style="font-weight:bold;">Email:</span><span style="margin-left:81px;">{{props.email}}</span></label><br>
                                 <label><span style="font-weight:bold;">Phone:</span><span style="margin-left:75px;">{{props.phone}}</span></label><br>
-                                <label><span style="font-weight:bold;">Card number:</span><span style="margin-left:26px">{{props.cardNumber}}</span></label><br>
+                                <label><span style="font-weight:bold;">Card number:</span><span style="margin-left:26px" v-if="props.cardNumber">{{props.cardNumber.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span></label><br>
                                 <label><span style="font-weight:bold;">Balance:</span><span style="margin-left:64px;">{{props.balance}}</span></label><br>
                                 <label><span style="font-weight:bold;">Created at:</span><span style="margin-left:46px;">{{props.createdAt}}</span></label>
                             </div>

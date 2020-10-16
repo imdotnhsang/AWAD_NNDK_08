@@ -240,7 +240,7 @@ export default {
                     let response = await this.$store.dispatch("employee/registerCustomer", payload)
                     if (response && !response.error) {
                         this.createdAt = getDateFromTimeStamp(response.data.data.personal_info.created_at)
-                        this.cardNumber = response.data.data.card_info.default_account_id.replace(/^(\d{4})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')
+                        this.cardNumber = response.data.data.card_info.default_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')
                         this.password = response.data.data.login_info.password
                         this.title = "Success!"
                         this.formatedBalance = formatMoney(this.balance)

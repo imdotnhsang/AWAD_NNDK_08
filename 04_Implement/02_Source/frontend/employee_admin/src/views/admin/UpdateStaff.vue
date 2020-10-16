@@ -15,11 +15,19 @@
                                 label="Email"
                                 v-model="email"
                                 style="margin-bottom:10px;"
+                                type="email"
+                                required
+                                was-validated
+                                invalid-feedback="Please enter a valid email"
+                                autocomplete="email"
                             />
                             <CInput
                                 label="Full name"
                                 v-model="fullName"
                                 style="margin-bottom:10px;"
+                                required
+                                was-validated
+                                type="text"
                             />
                             <CInput
                                 label="Phone number"
@@ -55,6 +63,7 @@
     </div>
 </template>
 <script>
+import {validateEmail,isVietnamesePhoneNumber} from "@/utils/check.js"
 export default {
     name: "UpdateStaff",
     data: function() {
@@ -89,6 +98,15 @@ export default {
             $("#modal-update-info").modal('show')
         },
         async doAction() {
+
+            if (!validateEmail(this.email)) {
+                return
+            }
+
+            if (this.fullName == "") {
+                return
+            }
+
             let payload = {
                 data: {
                     username: this.username
@@ -114,7 +132,12 @@ export default {
                     this.step++
                     return
                 } else {
-                    alert("Something went wrong :)")
+                    if (response && response.error && response.error.response && response.error.response.data && response.error.response.data.errors && response.error.response.data.errors[0]) {
+                        alert(response.error.response.data.errors[0].msg);
+                    } else {
+                        alert("Something went wrong")
+                    }
+                    return
                 }
             }
             this.step++

@@ -48,7 +48,7 @@
                                             <td width="5%">{{start + index}}</td>
                                             <td>
                                                 <span>{{value.full_name}}</span><br>
-                                                <span>{{value.default_account_id}}</span>
+                                                <span>{{value.default_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}}</span>
                                             </td>
                                             <td>
                                                 {{value.phone_number}}
@@ -118,7 +118,7 @@
                         </div>
                         <div :class="{'hidden': !isClickedOnRow}">
                             <div style="margin-bottom:20px;">
-                                <span v-if="currentAccount"><b>Account:</b> {{currentAccount.full_name}} / {{currentAccount.default_account_id}} / {{currentAccount.email}}</span>
+                                <span v-if="currentAccount"><b>Account:</b> {{currentAccount.full_name}} / {{currentAccount.default_account_id.replace(/^(\d{2})?(\d{4})?(\d{4})?(\d{4})?/g, '$1 $2 $3 $4')}} / {{currentAccount.email}}</span>
                             </div>
                             <CTabs add-tab-classes="mt-1" :active-tab.sync="activeTab" @update:activeTab="clickTab">
                                 <CTab>
@@ -327,6 +327,7 @@ export default {
                 await this.searchCustomer(e)
             } else if (this.emailOrCardNumber == "" && this.backUpSearchData != "") {
                 this.index = 1
+                setUrlDefault(this.index, this.limit)
                 await this.loadData()
             }
             this.backUpSearchData = this.emailOrCardNumber
