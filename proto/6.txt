@@ -1,2 +1,2 @@
 Add test 6
-Master change proto
+Master change proto draft
