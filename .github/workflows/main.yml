@@ -25,7 +25,11 @@ jobs:
     - name: Master branch
       run: echo "FROM=master" >> $GITHUB_ENV
     - name: Check diff
-      run: echo "IS_DIFF=$(git diff 'refs/heads/master...refs/heads/${{ env.TO }}' proto)" >> $GITHUB_ENV
+      #run: echo "IS_DIFF=$(git diff 'refs/heads/master...refs/heads/${{ env.TO }}' proto)" >> $GITHUB_ENV
+      run: |
+        git remote add get-diff-action
+        git fetch --no-tags --no-recurse-submodules '--depth=10000' get-diff-action 'refs/heads/${{ env.TO }}:refs/remotes/get-diff-action/${{ env.TO }}' 'refs/heads/master:refs/remotes/get-diff-action/master'
+        git diff 'get-diff-action/master...get-diff-action/${{ env.TO }}' '--diff-filter=AMRC' --name-only
     - uses: technote-space/get-diff-action@v4.0.1
     - name: Branch name
       run: echo running on branch ${{ env.TO }}
