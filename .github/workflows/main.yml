@@ -22,8 +22,8 @@ jobs:
       shell: bash
       run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
     - name: Check diff
-      run: echo "IS_DIFF=$(git diff 'origin/master...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
       if: ${{ env.TO }} != 'master' 
+      run: echo "IS_DIFF=$(git diff 'origin/master...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
