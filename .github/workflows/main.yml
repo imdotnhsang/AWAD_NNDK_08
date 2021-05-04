@@ -18,6 +18,8 @@ jobs:
         DOT: '...'
         FROM: master
         TO: ${GITHUB_REF##*/}
+    - name: Branch name
+      run: echo running on branch ${GITHUB_REF##*/}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
