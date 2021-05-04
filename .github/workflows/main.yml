@@ -15,6 +15,7 @@ jobs:
     - uses: technote-space/get-diff-action@v4
       with:
         PATTERNS: proto/**
+        DOT: '...'
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
