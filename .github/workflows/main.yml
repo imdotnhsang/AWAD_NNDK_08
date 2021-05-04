@@ -3,8 +3,8 @@ name: Github Actions Example
 on:
   pull_request:
   push:
-    paths:
-      - "proto/**"
+    # paths:
+    #   - "proto/**"
 jobs:
   test:
     name: Running Units Tests
@@ -13,8 +13,6 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Get all branch
-      run: echo $(git branch -r)
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
       shell: bash
@@ -23,15 +21,14 @@ jobs:
       if: github.event_name == 'pull_request'
       shell: bash
       run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
-    - name: Master branch
-      run: echo "FROM=master" >> $GITHUB_ENV
     - name: Check diff
       run: echo "IS_DIFF=$(git diff 'origin/master...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
+      if: ${{env.TO}} != master 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-      if: env.IS_DIFF
+      if: env.IS_DIFF || (!env.IS_DIFF && ${{ env.TO}} == master)
     - name: Install
       run: npm install
-      if: env.IS_DIFF
+      if: env.IS_DIFF || (!env.IS_DIFF && ${{ env.TO}} == master)
