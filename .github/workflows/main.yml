@@ -23,14 +23,14 @@ jobs:
       run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
     - name: Check diff
       if: ${{ github.ref != 'refs/heads/master' }}
-      run: echo "IS_DIFF=$(git diff 'origin/master...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
+      run: git diff 'origin/master...origin/${{ env.TO }}' proto
     - name: Show diff value
-      run: echo diff values is ${{ env.IS_DIFF }}
+      run: echo diff values is ${{ env.GIT_DIFF }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-      if: (env.IS_DIFF && env.IS_DIFF != "") || (!env.IS_DIFF && ${{ env.TO }} == 'master')
+      if: (env.GIT_DIFF && env.GIT_DIFF != "") || (!env.GIT_DIFF && ${{ env.TO }} == 'master')
     - name: Install
       run: npm install
-      if: (env.IS_DIFF && env.IS_DIFF != "") || (!env.IS_DIFF && ${{ env.TO }} == 'master')
+      if: (env.GIT_DIFF && env.GIT_DIFF != "") || (!env.GIT_DIFF && ${{ env.TO }} == 'master')
