@@ -3,13 +3,12 @@ name: Github Actions Example
 on:
   pull_request:
   push:
-    # paths:
-    #   - "proto/**"
+    paths:
+      - "proto/**"
 jobs:
   test:
     name: Running Units Tests
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
       with:
@@ -28,17 +27,11 @@ jobs:
       run: echo "FROM=master" >> $GITHUB_ENV
     - name: Check diff
       run: echo "IS_DIFF=$(git diff 'origin/master...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
-    - uses: technote-space/get-diff-action@v4.0.1
-    - name: Branch name
-      run: echo running on branch ${{ env.TO }}
-    - name: Is diff?
-      shell: bash
-      run: echo is diff value ${{ env.IS_DIFF }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-      if: env.GIT_DIFF
+      if: env.IS_DIFF
     - name: Install
       run: npm install
-      if: env.GIT_DIFF
+      if: env.IS_DIFF
