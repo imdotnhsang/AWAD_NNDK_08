@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Get all branch
+      run: echo $(git branch -r)
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
       shell: bash
