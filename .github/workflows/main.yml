@@ -30,7 +30,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-      if: (env.GIT_DIFF && env.GIT_DIFF != "") || (!env.GIT_DIFF && ${{ env.TO }} == 'master')
+      if: (env.IS_DIFF && env.IS_DIFF != "") || (!env.IS_DIFF && ${{ env.TO }} == 'master')
     - name: Install
       run: npm install
-      if: (env.GIT_DIFF && env.GIT_DIFF != "") || (!env.GIT_DIFF && ${{ env.TO }} == 'master')
+      if: (env.IS_DIFF && env.IS_DIFF != "") || (!env.IS_DIFF && ${{ env.TO }} == 'master')
