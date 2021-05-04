@@ -14,13 +14,13 @@ jobs:
       with:
         fetch-depth: 0
     - name: Get branch name (merge)
-      if: github.event_name != 'pull_request'
+      #if: github.event_name != 'pull_request'
       shell: bash
       run: echo "TO=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-    - name: Get branch name (pull request)
-      if: github.event_name == 'pull_request'
-      shell: bash
-      run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
+    # - name: Get branch name (pull request)
+    #   if: github.event_name == 'pull_request'
+    #   shell: bash
+    #   run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
     - name: Check diff
       if: env.TO != 'master'
       run: echo "IS_DIFF="$(git diff 'origin/master...origin/${{ env.TO }}' proto)"" >> $GITHUB_ENV
