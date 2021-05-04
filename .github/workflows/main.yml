@@ -23,9 +23,6 @@ jobs:
     - name: Master branch
       run: echo "FROM=master" >> $GITHUB_ENV
     - uses: technote-space/get-diff-action@v4
-      with:
-        PATTERNS: proto/**
-        DOT: '...'
     - name: Branch name
       run: echo running on branch ${{ env.TO }}
     - name: Use Node.js ${{ matrix.node-version }}
