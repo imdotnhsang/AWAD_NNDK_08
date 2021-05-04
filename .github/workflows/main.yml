@@ -3,8 +3,8 @@ name: Github Actions Example
 on:
   pull_request:
   push:
-    paths:
-      - "proto/**"
+    # paths:
+    #   - "proto/**"
 jobs:
   test:
     name: Running Units Tests
@@ -27,6 +27,8 @@ jobs:
     - uses: technote-space/get-diff-action@v4.0.1
     - name: Branch name
       run: echo running on branch ${{ env.TO }}
+    - name: Is diff?
+      run: Is diff value ${{ env.IS_DIFF }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
