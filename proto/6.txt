@@ -1,4 +1,2 @@
 Add test 6
-Something new in test 6
-Modify test 6
-Change test 6 lan 2
+Master change proto
