@@ -24,19 +24,19 @@ jobs:
       run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
     - name: Master branch
       run: echo "FROM=master" >> $GITHUB_ENV
-    - name: Check diff
-      run: echo "IS_DIFF=$(git diff 'origin/${{ env.TO }}...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
+    # - name: Check diff
+    #   run: echo "IS_DIFF=$(git diff 'origin/${{ env.TO }}...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
     - uses: technote-space/get-diff-action@v4.0.1
     - name: Branch name
       run: echo running on branch ${{ env.TO }}
     - name: Is diff?
       shell: bash
-      run: echo is diff value ${{ env.IS_DIFF }}
+      run: echo is diff value ${{ env.GIT_DIFF }}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-      if: env.IS_DIFF
+      if: env.GIT_DIFF
     - name: Install
       run: npm install
-      if: env.IS_DIFF
+      if: env.GIT_DIFF
