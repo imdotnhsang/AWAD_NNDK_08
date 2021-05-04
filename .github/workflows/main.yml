@@ -15,11 +15,11 @@ jobs:
     - name: Get branch name (merge)
       if: github.event_name != 'pull_request'
       shell: bash
-      run: echo "TO=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+      run: echo "TO=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
     - name: Get branch name (pull request)
       if: github.event_name == 'pull_request'
       shell: bash
-      run: echo "TO=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
+      run: echo "TO=$(echo ${GITHUB_HEAD_REF}" >> $GITHUB_ENV
     - name: Master branch
       run: echo "FROM=master" >> $GITHUB_ENV
     - uses: technote-space/get-diff-action@v4
