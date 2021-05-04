@@ -27,8 +27,7 @@ jobs:
     - name: Master branch
       run: echo "FROM=master" >> $GITHUB_ENV
     - name: Check diff
-      run: echo "IS_DIFF=$(git diff 'origin/master...refs/heads/${{ env.TO }}' proto)" >> $GITHUB_ENV
-      #run: echo "IS_DIFF=$(git diff master proto)" >> $GITHUB_ENV
+      run: echo "IS_DIFF=$(git diff 'origin/master...origin/${{ env.TO }}' proto)" >> $GITHUB_ENV
     - uses: technote-space/get-diff-action@v4.0.1
     - name: Branch name
       run: echo running on branch ${{ env.TO }}
