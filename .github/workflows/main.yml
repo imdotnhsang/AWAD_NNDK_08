@@ -3,8 +3,8 @@ name: Github Actions Example
 on:
   pull_request:
   push:
-    # paths:
-    #   - "proto/**"
+    paths:
+      - "proto/**"
 jobs:
   test:
     name: Running Units Tests
