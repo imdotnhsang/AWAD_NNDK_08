@@ -1,1 +1,2 @@
 Add test 6
+Something new in test 6
