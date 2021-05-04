@@ -16,6 +16,8 @@ jobs:
       with:
         PATTERNS: proto/**
         DOT: '...'
+        FROM: master
+        TO: ${GITHUB_REF##*/}
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
